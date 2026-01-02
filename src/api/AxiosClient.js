@@ -7,14 +7,12 @@ const axiosClient = axios.create({
   timeout: 300000,
 });
 
-// Attach Token
 axiosClient.interceptors.request.use((req) => {
   const token = localStorage.getItem("auth_token");
   if (token) req.headers.Authorization = `Bearer ${token}`;
   return req;
 });
 
-// Response Handling
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,7 +30,6 @@ axiosClient.interceptors.response.use(
   }
 );
 
-// Request Helpers
 export const getRequest = (URL, params) => axiosClient.get(`/${URL}`, { params });
 export const postRequest = (URL, payload) => axiosClient.post(`/${URL}`, payload);
 export const patchRequest = (URL, payload) => axiosClient.patch(`/${URL}`, payload);

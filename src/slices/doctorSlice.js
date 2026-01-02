@@ -3,10 +3,11 @@ import doctorService from "../services/doctorService";
 
 export const fetchDoctors = createAsyncThunk(
   "doctor/fetchDoctors",
-  async ({ page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" } = {}, { rejectWithValue }) => {
     try {
       const res = await doctorService.getDoctors({ page, limit, orderBy, order, search });
-      return res;  // { doctors, total, limit, page, totalPages }
+
+      return res;
     } catch (err) {
       return rejectWithValue(err.message || "Failed to load doctors");
     }
@@ -64,16 +65,13 @@ export const deleteDoctor = createAsyncThunk(
 
 const initialState = {
   doctors: [],
-  doctor: null,
   total: 0,
   totalPages: 1,
   page: 1,
   limit: 10,
-
-  orderBy: "createdAt",
-  order: "DESC",
-  search: "",
-
+  selectedDoctor: null,
+  ordering: '-createdAt',
+  search: '',
   loading: false,
   error: null,
   success: false,
@@ -84,6 +82,7 @@ const doctorSlice = createSlice({
   initialState,
   reducers: {
     resetDoctorState: (state) => {
+      state.selectedDoctor = null;
       state.success = false;
       state.error = null;
     }
@@ -109,6 +108,7 @@ const doctorSlice = createSlice({
       .addCase(fetchDoctorById.fulfilled, (state, action) => {
         state.loading = false;
         state.doctor = action.payload;
+        state.selectedDoctor = action.payload
       })
       .addCase(fetchDoctorById.rejected, (state, action) => {
         state.loading = false;

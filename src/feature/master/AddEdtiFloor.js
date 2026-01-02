@@ -48,7 +48,6 @@ const AddEditFloor = () => {
       .finally(() => setLoading(false));
   }, [id, isEdit, dispatch, form]);
 
-  /* ================= SUBMIT ================= */
   const onFinish = async (values) => {
     try {
       setLoading(true);
@@ -148,8 +147,6 @@ const AddEditFloor = () => {
               </Col>
             </Row>
           </Card>
-
-          {/* SUBMIT */}
           <div style={{ textAlign: "right", display:"flex", alignItems: "center", justifyContent: "flex-end", marginTop: 16, marginLeft :16}}>
             <Button
               type="primary"

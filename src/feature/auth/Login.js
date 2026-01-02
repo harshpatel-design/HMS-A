@@ -5,7 +5,7 @@ import RightLogo from "../../images/logo.png";
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../slices/authSlice";   // <-- slice import
+import { loginUser } from "../../slices/authSlice";
 
 function Login() {
 
@@ -18,11 +18,11 @@ function Login() {
 
     if (result.meta.requestStatus === "fulfilled") {
       message.success("Login Successful 🎉");
-      navigate("/dashboard");  // Redirect on success
+      navigate("/dashboard");
     } else {
       const err = result.payload;
       console.log(err);
-      
+
       message.error(err?.message || "Invalid Email or Password");
     }
   };

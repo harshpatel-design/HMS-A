@@ -338,7 +338,7 @@ const LabTest = () => {
         columns={filteredColumns}
         dataSource={labTests}
         loading={loading}
-        onChange={handleTableChange} // ✅ sorting handler
+        onChange={handleTableChange} 
         pagination={{
           current: page,
           pageSize: limit,

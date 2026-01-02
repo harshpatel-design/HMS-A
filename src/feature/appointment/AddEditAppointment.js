@@ -44,19 +44,15 @@ const AddEditAppointment = () => {
     const { appointment, loading } = useSelector((state) => state.appointment);
     const [form] = Form.useForm();
 
-    /* ---------------------------------------------------
-       LOAD APPOINTMENT IN EDIT MODE
-    --------------------------------------------------- */
     useEffect(() => {
         if (isEdit) dispatch(fetchAppointmentById(id));
     }, [id]);
 
     useEffect(() => {
         if (isEdit && appointment) {
-            // Build full name for patient
+
             const fullName = `${appointment.patient.firstName} ${appointment.patient.lastName}`;
 
-            // Insert patient option if missing
             setPatientList(prev => {
                 const exists = prev.some(p => p.value === appointment.patient._id);
                 if (!exists) {
@@ -103,9 +99,6 @@ const AddEditAppointment = () => {
         }
     }, [appointment]);
 
-    /* ---------------------------------------------------
-       FETCH DOCTOR LIST
-    --------------------------------------------------- */
     const fetchDoctorNames = async () => {
         try {
             if (doctorList.length > 0) return;
@@ -121,9 +114,6 @@ const AddEditAppointment = () => {
         }
     };
 
-    /* ---------------------------------------------------
-       FETCH PATIENT LIST
-    --------------------------------------------------- */
     const fetchPatientNames = async () => {
         try {
             const res = await patientService.getPatientNames({ search: "" });
@@ -137,10 +127,6 @@ const AddEditAppointment = () => {
             message.error("Failed to load patients");
         }
     };
-
-    /* ---------------------------------------------------
-       CALCULATE DURATION
-    --------------------------------------------------- */
     const calculateDuration = () => {
         const { startTime, endTime } = form.getFieldsValue();
         if (!startTime || !endTime) return 0;
@@ -149,14 +135,11 @@ const AddEditAppointment = () => {
         return diff > 0 ? diff : 0;
     };
 
-    /* ---------------------------------------------------
-       SUBMIT FORM
-    --------------------------------------------------- */
     const onFinish = async (values) => {
         const payload = {
             patient: values.patient,
             doctor: values.doctor,
-            appointmentDate: values.appointmentDate.format("YYYY-MM-DD"), // FIXED
+            appointmentDate: values.appointmentDate.format("YYYY-MM-DD"),
             startTime: values.startTime.format("HH:mm"),
             endTime: values.endTime.format("HH:mm"),
             duration: calculateDuration(),
@@ -192,7 +175,7 @@ const AddEditAppointment = () => {
 
                 <Form layout="vertical" form={form} onFinish={onFinish}>
                     <Row gutter={16}>
-                        {/* Patient */}
+
                         <Col span={8}>
                             <Form.Item name="patient" label="Patient" rules={[{ required: true }]}>
                                 <Select
@@ -203,8 +186,6 @@ const AddEditAppointment = () => {
                                 />
                             </Form.Item>
                         </Col>
-
-                        {/* Doctor */}
                         <Col span={8}>
                             <Form.Item name="doctor" label="Doctor" rules={[{ required: true }]}>
                                 <Select
@@ -215,8 +196,6 @@ const AddEditAppointment = () => {
                                 />
                             </Form.Item>
                         </Col>
-
-                        {/* Appointment Type */}
                         <Col span={8}>
                             <Form.Item name="type" label="Appointment Type" rules={[{ required: true }]}>
                                 <Select placeholder="Select Type">
@@ -229,7 +208,6 @@ const AddEditAppointment = () => {
                             </Form.Item>
                         </Col>
 
-                        {/* Date */}
                         <Col span={4}>
                             <Form.Item
                                 name="appointmentDate"
@@ -243,15 +221,12 @@ const AddEditAppointment = () => {
                                 />
                             </Form.Item>
                         </Col>
-
-                        {/* Start Time */}
                         <Col span={4}>
                             <Form.Item name="startTime" label="Start Time" rules={[{ required: true }]}>
                                 <TimePicker format="HH:mm" className="w-full" disabledTime={() => ({})} />
                             </Form.Item>
                         </Col>
 
-                        {/* End Time */}
                         <Col span={4}>
                             <Form.Item name="endTime" label="End Time" rules={[{ required: true }]}>
                                 <TimePicker format="HH:mm" className="w-full" disabledTime={() => ({})} />
@@ -276,17 +251,14 @@ const AddEditAppointment = () => {
 
                     </Row>
 
-                    {/* Reason */}
                     <Form.Item name="reason" label="Reason">
                         <Input placeholder="Reason for appointment" />
                     </Form.Item>
 
-                    {/* Notes */}
                     <Form.Item name="notes" label="Notes">
                         <TextArea rows={3} />
                     </Form.Item>
 
-                    {/* Submit */}
                     <div style={{ textAlign: "right" }}>
                         <Space>
                             <Button onClick={() => navigate("/appointments")} style={{ borderRadius: 8, padding: "6px 14px", height: 32 }}>Cancel</Button>

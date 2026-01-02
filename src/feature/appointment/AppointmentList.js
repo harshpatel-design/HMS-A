@@ -27,8 +27,6 @@ const AppointmentList = () => {
     const [ordering, setOrdering] = useState("-appointmentDate");
     const [dateRange, setDateRange] = useState(null);
 
-
-    // 🔥 Default Visible Columns
     const defaultChecked = [
         "date",
         "time",
@@ -83,7 +81,6 @@ const AppointmentList = () => {
                 try {
                     await dispatch(deleteAppointment(record._id)).unwrap();
                     message.success("Appointment cancelled successfully!");
-                    // refresh table
                     dispatch(fetchAppointments());
                 } catch (err) {
                     message.error(err || "Failed to cancel appointment");
@@ -118,22 +115,18 @@ const AppointmentList = () => {
         );
     };
 
-
-    // Status colors
     const statusColors = {
         scheduled: "blue",
         completed: "green",
         cancelled: "red",
         "no-show": "orange",
     };
-
-    // 🔥 MASTER COLUMN LIST (All columns)
     const allColumns = [
         {
             key: "patientName",
             title: "Patient",
             fixed: "left",
-            width: 150,   // FIX WIDTH
+            width: 150,
             render: (r) => {
 
                 const name = `${r.patient?.firstName || ""} ${r.patient?.lastName || ""}`;
@@ -170,7 +163,7 @@ const AppointmentList = () => {
         {
             key: "doctorId",
             title: "Dr. Name",
-            width: 150,   // FIX WIDTH
+            width: 150,
             render: (r) => {
                 const docName = r.doctor?.name || "N/A";
                 return (
@@ -240,13 +233,9 @@ const AppointmentList = () => {
             title: "Actions",
             render: (record) => (
                 <Space size="middle">
-
-                    {/* Edit */}
                     <Link to={`/edit-appointment/${record._id}`}>
                         <Button type="text" icon={<EditOutlined />} />
                     </Link>
-
-                    {/* Cancel */}
                     <Button
                         type="text"
                         danger
@@ -258,7 +247,6 @@ const AppointmentList = () => {
         }
     ];
 
-    // 🔥 Filter which columns are visible
     const filteredColumns = allColumns.filter((col) =>
         selectedColumns.includes(col.key) || col.key === "actions"
     );
@@ -318,7 +306,6 @@ const AppointmentList = () => {
 
     return (
         <>
-            {/* Top Bar */}
             <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Breadcrumbs
                     title="Appointments List"

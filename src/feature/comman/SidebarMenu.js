@@ -6,7 +6,7 @@ import {
     AppstoreOutlined
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import "../../hcss.css";  // if sidebar styles exist here
+import "../../hcss.css";
 
 export default function SidebarMenu({ collapsed }) {
 
@@ -37,7 +37,7 @@ export default function SidebarMenu({ collapsed }) {
             label: "Charge Master",
             children: [
                 { label: "Charge" , key: "/charge-master" },
-                
+
             ]
         },
         {
@@ -76,8 +76,6 @@ export default function SidebarMenu({ collapsed }) {
                 { key: "/add-appointment", label: "New Appointment" }
             ]
         },
-
-        /* 🔥 NEW — SERVICE MENU ADDED */
         {
             key: "services",
             icon: <AppstoreOutlined />,

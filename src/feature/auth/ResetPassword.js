@@ -20,8 +20,6 @@ export default function ResetPassword() {
 
         try {
             setLoading(true);
-
-            // ⭐ USE GLOBAL SERVICE
             await authService.resetPassword(token, values.password);
 
             message.success("Password Reset Successfully!");
@@ -36,12 +34,9 @@ export default function ResetPassword() {
 
     return (
         <Row>
-            {/* LEFT SIDE */}
             <Col span={12} className="login-left">
                 <img src={ResetImg} alt="reset" style={{ width: "80%", objectFit: "cover" }} />
             </Col>
-
-            {/* RIGHT SIDE */}
             <Col span={12} className="login-right">
                 <div className="login-box">
 

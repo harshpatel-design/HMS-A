@@ -34,13 +34,12 @@ import Breadcrumbs from "../comman/Breadcrumbs";
 import debounce from "lodash/debounce";
 import "../../index.css"
 
-
 const { Search } = Input
 
 const FloorList = () => {
   const [form] = Form.useForm();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState("add"); // add | edit
+  const [drawerMode, setDrawerMode] = useState("add");
   const [editingRecord, setEditingRecord] = useState(null);
 
   const dispatch = useDispatch();
@@ -53,7 +52,6 @@ const FloorList = () => {
     orderBy,
     order,
   } = useSelector((state) => state.floor);
-
 
   const [searchText, setSearchText] = useState("");
 
@@ -76,7 +74,6 @@ const FloorList = () => {
       }, 500),
     [dispatch, limit, orderBy, order]
   );
-
 
   useEffect(() => {
     return () => {
@@ -109,7 +106,6 @@ const FloorList = () => {
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    // 🔄 UNSORT
     if (!sorter.order) {
       dispatch(resetSort());
       dispatch(
@@ -122,8 +118,6 @@ const FloorList = () => {
       );
       return;
     }
-
-    // 🔥 SORT
     const sortOrder = sorter.order === "ascend" ? "ASC" : "DESC";
 
     dispatch(
@@ -161,8 +155,6 @@ const FloorList = () => {
           await dispatch(deleteFloor(record._id)).unwrap();
 
           message.success("Floor deleted successfully");
-
-          // 🔥 Reload list after delete
           dispatch(fetchFloors({ page, limit }));
         } catch (err) {
           message.error(err?.message || "Failed to delete floor");
@@ -339,7 +331,6 @@ const FloorList = () => {
 
   return (
     <>
-      {/* Breadcrumb */}
       <Breadcrumbs
         title="Floor List"
         showBack
@@ -360,11 +351,11 @@ const FloorList = () => {
             onChange={(e) => {
               const value = e.target.value;
               setSearchText(value);
-              debouncedFetch(value); // 🔥 debounced API call
+              debouncedFetch(value);
             }}
             onSearch={(value) => {
               setSearchText(value);
-              loadData(1, limit); // 🔥 immediate on Enter
+              loadData(1, limit);
             }}
             style={{ width: 280 }}
           />
@@ -392,7 +383,6 @@ const FloorList = () => {
         </Space>
       </div>
 
-      {/* Table */}
       <div className="table-scroll-container">
         <Table
           columns={filteredColumns}

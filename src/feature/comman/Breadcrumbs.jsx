@@ -19,25 +19,15 @@ export default function Breadcrumbs({
     <div
       style={{
         padding: "12px 0",
-        borderBottom: "1px solid #eee",
+        borderBottom: "1px solid #dadde3",
         marginBottom: 16,
       }}
     >
-      {/* Page Title */}
       {title && (
-        <h2
-          style={{
-            margin: 0,
-            fontWeight: 600,
-            fontSize: 22,
-            marginBottom: 10,
-          }}
-        >
+        <h2 className="b-titele">
           {title}
         </h2>
       )}
-
-      {/* Breadcrumb Row */}
       <div
         style={{
           display: "flex",

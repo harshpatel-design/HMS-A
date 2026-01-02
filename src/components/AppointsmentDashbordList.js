@@ -28,13 +28,13 @@ function AppointsmentDashbordList() {
             name: "Dr. Emily Carter",
             specialty: "Pediatrician",
             bookings: 125,
-            image: "", // ❌ no image
+            image: "",
         },
         {
             name: "Dr. David Lee",
             specialty: "Gynecologist",
             bookings: 115,
-            image: null, // ❌ no image
+            image: null,
         },
     ];
 
@@ -42,10 +42,10 @@ function AppointsmentDashbordList() {
     return (
         <>
             <div className="appointment-dashboard">
-                <Row gutter={[16, 24]} >
-                    <Col span={15}>
+                <Row gutter={[24,24]} >
+                    <Col span={15} style={{background:"#fff"}}>
                         <Row>
-                            <Col span={24}>
+                            <Col span={24} >
                                 <div className='app-heading'>
                                     <h1 className='dashbord-heading'>
                                         Appointment Statistic

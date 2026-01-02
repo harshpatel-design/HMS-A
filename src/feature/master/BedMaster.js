@@ -481,15 +481,15 @@ const BedMaster = () => {
           >
             <Select
               placeholder="Select Room"
-              loading={roomLoading}
-              disabled={!!selectedWard} // 🔒 disable if ward selected
+              loading={roomLoading}//
+              disabled={!!selectedWard}
               allowClear
               onChange={(value) => {
                 setSelectedRoom(value);
 
                 if (value) {
-                  setSelectedWard(null); // clear ward state
-                  form.setFieldsValue({ ward: null }); // clear ward field
+                  setSelectedWard(null);
+                  form.setFieldsValue({ ward: null });
                 }
               }}
               onClear={() => setSelectedRoom(null)}

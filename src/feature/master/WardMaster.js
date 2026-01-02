@@ -46,7 +46,7 @@ const WardMaster = () => {
     const [form] = Form.useForm();
 
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerMode, setDrawerMode] = useState("add"); // add | edit
+    const [drawerMode, setDrawerMode] = useState("add");
     const [editingRecord, setEditingRecord] = useState(null);
 
     const dispatch = useDispatch();
@@ -386,8 +386,6 @@ const WardMaster = () => {
                         `${range[0]}-${range[1]} of ${total} wards`,
                 }}
             />
-
-            {/* DRAWER */}
             <Drawer
                 title={drawerMode === "add" ? "Add Ward" : "Edit Ward"}
                 width={420}

@@ -7,7 +7,6 @@ const axiosClient = axios.create({
     baseURL: API_URL,
 });
 
-// 🔥 FIX 1: Token attach automatically for all requests
 axiosClient.interceptors.request.use((req) => {
     const token = localStorage.getItem("auth_token");
     if (token) req.headers.Authorization = `Bearer ${token}`;

@@ -33,10 +33,13 @@ import {
 } from "../../slices/chargeMasterSlice";
 import { fetchLabTests } from "../../slices/labTestSlice";
 import { fetchDoctors } from "../../slices/doctorSlice";
+import { fetchDepartments } from "../../slices/departmentSlice";
+
 
 import Breadcrumbs from "../comman/Breadcrumbs";
 import debounce from "lodash/debounce";
 import "../../index.css";
+import { useParams } from "react-router-dom";
 
 const { Search } = Input;
 
@@ -57,10 +60,11 @@ const GST_TYPES = ["CGST_SGST", "IGST"];
 const ChargeMaster = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+    const { id } = useParams();
+    const isEdit = Boolean(id);
 
   const { chargeMasters, loading, page, limit, total, selectedChargeMaster } =
     useSelector((state) => state.chargeMaster);
-
   const { labTests } = useSelector((state) => state.labTest);
   const { doctors } = useSelector((state) => state.doctor);
   const { departments } = useSelector((state) => state.department);
@@ -74,11 +78,25 @@ const ChargeMaster = () => {
     dispatch(fetchChargeMasters({ page: 1, limit: 20 }));
   }, [dispatch]);
 
-  useEffect(() => {
-    if (drawerMode === "edit" && selectedChargeMaster) {
-      form.setFieldsValue(selectedChargeMaster);
-    }
-  }, [drawerMode, selectedChargeMaster, form]);
+ useEffect(() => {
+   if (drawerOpen) {
+     dispatch(fetchLabTests({page : 1,pazeSize:400}));
+     dispatch(fetchDoctors({page:1,limit:500}));
+     dispatch(fetchDepartments());
+   }
+ }, [drawerOpen, dispatch]);
+
+useEffect(() => {
+  if (drawerMode === "edit" && selectedChargeMaster) {
+    form.setFieldsValue({
+      ...selectedChargeMaster,
+      gstApplicable: !!selectedChargeMaster.gstApplicable,
+      taxInclusive: !!selectedChargeMaster.taxInclusive,
+      isActive: selectedChargeMaster.isActive ?? true,
+    });
+  }
+}, [drawerMode, selectedChargeMaster, form]);
+
 
   const debouncedFetch = useMemo(
     () =>
@@ -132,58 +150,83 @@ const ChargeMaster = () => {
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
 
   const allColumns = [
-    { title: "Name", dataIndex: "name", key: "name", sorter: true },
-    { title: "Code", dataIndex: "code", key: "code", sorter: true },
+    { title: 'Name', dataIndex: 'name', key: 'name', sorter: true },
+    { title: 'Code', dataIndex: 'code', key: 'code', sorter: true },
     {
-      title: "Type",
-      dataIndex: "chargeType",
-      key: "chargeType",
+      title: 'Type',
+      dataIndex: 'chargeType',
+      key: 'chargeType',
       render: (v) => <Tag color="blue">{v}</Tag>,
     },
     {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
       render: (v) => `₹${v}`,
     },
     {
-      title: "GST %",
-      dataIndex: "gstRate",
-      key: "gstRate",
+      title: 'HSN Code',
+      dataIndex: 'hsnCode',
+      key: 'hsnCode',
+      render: (v) => v,
+    },
+    {
+      title: 'GST %',
+      dataIndex: 'gstRate',
+      key: 'gstRate',
       render: (v) => `${v}%`,
     },
     {
-      title: "Tax Inclusive",
-      dataIndex: "taxInclusive",
-      key: "taxInclusive",
-      render: (v) => (v ? "Yes" : "No"),
+      title: 'Tax Inclusive',
+      dataIndex: 'taxInclusive',
+      key: 'taxInclusive',
+      width:60,
+      render: (v) => (v ? 'Yes' : 'No'),
     },
     {
-      title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
-      render: (v) =>
-        v ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>,
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date) => {
+        return date ? new Date(date).toLocaleDateString('en-GB') : '-';
+      },
     },
     {
-      title: "Actions",
-      key: "actions",
-      render: (record) => (
-        <Space>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          />
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-          />
-        </Space>
-      ),
+      title: 'updated At',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (date) => {
+        return date ? new Date(date).toLocaleDateString('en-GB') : '-';
+      },
     },
+    {
+      title: 'Status',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      render: (v) => (v ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>),
+    },
+   {
+  title: 'Actions',
+  key: 'actions',
+  render: (record) => {
+    return (
+      <Space>
+        <Button
+          type="text"
+          icon={<EditOutlined />}
+          onClick={() => handleEdit(record)}
+        />
+        <Button
+          type="text"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => handleDelete(record)}
+        />
+      </Space>
+    );
+  },
+}
+
   ];
 
   const filteredColumns = allColumns.filter(
@@ -248,9 +291,38 @@ const ChargeMaster = () => {
       </Button>
     </div>
   );
+
+  const handleTableChange = (pagination, filters, sorter) => {
+  let ordering = "-createdAt";
+
+  if (sorter?.order === 'ascend') {
+    ordering = sorter.field;
+  } else if (sorter?.order === 'descend') {
+    ordering = `-${sorter.field}`;
+  }
+
+  dispatch(
+    fetchChargeMasters({
+      page: pagination.current,
+      limit: pagination.pageSize,
+      search: searchText,
+      ordering,
+    })
+  );
+};
+
+
   return (
     <>
-      <Breadcrumbs title="Charge Master" />
+      <Breadcrumbs
+        title={isEdit ? 'Edit Docotr' : 'Add New Doctor'}
+        showBack={true}
+        backTo="/doctor-onbording"
+        items={[
+          { label: 'Doctors', href: '/doctor-onbording' },
+          { label: isEdit ? 'Edit Doctor' : 'Add New Doctor' },
+        ]}
+      />
 
       <div className="serachbar-bread">
         <Space>
@@ -265,13 +337,14 @@ const ChargeMaster = () => {
             style={{ width: 280 }}
           />
           <Button icon={<ReloadOutlined />} onClick={handleReset} />
-          <Dropdown dropdownRender={() => columnMenu} trigger={["click"]}>
+          <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
             <Button icon={<FilterOutlined />} />
           </Dropdown>
           <Button
             type="primary"
+            className="btn"
             onClick={() => {
-              setDrawerMode("add");
+              setDrawerMode('add');
               form.resetFields();
               setDrawerOpen(true);
             }}
@@ -286,16 +359,23 @@ const ChargeMaster = () => {
         columns={filteredColumns}
         dataSource={chargeMasters}
         loading={loading}
+        onChange={handleTableChange}
         pagination={{
           current: page,
           pageSize: limit,
           total,
           showSizeChanger: true,
+          pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+          showTotal: (totalRecord) => `Total ${totalRecord} items`,
+          showQuickJumper: limit > 100 && limit < 500,
+          locale: {
+            items_per_page: 'Items / Page',
+          },
         }}
       />
 
       <Drawer
-        title={drawerMode === "add" ? "Add Charge" : "Edit Charge"}
+        title={drawerMode === 'add' ? 'Add Charge' : 'Edit Charge'}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         width={420}
@@ -305,29 +385,48 @@ const ChargeMaster = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item name="code" label="Code" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item
+            name="code"
+            label="Code"
+            rules={[
+              { required: true },
+              { pattern: /^[A-Z0-9_]+$/, message: 'Only uppercase letters & numbers' },
+            ]}
+          >
+            <Input onChange={(e) => form.setFieldsValue({ code: e.target.value.toUpperCase() })} />
           </Form.Item>
 
-          <Form.Item
-            name="caseCategory"
-            label="Case Category"
-            initialValue="BOTH"
-          >
-            <Select>
-              {CASE_CATEGORIES.map((c) => (
-                <Select.Option key={c} value={c}>
-                  {c}
+          <Form.Item name="doctor" label="Doctor">
+            <Select allowClear placeholder="Select Doctor">
+              {doctors.map((d) => (
+                <Select.Option key={d.doctorid} value={d.doctorid}>
+                  {d?.name}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="chargeType"
-            label="Charge Type"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="department" label="Department">
+            <Select allowClear placeholder="Select Department">
+              {departments.map((d) => (
+                <Select.Option key={d._id} value={d._id}>
+                  {d.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="labTest" label="Lab Test">
+            <Select allowClear placeholder="Select Lab Test">
+              {labTests.map((t) => (
+                <Select.Option key={t._id} value={t._id}>
+                  {t.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="chargeType" label="Charge Type" rules={[{ required: true }]}>
             <Select>
               {CHARGE_TYPES.map((c) => (
                 <Select.Option key={c} value={c}>
@@ -338,26 +437,28 @@ const ChargeMaster = () => {
           </Form.Item>
 
           <Form.Item name="amount" label="Amount" rules={[{ required: true }]}>
-            <InputNumber min={0} style={{ width: "100%" }} />
+            <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
 
-          <Form.Item
-            name="gstApplicable"
-            label="GST Applicable"
-            valuePropName="checked"
-          >
-            <Switch />
+          <Form.Item name="gstApplicable" label="GST Applicable" valuePropName="checked">
+            <Switch
+              onChange={(checked) => {
+                if (!checked) {
+                  form.setFieldsValue({
+                    gstRate: 0,
+                    gstType: 'CGST_SGST',
+                    hsnCode: undefined,
+                  });
+                }
+              }}
+            />
           </Form.Item>
 
           <Form.Item shouldUpdate>
             {({ getFieldValue }) =>
-              getFieldValue("gstApplicable") && (
+              getFieldValue('gstApplicable') && (
                 <>
-                  <Form.Item
-                    name="gstRate"
-                    label="GST Rate"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="gstRate" label="GST Rate" rules={[{ required: true }]}>
                     <Select>
                       {GST_RATES.map((r) => (
                         <Select.Option key={r} value={r}>
@@ -385,23 +486,22 @@ const ChargeMaster = () => {
             }
           </Form.Item>
 
-          <Form.Item
-            name="taxInclusive"
-            label="Tax Inclusive"
-            valuePropName="checked"
-          >
+          <Form.Item name="taxInclusive" label="Tax Inclusive" valuePropName="checked">
             <Switch />
           </Form.Item>
 
-          {drawerMode === "edit" && (
+          {drawerMode === 'edit' && (
             <Form.Item name="isActive" label="Status" valuePropName="checked">
               <Switch />
             </Form.Item>
           )}
 
-          <Button type="primary" htmlType="submit">
-            {drawerMode === "add" ? "Create" : "Update"}
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'end' }}>
+            {' '}
+            <Button type="primary" htmlType="submit" className="btn">
+              {drawerMode === 'add' ? 'Create' : 'Update'}
+            </Button>
+          </div>
         </Form>
       </Drawer>
     </>

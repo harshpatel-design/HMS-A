@@ -70,7 +70,7 @@ const RoomMaster = () => {
     );
 
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerMode, setDrawerMode] = useState("add"); // add | edit
+    const [drawerMode, setDrawerMode] = useState("add");
     const [editingRecord, setEditingRecord] = useState(null);
     const [searchText, setSearchText] = useState("");
 

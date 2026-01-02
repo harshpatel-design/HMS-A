@@ -12,6 +12,7 @@ import roomReducer from "./slices/roomSlice";
 import bedReducer from "./slices/badSlice";
 import labTestReducer from "./slices/labTestSlice";
 import chargeMasterReducer from "./slices/chargeMasterSlice";
+import departmentReducer from "./slices/departmentSlice";
 
 const rootReducer = {
   auth: authReducer,
@@ -26,6 +27,7 @@ const rootReducer = {
   bed: bedReducer,
   labTest: labTestReducer,
   chargeMaster: chargeMasterReducer,
+   department: departmentReducer,
 };
 
 const store = configureStore({

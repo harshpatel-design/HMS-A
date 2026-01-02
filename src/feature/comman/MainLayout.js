@@ -12,7 +12,7 @@ import { logoutUser } from "../../slices/authSlice";
 import "../../hcss.css";
 import logo from "../../images/logo.png";
 import logo2 from "../../images/logo2.png";
-import SidebarMenu from "../comman/SidebarMenu";  // 👈 Sidebar Component Imported
+import SidebarMenu from "../comman/SidebarMenu";
 import { Modal } from "antd";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 const { Sider, Content } = Layout;
@@ -51,8 +51,6 @@ export default function MainLayout() {
 
     return (
         <Layout className="layout-wrapper">
-
-            {/* HEADER */}
             <header className="head">
                 <div className="head-left">
                     <img src={collapsed ? logo2 : logo} className="brand-logo" alt="logo" />
@@ -66,10 +64,8 @@ export default function MainLayout() {
 
             <Layout className="layout-body">
 
-                {/* SIDEBAR */}
                 <Sider collapsed={collapsed} width={240} collapsedWidth={75} trigger={null} className="sidebar">
 
-                    {/* Toggle Button */}
                     <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
                         <div
                             className="sidebar-toggle-right"
@@ -77,19 +73,13 @@ export default function MainLayout() {
                         >
                             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                         </div>
-
-                        {/* sidebar content */}
                     </div>
-
-                    {/* 👉 SEPARATE COMPONENT HERE */}
                     <SidebarMenu collapsed={collapsed} />
 
                 </Sider>
-
-                {/* MAIN CONTENT */}
                 <Content className={`content ${collapsed ? "collapsed" : ""}`}>
 
-                    <Outlet /> {/* Renders pages */}
+                    <Outlet />
 
                 </Content>
 

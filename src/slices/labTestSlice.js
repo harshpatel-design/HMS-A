@@ -9,7 +9,7 @@ export const fetchLabTests = createAsyncThunk(
       limit = 20,
       ordering = "-createdAt",
       search = "",
-    },
+    } = {},
     { rejectWithValue }
   ) => {
     try {

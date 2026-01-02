@@ -8,7 +8,7 @@ export default function GlobalMessageProvider({ children }) {
 
   return (
     <MessageContext.Provider value={msgApi}>
-      {contextHolder}    {/* 👈 Yaha se pop-up har page pe visible */}
+      {contextHolder}
       {children}
     </MessageContext.Provider>
   );

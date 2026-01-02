@@ -10,7 +10,7 @@ export const fetchChargeMasters = createAsyncThunk(
       ordering = "-createdAt",
       search = "",
       chargeType,
-    },
+    } = {},
     { rejectWithValue }
   ) => {
     try {
@@ -94,9 +94,7 @@ export const deleteChargeMaster = createAsyncThunk(
 
 const initialState = {
   chargeMasters: [],
-  chargeMaster: null,
   selectedChargeMaster: null,
-
   total: 0,
   totalPages: 1,
   page: 1,
@@ -138,13 +136,15 @@ const chargeMasterSlice = createSlice({
       .addCase(fetchChargeMasters.pending, (state) => {
         state.loading = true;
       })
+
       .addCase(fetchChargeMasters.fulfilled, (state, action) => {
         state.loading = false;
-        state.chargeMasters = action.payload.charges || [];
-        state.total = action.payload.total || 0;
-        state.totalPages = action.payload.totalPages || 1;
-        state.page = action.meta.arg.page;
-        state.limit = action.meta.arg.limit || 10;
+        state.chargeMasters = action.payload.data || [];
+      state.total = action.payload.pagination.total;
+  state.page = action.payload.pagination.page;
+  state.limit = action.payload.pagination.limit;
+  state.totalPages = action.payload.pagination.totalPages;
+  state.ordering = action.meta.arg?.ordering ?? state.ordering;
       })
       .addCase(fetchChargeMasters.rejected, (state, action) => {
         state.loading = false;
@@ -157,8 +157,9 @@ const chargeMasterSlice = createSlice({
       .addCase(fetchChargeMasterById.fulfilled, (state, action) => {
         state.loading = false;
         state.chargeMaster = action.payload.charge || action.payload;
-        state.selectedChargeMaster =
-          action.payload.charge || action.payload;
+        state.selectedChargeMaster = action.payload.charge || action.payload;
+        console.log("state.selectedChargeMaster",state.selectedChargeMaster);
+
       })
       .addCase(fetchChargeMasterById.rejected, (state, action) => {
         state.loading = false;
@@ -177,9 +178,7 @@ const chargeMasterSlice = createSlice({
       .addCase(updateChargeMaster.fulfilled, (state, action) => {
         state.success = true;
         const updated = action.payload.charge || action.payload;
-        const index = state.chargeMasters.findIndex(
-          (c) => c._id === updated._id
-        );
+        const index = state.chargeMasters.findIndex((c) => c._id === updated._id);
         if (index !== -1) {
           state.chargeMasters[index] = updated;
         }
@@ -190,9 +189,7 @@ const chargeMasterSlice = createSlice({
 
       .addCase(deleteChargeMaster.fulfilled, (state, action) => {
         state.success = true;
-        state.chargeMasters = state.chargeMasters.filter(
-          (c) => c._id !== action.meta.arg
-        );
+        state.chargeMasters = state.chargeMasters.filter((c) => c._id !== action.meta.arg);
       })
       .addCase(deleteChargeMaster.rejected, (state, action) => {
         state.error = action.payload;
