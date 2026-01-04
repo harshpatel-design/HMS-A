@@ -28,48 +28,52 @@ function Login() {
   };
 
   return (
-    <Row className="loging-wapper">
-      <div className="login-page">
-        <Col xs={0} md={12} className="login-left">
-          <img src={leftImg} alt="login"/>
-        </Col>
+    <>
+      <div className="page-wrapper">
+        <Row className="loging-wapper">
+          <div className="login-page">
+            <Col xs={0} md={12} className="login-left">
+              <img src={leftImg} alt="login" />
+            </Col>
 
-        <Col xs={24} md={12} className="login-right">
-          <div className="login-box">
-            <Form layout="vertical" className="form-container" onFinish={onFinish}>
-              <h3 className="login-title">Login</h3>
-              <Form.Item
-                name="email"
-                label="Email Address"
-                rules={[{ required: true, message: 'Email is required' }]}
-              >
-                <Input placeholder="Enter Email" />
-              </Form.Item>
+            <Col xs={24} md={12} className="login-right">
+              <div className="login-box">
+                <Form layout="vertical" className="form-container" onFinish={onFinish}>
+                  <h3 className="login-title">Login</h3>
+                  <Form.Item
+                    name="email"
+                    label="Email Address"
+                    rules={[{ required: true, message: 'Email is required' }]}
+                  >
+                    <Input placeholder="Enter Email" />
+                  </Form.Item>
 
-              <Form.Item
-                name="password"
-                label="Password"
-                rules={[{ required: true, message: 'Password is required' }]}
-              >
-                <Input.Password
-                  placeholder="Enter Password"
-                  iconRender={(v) => (v ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
-                />
-              </Form.Item>
+                  <Form.Item
+                    name="password"
+                    label="Password"
+                    rules={[{ required: true, message: 'Password is required' }]}
+                  >
+                    <Input.Password
+                      placeholder="Enter Password"
+                      iconRender={(v) => (v ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
+                    />
+                  </Form.Item>
 
-              <Button type="primary" block htmlType="submit" loading={loading}>
-                Login
-              </Button>
+                  <Button type="primary" block htmlType="submit" loading={loading}>
+                    Login
+                  </Button>
 
-              <Divider>OR</Divider>
-              <p className="register-text">
-                Don't have an account? <Link to="/register">Register</Link>
-              </p>
-            </Form>
+                  <Divider>OR</Divider>
+                  <p className="register-text">
+                    Don't have an account? <Link to="/register">Register</Link>
+                  </p>
+                </Form>
+              </div>
+            </Col>
           </div>
-        </Col>
+        </Row>
       </div>
-    </Row>
+    </>
   );
 }
 
