@@ -110,7 +110,6 @@ export default function AddEditPatient() {
       };
     }
 
-    /* ===================== DOCUMENTS ===================== */
     if (Array.isArray(values.documents)) {
       payload.documents = values.documents.map((f) => f.originFileObj).filter(Boolean);
     }

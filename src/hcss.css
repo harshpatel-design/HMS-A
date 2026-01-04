@@ -1782,6 +1782,10 @@ section {
 
 @media (max-width: 768px) {
 
+    .ant-message .ant-message-notice-wrapper {
+        margin-top: 15px;
+    }
+
     .ant-table-wrapper .ant-table-thead>tr>th {
         padding: 8px !important;
     }
@@ -1908,7 +1912,7 @@ section {
     }
 
     section {
-        margin: 5px 0px;
+        margin: 10px 0px;
     }
 
     .app-heading {
@@ -1980,5 +1984,8 @@ section {
     .rage-2space .ant-picker {
         width: 100% !important;
 
+    }
+    .sess-details .ant-picker {
+        width: 100% !important;
     }
 }

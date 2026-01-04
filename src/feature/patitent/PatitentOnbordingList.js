@@ -92,6 +92,7 @@ const PatientOnboardingList = () => {
     {
       title: 'Full Name',
       key: 'name',
+      width:140,
       render: (r) => (
         <Tooltip title={`${r.firstName} ${r.lastName}`}>
           <span>
