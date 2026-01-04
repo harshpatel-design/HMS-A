@@ -165,6 +165,21 @@ const RoomMaster = () => {
         });
     };
 
+    const loadData = (pageNum = 1, pageSize = limit, search = searchText, order, orderBy) => {
+        if (loading) return;
+
+        dispatch(
+          fetchFloors({
+            page: pageNum,
+            limit: pageSize,
+            search,
+            orderBy,
+            order
+
+          })
+        );
+      };
+
     const columns = [
         {
             title: "Floor",
@@ -229,159 +244,159 @@ const RoomMaster = () => {
     ];
 
     return (
-        <>
-            <Breadcrumbs title="Room List" items={[{ label: "Room List" }]} />
+      <>
+        <div className="page-wrapper">
+          <Breadcrumbs
+            title="Room List"
+            showBack
+            backTo="/dashboard"
+            items={[{ label: 'Room List', href: '/room-master' }, { label: 'Room List' }]}
+          />
 
-            <div className="serachbar-bread">
-                <Space>
-                    <Search
-                        placeholder="Search room"
-                        allowClear
-                        value={searchText}
-                        onChange={(e) => {
-                            setSearchText(e.target.value);
-                            debouncedFetch(e.target.value);
-                        }}
-                        style={{ width: 260 }}
-                    />
-                    <Button icon={<ReloadOutlined />} onClick={handleReset} />
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            setDrawerMode("add");
-                            setEditingRecord(null);
-                            form.resetFields();
-                            setDrawerOpen(true);
-                        }}
-                    >
-                        Add Room
-                    </Button>
-                </Space>
-            </div>
-
-            <Table
-                rowKey="_id"
-                columns={columns}
-                dataSource={rooms}
-                loading={loading}
-                onChange={handleTableChange}
-                pagination={{
-                    current: page,
-                    pageSize: limit,
-                    total,
+          <div className="serachbar-bread">
+            <Space>
+              {/* Search */}
+              <Search
+                placeholder="Search room"
+                allowClear
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  debouncedFetch(e.target.value);
                 }}
+                onSearch={(value) => {
+                  setSearchText(value);
+                }}
+                style={{  maxWidth:280 , width:"100%"  }}
+              />
+
+              <Space wrap size={8}>
+                <Button icon={<ReloadOutlined />} onClick={handleReset} />
+                <Button
+                  type="primary"
+                  className="btn"
+                  onClick={() => {
+                    setDrawerMode('add');
+                    setEditingRecord(null);
+                    form.resetFields();
+                    setDrawerOpen(true);
+                  }}
+                >
+                  Add Room
+                </Button>
+              </Space>
+            </Space>
+          </div>
+
+          <div className="table-scroll-container">
+            <Table
+              rowKey="_id"
+              columns={columns}
+              dataSource={rooms}
+              scroll={{ x: 1000}}
+              loading={loading}
+              pagination={{
+                current: page,
+                pageSize: limit,
+                total: total,
+                showSizeChanger: true,
+                pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+                onChange: handleTableChange,
+                showTotal: (totalRecord) => `Total ${totalRecord} items`,
+                showQuickJumper: limit > 100 && limit < 500,
+                locale: {
+                  items_per_page: 'Items / Page',
+                },
+              }}
             />
+          </div>
 
-            <Drawer
-                title={drawerMode === "add" ? "Add Room" : "Edit Room"}
-                width={420}
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                destroyOnClose
-            >
-                {loading ? (
-                    <Spin />
-                ) : (
-                    <Form
-                        layout="vertical"
-                        form={form}
-                        onFinish={async (values) => {
-                            try {
-                                if (drawerMode === "add") {
-                                    await dispatch(createRoom(values)).unwrap();
-                                    message.success("Room created");
-                                } else {
-                                    await dispatch(
-                                        updateRoom({
-                                            id: editingRecord._id,
-                                            data: values,
-                                        })
-                                    ).unwrap();
-                                    message.success("Room updated");
-                                }
-                                setDrawerOpen(false);
-                                dispatch(fetchRooms({ page, limit }));
-                            } catch (err) {
-                                message.error(err?.message || "Failed");
-                            }
-                        }}
-                    >
-                        <Form.Item
-                            name="floor"
-                            label="Floor"
-                            rules={[{ required: true }]}
-                        >
-                            <Select
-                                placeholder="Select Floor"
-                                loading={floorLoading}
-                            >
-                                {floors.map((f) => (
-                                    <Select.Option key={f._id} value={f._id}>
-                                        {f.name} (Floor {f.floorNumber})
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+          <Drawer
+            title={drawerMode === 'add' ? 'Add Room' : 'Edit Room'}
+            width={420}
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            destroyOnClose
+          >
+            {loading ? (
+              <Spin />
+            ) : (
+              <Form
+                layout="vertical"
+                form={form}
+                onFinish={async (values) => {
+                  try {
+                    if (drawerMode === 'add') {
+                      await dispatch(createRoom(values)).unwrap();
+                      message.success('Room created');
+                    } else {
+                      await dispatch(
+                        updateRoom({
+                          id: editingRecord._id,
+                          data: values,
+                        })
+                      ).unwrap();
+                      message.success('Room updated');
+                    }
+                    setDrawerOpen(false);
+                    dispatch(fetchRooms({ page, limit }));
+                  } catch (err) {
+                    message.error(err?.message || 'Failed');
+                  }
+                }}
+              >
+                <Form.Item name="floor" label="Floor" rules={[{ required: true }]}>
+                  <Select placeholder="Select Floor" loading={floorLoading}>
+                    {floors.map((f) => (
+                      <Select.Option key={f._id} value={f._id}>
+                        {f.name} (Floor {f.floorNumber})
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
 
-                        <Form.Item
-                            name="roomNumber"
-                            label="Room Number"
-                            rules={[{ required: true }]}
-                        >
-                            <Input />
-                        </Form.Item>
+                <Form.Item name="roomNumber" label="Room Number" rules={[{ required: true }]}>
+                  <Input />
+                </Form.Item>
 
-                        <Form.Item
-                            name="roomType"
-                            label="Room Type"
-                            rules={[{ required: true }]}
-                        >
-                            <Select placeholder="Select Room Type">
-                                {ROOM_TYPES.map((type) => (
-                                    <Select.Option key={type} value={type}>
-                                        {type}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+                <Form.Item name="roomType" label="Room Type" rules={[{ required: true }]}>
+                  <Select placeholder="Select Room Type">
+                    {ROOM_TYPES.map((type) => (
+                      <Select.Option key={type} value={type}>
+                        {type}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
 
-                        <Form.Item
-                            name="capacity"
-                            label="Capacity"
-                            rules={[{ required: true }]}
-                        >
-                            <Input type="number" />
-                        </Form.Item>
+                <Form.Item name="capacity" label="Capacity" rules={[{ required: true }]}>
+                  <Input type="number" />
+                </Form.Item>
 
-                        {drawerMode === "edit" && (
-                            <Form.Item
-                                name="isActive"
-                                label="Active Status"
-                                rules={[{ required: true }]}
-                            >
-                                <Select>
-                                    <Select.Option value={true}>Active</Select.Option>
-                                    <Select.Option value={false}>Inactive</Select.Option>
-                                </Select>
-                            </Form.Item>
-                        )}
-
-                        <Form.Item name="notes" label="Notes">
-                            <Input.TextArea rows={3} />
-                        </Form.Item>
-
-                        <Space>
-                            <Button type="primary" htmlType="submit">
-                                {drawerMode === "add" ? "Create" : "Update"}
-                            </Button>
-                            <Button onClick={() => setDrawerOpen(false)}>
-                                Cancel
-                            </Button>
-                        </Space>
-                    </Form>
+                {drawerMode === 'edit' && (
+                  <Form.Item name="isActive" label="Active Status" rules={[{ required: true }]}>
+                    <Select>
+                      <Select.Option value={true}>Active</Select.Option>
+                      <Select.Option value={false}>Inactive</Select.Option>
+                    </Select>
+                  </Form.Item>
                 )}
-            </Drawer>
-        </>
+
+                <Form.Item name="notes" label="Notes">
+                  <Input.TextArea rows={3} />
+                </Form.Item>
+
+                <Space>
+                  <Button type="primary" htmlType="submit" className="btn">
+                    {drawerMode === 'add' ? 'Create' : 'Update'}
+                  </Button>
+                  <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+                </Space>
+              </Form>
+            )}
+          </Drawer>
+        </div>
+      </>
     );
 };
 

@@ -1,90 +1,117 @@
-import React, { useState } from "react";
-import { Layout, message } from "antd";
+import React, { useState } from 'react';
+import { Layout, message, Tooltip } from 'antd';
 import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    LogoutOutlined
-} from "@ant-design/icons";
-import { Outlet, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../../slices/authSlice";
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  LogoutOutlined,
+  RightOutlined,
+  LeftOutlined,
+} from '@ant-design/icons';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../../slices/authSlice';
 
-import "../../hcss.css";
-import logo from "../../images/logo.png";
-import logo2 from "../../images/logo2.png";
-import SidebarMenu from "../comman/SidebarMenu";
-import { Modal } from "antd";
-import { ExclamationCircleFilled } from "@ant-design/icons";
+import '../../hcss.css';
+import logo from '../../images/logo.png';
+import logo2 from '../../images/logo2.png';
+import SidebarMenu from '../comman/SidebarMenu';
+import { Modal } from 'antd';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 const { Sider, Content } = Layout;
 
 export default function MainLayout() {
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const [collapsed, setCollapsed] = useState(false);
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const handleLogout = () => {
+    Modal.confirm({
+      title: null,
+      icon: null,
+      content: (
+        <div className="logout-modal-content">
+          <div className="logout-icon">
+            <ExclamationCircleFilled />
+          </div>
+          <h2>Confirm Logout</h2>
+          <p>Are you sure you want to logout from your account?</p>
+        </div>
+      ),
+      okText: 'Logout',
+      cancelText: 'Cancel',
+      className: 'custom-logout-modal',
+      centered: true,
 
-    const handleLogout = () => {
-        Modal.confirm({
-            title: null,
-            icon: null,
-            content: (
-                <div className="logout-modal-content">
-                    <div className="logout-icon">
-                        <ExclamationCircleFilled />
-                    </div>
-                    <h2>Confirm Logout</h2>
-                    <p>Are you sure you want to logout from your account?</p>
-                </div>
-            ),
-            okText: "Logout",
-            cancelText: "Cancel",
-            className: "custom-logout-modal",
-            centered: true,
+      onOk: async () => {
+        await dispatch(logoutUser());
+        message.success('Logged Out Successfully!');
+        navigate('/login');
+      },
+    });
+  };
 
-            onOk: async () => {
-                await dispatch(logoutUser());
-                message.success("Logged Out Successfully!");
-                navigate("/login");
-            }
-        });
-    };
+  return (
+    <Layout className="layout-wrapper">
+      <header className="head">
+        <div className="head-left">
+          {isMobile && (
+            <MenuUnfoldOutlined
+              className="mobile-menu-btn"
+              onClick={() => setCollapsed(!collapsed)}
+            />
+          )}
+          <Link to="/dashbord">
+            {' '}
+            <img
+              src={collapsed ? logo : logo}
+              className={collapsed ? ' brand-logo' : 'brand-logo-col'}
+              alt="logo"
+            />
+          </Link>
+        </div>
 
-    return (
-        <Layout className="layout-wrapper">
-            <header className="head">
-                <div className="head-left">
-                    <img src={collapsed ? logo2 : logo} className="brand-logo" alt="logo" />
-                </div>
+        <div className="head-right">
+          <img src={logo2} className="avatar profile-btn" alt="user" />
+          <LogoutOutlined className="logout-icon" onClick={handleLogout} />
+        </div>
+      </header>
 
-                <div className="head-right">
-                    <img src={logo2} className="avatar profile-btn" alt="user" />
-                    <LogoutOutlined className="logout-icon" onClick={handleLogout} />
-                </div>
-            </header>
+      <Layout className="layout-body">
+        <Sider
+          collapsed={collapsed} 
+          collapsedWidth={isMobile ? 0 : 75}
+          width={isMobile ? '100%' : 240}
+          trigger={null}
+          className={`sidebar ${isMobile ? 'mobile-sidebar' : ''} ${
+            !collapsed && isMobile ? 'open' : ''
+          }`}
+          breakpoint="md"
+          onBreakpoint={(broken) => {
+            setIsMobile(broken);
+            setCollapsed(broken);
+          }}
+        >
+          <Tooltip title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'} placement="right">
+            <div className="sidebar-toggle-right" onClick={() => setCollapsed(!collapsed)}>
+              {collapsed ? <RightOutlined /> : <LeftOutlined />}
+            </div>
+          </Tooltip>
 
-            <Layout className="layout-body">
+          <SidebarMenu
+            collapsed={collapsed}
+            onMenuClick={() => {
+              if (isMobile) {
+                setCollapsed(true); // 🔥 CLOSE SIDEBAR
+              }
+            }}
+          />
+        </Sider>
 
-                <Sider collapsed={collapsed} width={240} collapsedWidth={75} trigger={null} className="sidebar">
-
-                    <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
-                        <div
-                            className="sidebar-toggle-right"
-                            onClick={() => setCollapsed(!collapsed)}
-                        >
-                            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                        </div>
-                    </div>
-                    <SidebarMenu collapsed={collapsed} />
-
-                </Sider>
-                <Content className={`content ${collapsed ? "collapsed" : ""}`}>
-
-                    <Outlet />
-
-                </Content>
-
-            </Layout>
-
-        </Layout>
-    );
+        <Content className={`content ${collapsed ? 'collapsed' : ''}`}>
+          <Outlet />
+        </Content>
+      </Layout>
+    </Layout>
+  );
 }

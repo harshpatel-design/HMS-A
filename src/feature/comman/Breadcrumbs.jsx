@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import "../../hcss.css";
 
 export default function Breadcrumbs({
   title,
@@ -16,64 +17,33 @@ export default function Breadcrumbs({
   };
 
   return (
-    <div
-      style={{
-        padding: "12px 0",
-        borderBottom: "1px solid #dadde3",
-        marginBottom: 16,
-      }}
-    >
-      {title && (
-        <h2 className="b-titele">
-          {title}
-        </h2>
-      )}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          fontSize: 14,
-          color: "#666",
-          gap: 6,
-        }}
-      >
+    <div className="breadcrumbs-wrapper">
+      {title && <h2 className="breadcrumbs-title">{title}</h2>}
+
+      <div className="breadcrumbs-row">
         {showBack && (
           <>
-            <span
-              onClick={handleBack}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                color: "#444",
-                fontWeight: 500,
-              }}
-            >
+            <span className="breadcrumbs-back" onClick={handleBack}>
               <ArrowLeftOutlined />
               Back
             </span>
-            <span>/</span>
+            <span className="breadcrumbs-separator">/</span>
           </>
         )}
 
         {items.map((item, index) => (
           <React.Fragment key={index}>
             {item.href ? (
-              <Link
-                to={item.href}
-                style={{
-                  color: "#1890ff",
-                  textDecoration: "none",
-                }}
-              >
+              <Link to={item.href} className="breadcrumbs-link">
                 {item.label}
               </Link>
             ) : (
-              <span style={{ color: "#999" }}>{item.label}</span>
+              <span className="breadcrumbs-current">{item.label}</span>
             )}
 
-            {index !== items.length - 1 && <span>/</span>}
+            {index !== items.length - 1 && (
+              <span className="breadcrumbs-separator">/</span>
+            )}
           </React.Fragment>
         ))}
       </div>

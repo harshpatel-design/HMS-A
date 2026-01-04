@@ -40,139 +40,122 @@ function AppointsmentDashbordList() {
 
 
     return (
-        <>
-            <div className="appointment-dashboard">
-                <Row gutter={[24,24]} >
-                    <Col span={15} style={{background:"#fff"}}>
-                        <Row>
-                            <Col span={24} >
-                                <div className='app-heading'>
-                                    <h1 className='dashbord-heading'>
-                                        Appointment Statistic
-                                    </h1>
-                                    <Select
-                                        value={filter}
-                                        onChange={setFilter}
-                                        style={{ width: 160 }}
-                                    >
-                                        {FILTER_OPTIONS.map((item) => (
-                                            <Option key={item.value} value={item.value}>
-                                                {item.label}
-                                            </Option>
-                                        ))}
-                                    </Select>
+      <>
+        <div className="appointment-dashboard">
+          <Row gutter={[24, 24]}>
+            <Col sm={24} md={15} style={{ background: '#fff' }}>
+              <Row style={{ padding: '8px 0px' }}>
+                <Col span={24}>
+                  <div className="app-heading">
+                    <h1 className="dashbord-heading">Appointment Statistic</h1>
+                    <Select value={filter} onChange={setFilter}>
+                      {FILTER_OPTIONS.map((item) => (
+                        <Option key={item.value} value={item.value}>
+                          {item.label}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
+
+                  <Row gutter={[16, 24]} style={{ marginTop: 12 }}>
+                    <Col xs={12} md={6}>
+                      <div className="dash-card">
+                        <span className="dash-title">All Appointments</span>
+                        <h2 className="dash-count">6314</h2>
+                      </div>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <div className="dash-card">
+                        <span className="dash-title">Canclled</span>
+                        <h2 className="dash-count">343</h2>
+                      </div>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <div className="dash-card">
+                        <span className="dash-title">Reschedule</span>
+                        <h2 className="dash-count">543</h2>
+                      </div>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <div className="dash-card">
+                        <span className="dash-title">Complated</span>
+                        <h2 className="dash-count">314</h2>
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
+                    <Col span={24}>
+                      <Card title="Product Statistics">
+                        <StackedBarChart />
+                      </Card>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col span={24}>
+                  <Row gutter={[16, 10]}>
+                    <Col span={24}>
+                      <div className="app-heading">
+                        <h1 className="dashbord-heading">Appointment Statistic</h1>
+                        <Select value={filter} onChange={setFilter} style={{ width: 160 }}>
+                          {FILTER_OPTIONS.map((item) => (
+                            <Option key={item.value} value={item.value}>
+                              {item.label}
+                            </Option>
+                          ))}
+                        </Select>
+                      </div>
+                    </Col>
+                    <Col span={24}>
+                      <Row gutter={16} className="doctor-grid-dashbord">
+                        {doctors.map((doc, index) => (
+                          <Col xs={24} sm={12} md={12} lg={8} key={index}>
+                            <Card className="doctor-card">
+                              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                                {doc.image ? (
+                                  <img
+                                    src={doc.image}
+                                    alt={doc.name}
+                                    style={{
+                                      width: 48,
+                                      height: 48,
+                                      borderRadius: '50%',
+                                      objectFit: 'cover',
+                                    }}
+                                  />
+                                ) : (
+                                  <Avatar size={48} icon={<UserOutlined />} />
+                                )}
+                                <div>
+                                  <div style={{ fontWeight: 600 }}>{doc.name}</div>
+                                  <div style={{ fontSize: 12, color: '#888' }}>{doc.specialty}</div>
+                                  <div style={{ marginTop: 4, fontSize: 12 }}>
+                                    <b>{doc.bookings}</b> Bookings
+                                  </div>
                                 </div>
-
-                                <Row gutter={[16, 24]} style={{ marginTop: 12 }}>
-
-                                    <Col span={6}>
-                                        <div className="dash-card">
-                                            <span className="dash-title">All Appointments</span>
-                                            <h2 className="dash-count">6314</h2>
-                                        </div>
-                                    </Col>
-                                    <Col span={6}>
-                                        <div className="dash-card">
-                                            <span className="dash-title">Canclled</span>
-                                            <h2 className="dash-count">343</h2>
-                                        </div>
-                                    </Col>
-                                    <Col span={6}>
-                                        <div className="dash-card">
-                                            <span className="dash-title">Reschedule</span>
-                                            <h2 className="dash-count">543</h2>
-                                        </div>
-                                    </Col>
-                                    <Col span={6}>
-                                        <div className="dash-card">
-                                            <span className="dash-title">Complated</span>
-                                            <h2 className="dash-count">314</h2>
-                                        </div>
-                                    </Col>
-                                </Row>
-                                <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
-                                    <Col span={24}>
-                                        <Card title="Product Statistics">
-                                            <StackedBarChart />
-                                        </Card>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col span={24}>
-                                <Row gutter={[16, 16]}>
-                                    <Col span={24}>
-                                        <div className='app-heading'>
-                                            <h1 className='dashbord-heading'>
-                                                Appointment Statistic
-                                            </h1>
-                                            <Select
-                                                value={filter}
-                                                onChange={setFilter}
-                                                style={{ width: 160 }}
-                                            >
-                                                {FILTER_OPTIONS.map((item) => (
-                                                    <Option key={item.value} value={item.value}>
-                                                        {item.label}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </div>
-                                    </Col>
-                                    <Col span={24}>
-                                        <Row gutter={16} style={{ border: "1px solid #0000001f", padding:"16px 6px" , borderRadius:10 }}>
-                                            {doctors.map((doc, index) => (
-                                                <Col span={8} key={index} >
-                                                    <Card className="doctor-card">
-                                                        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                                                            {doc.image ? (
-                                                                <img
-                                                                    src={doc.image}
-                                                                    alt={doc.name}
-                                                                    style={{
-                                                                        width: 48,
-                                                                        height: 48,
-                                                                        borderRadius: "50%",
-                                                                        objectFit: "cover",
-                                                                    }}
-                                                                />
-                                                            ) : (
-                                                                <Avatar size={48} icon={<UserOutlined />} />
-                                                            )}
-                                                            <div>
-                                                                <div style={{ fontWeight: 600 }}>{doc.name}</div>
-                                                                <div style={{ fontSize: 12, color: "#888" }}>
-                                                                    {doc.specialty}
-                                                                </div>
-                                                                <div style={{ marginTop: 4, fontSize: 12 }}>
-                                                                    <b>{doc.bookings}</b> Bookings
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    </Card>
-                                                </Col>
-                                            ))}
-                                        </Row>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
+                              </div>
+                            </Card>
+                          </Col>
+                        ))}
+                      </Row>
                     </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Col>
 
-
-                    <Col span={9}>
-                        <div className="full-height">
-                            <AppointmentsWidget />
-                        </div>
-                    </Col>
-                </Row >
-            </div>
-        </>
-
-    )
+            <Col sm={24} md={9}>
+              <div className="full-height">
+                <AppointmentsWidget />
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </>
+    );
 }
 
 export default AppointsmentDashbordList

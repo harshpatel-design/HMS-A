@@ -45,7 +45,7 @@ function ViewDoctor() {
 
       <div className="profile-card">
         <Row gutter={16}>
-          <Col span={3}>
+          <Col md={3} xs={8}>
             <img
               src={imageUrl}
               alt={doctor.name}
@@ -56,7 +56,7 @@ function ViewDoctor() {
             />
           </Col>
 
-          <Col span={15}>
+          <Col md={15} xs={16}>
             <div className="flex-column-between">
               <div className="profile-details">
                 <div className="doctor-profile-effect-1">
@@ -102,7 +102,7 @@ function ViewDoctor() {
               </div>
             </div>
           </Col>
-          <Col span={6} className="profile-action ">
+          <Col span={6} xs={0} xm={0} className="profile-action ">
             <div className="flex-column-between">
               <p className="education-degree"> {selectedDoctor.doctor.user.email}</p>
               <div className="flex-end">
@@ -114,14 +114,15 @@ function ViewDoctor() {
           </Col>
         </Row>
       </div>
-      {/* <Divider orientation="left">Availability</Divider> */}
+
+
       <div style={{ marginTop: 12 }}>
         <Row gutter={[16, 16]}>
-          <Col span={16}>
+          <Col xm={16} xs={24}>
             <Card title="Availability" className="Availability-doc-card">
               <Row gutter={[16, 16]}>
                 {selectedDoctor?.doctor?.profile?.schedule?.map((day) => (
-                  <Col key={day._id} xs={24} sm={12} md={8} lg={4}>
+                  <Col key={day._id} xs={12} sm={12} md={8} lg={4}>
                     <div className="availability-day">
                       <div className="day-title">{day.day}</div>
 
@@ -163,7 +164,7 @@ function ViewDoctor() {
             </Card>
           </Col>
 
-          <Col span={8}>
+          <Col xs={24} xm={8}>
             {/* <Row gutter={[10, 10]}>
              {selectedDoctor.doctor.user.map((data) => {
                  <Col span={24}>

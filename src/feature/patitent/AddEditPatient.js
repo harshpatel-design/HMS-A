@@ -1,589 +1,529 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import {
-    Form,
-    Input,
-    Select,
-    DatePicker,
-    Card,
-    Row,
-    Col,
-    Button,
-    Spin,
-    message
-} from "antd";
+  Form,
+  Input,
+  Row,
+  Col,
+  Button,
+  Select,
+  DatePicker,
+  Collapse,
+  InputNumber,
+  Upload,
+  message,
+  Spin,
+} from 'antd';
 
-import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import dayjs from "dayjs";
-import Breadcrumbs from "../comman/Breadcrumbs";
-import doctorService from "../../services/doctorService"
-import {
-    fetchPatientById,
-    createPatient,
-    updatePatient
-} from "../../slices/patientSlice";
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { createPatient, fetchPatientById, updatePatient } from '../../slices/patientSlice';
+import Breadcrumbs from '../comman/Breadcrumbs';
 
+const { Panel } = Collapse;
 const { Option } = Select;
 
-export function AddEditPatient() {
-    const { id } = useParams();
-    const isEdit = Boolean(id);
+export default function AddEditPatient() {
+  const dispatch = useDispatch();
+  const { id } = useParams(); // 👈 URL se id
+  const isEdit = Boolean(id);
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const { loading, patient } = useSelector((state) => state.patient);
+  const handleValuesChange = () => {};
 
-    const [form] = Form.useForm();
+  useEffect(() => {
+    if (isEdit) {
+      dispatch(fetchPatientById(id));
+    }
+  }, [id, isEdit, dispatch]);
 
-    const { patient, loading } = useSelector((state) => state.patient);
+  useEffect(() => {
+    if (isEdit && patient) {
+      form.setFieldsValue({
+        ...patient,
 
-    const [caseType, setCaseType] = useState(null);
-    const [doctorNames, setDoctorNames] = useState([]);
-    const [doctorLoading, setDoctorLoading] = useState(false);
+        dob: patient.dob ? dayjs(patient.dob) : null,
 
-    // 1️⃣ Fetch patient on edit mode
-    useEffect(() => {
-        if (isEdit) {
-            dispatch(fetchPatientById(id));
-        }
-    }, [isEdit, id]);
-
-    // 2️⃣ Fill form when patient data loads
-    useEffect(() => {
-        if (patient && isEdit) {
-            // patient already contains the actual object
-            const p = patient;
-
-            setCaseType(p.caseType);
-
-            const formatted = {
-                ...p,
-                dob: p.dob ? dayjs(p.dob) : null,
-
-                opd: p.opd
-                    ? {
-                        ...p.opd,
-                        lastVisit: p?.opd?.lastVisit ? dayjs(p.opd.lastVisit) : null,
-                    }
-                    : undefined,
-
-                ipd: p.ipd
-                    ? {
-                        ...p.ipd,
-                        admissionDate: p.ipd.admissionDate ? dayjs(p.ipd.admissionDate) : null,
-                        dischargeDate: p.ipd.dischargeDate ? dayjs(p.ipd.dischargeDate) : null,
-                    }
-                    : undefined,
-            };
-
-            form.setFieldsValue(formatted);
-        }
-    }, [patient, isEdit, form]);
-
-    // 3️⃣ Auto age calculation + case type switching
-    const handleValuesChange = (changed, all) => {
-        if (changed.caseType) setCaseType(changed.caseType);
-
-        if (changed.dob) {
-            const dob = changed.dob;
-            if (dob) {
-                const today = new Date();
-                const birth = new Date(dob);
-
-                let age = today.getFullYear() - birth.getFullYear();
-                const monthDiff = today.getMonth() - birth.getMonth();
-
-                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-                    age--;
-                }
-
-                form.setFieldsValue({ age });
+        insurance: patient.insurance
+          ? {
+              ...patient.insurance,
+              expiryDate: patient.insurance.expiryDate ? dayjs(patient.insurance.expiryDate) : null,
             }
-        }
+          : undefined,
+      });
+    }
+  }, [isEdit, patient, form]);
+
+  const allPanels = [
+    'basic',
+    'address',
+    'vitals',
+    'notes',
+    'documents',
+    'guardian',
+    'emergencyContact',
+    'insurance',
+    'chronicDiseases',
+    'medicalHistory',
+    'allergies',
+  ];
+
+  const onFinishFailed = ({ errorFields }) => {
+    if (!Array.isArray(errorFields)) return;
+
+    errorFields.forEach((field) => {
+      if (Array.isArray(field.errors) && field.errors.length > 0) {
+        message.error(field.errors[0]);
+      }
+    });
+  };
+
+  const onFinish = (values) => {
+    const payload = {
+      ...values,
     };
 
-    const fetchDoctorNames = async () => {
-        try {
-            setDoctorLoading(true);
-            const res = await doctorService.getDoctorNames({ search: "", sort: "asc" });
-            setDoctorNames(res.doctors || []);
-        } catch (err) {
-            setDoctorNames([]);
-        } finally {
-            setDoctorLoading(false);
-        }
+    if (values.dob) {
+      payload.dob = values.dob.toISOString();
+    } else {
+      delete payload.dob; // 🔥 null kabhi mat bhejo
+    }
+
+    /* ===================== ARRAYS ===================== */
+    const toArray = (val) => {
+      if (Array.isArray(val)) return val;
+      if (typeof val === 'string' && val.trim() !== '') return val.split(',').map((i) => i.trim());
+      return [];
     };
 
-    const onFinishFailed = ({ errorFields }) => {
-        const allErrors = errorFields
-            .flatMap(field => field.errors)
-            .map(err => `• ${err}`)
-            .join("\n");
+    payload.allergies = toArray(values.allergies);
+    payload.medicalHistory = toArray(values.medicalHistory);
+    payload.chronicDiseases = toArray(values.chronicDiseases);
 
-        message.error({
-            content: allErrors,
-            duration: 4,
-            style: { whiteSpace: "pre-line" }
-        });
-    };
+    /* ===================== INSURANCE DATE ===================== */
+    if (values.insurance?.expiryDate) {
+      payload.insurance = {
+        ...values.insurance,
+        expiryDate: values.insurance.expiryDate.toISOString(),
+      };
+    }
 
-    const onFinish = async (values) => {
-        try {
-            const payload = { ...values };
+    /* ===================== DOCUMENTS ===================== */
+    if (Array.isArray(values.documents)) {
+      payload.documents = values.documents.map((f) => f.originFileObj).filter(Boolean);
+    }
 
-            if (payload.dob) payload.dob = payload.dob.toISOString();
+    console.log('✅ FINAL PAYLOAD:', payload);
 
-            if (payload.opd?.lastVisit)
-                payload.opd.lastVisit = payload.opd.lastVisit.toISOString();
+    dispatch(createPatient(payload))
+      .unwrap()
+      .then(() => {
+        message.success('Patient created successfully ✅');
+        navigate('/patient-onboarding');
+      })
+      .catch((err) => {
+        message.error(err || 'Validation failed ❌');
+      });
+  };
 
-            if (payload.ipd?.admissionDate)
-                payload.ipd.admissionDate = payload.ipd.admissionDate.toISOString();
+  return (
+    <>
+      <div className="page-wrapper">
+        <Breadcrumbs
+          title="Patient List"
+          showBack
+          backTo="/dashboard"
+          items={[
+            { label: 'Patient List', href: '/patitent-onboarding' },
+            { label: 'Add-Edit Patient List' },
+          ]}
+        />
 
-            if (payload.ipd?.dischargeDate)
-                payload.ipd.dischargeDate = payload.ipd.dischargeDate.toISOString();
+        <Spin spinning={loading} tip="Saving patient...">
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={onFinish}
+            onValuesChange={handleValuesChange}
+            onFinishFailed={onFinishFailed}
+          >
+            <Collapse defaultActiveKey={allPanels} accordion={false}>
+              <Panel header="Basic Information" key="basic">
+                <Row gutter={[16, 10]}>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item
+                      name="firstName"
+                      label="First Name"
+                      rules={[{ required: true, message: 'First name is required' }]}
+                    >
+                      <Input placeholder="Enter first name" />
+                    </Form.Item>
+                  </Col>
 
-            if (payload.ipd) {
-                if (!payload.ipd.admissionDate) delete payload.ipd.admissionDate;
-                if (!payload.ipd.dischargeDate) delete payload.ipd.dischargeDate;
-            }
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name="lastName" label="Last Name">
+                      <Input placeholder="Enter last name" />
+                    </Form.Item>
+                  </Col>
 
-            if (payload.opd && !payload.opd.doctor) delete payload.opd.doctor;
-            if (payload.ipd && !payload.ipd.doctor) delete payload.ipd.doctor;
+                  <Col xs={16} sm={12} md={8}>
+                    <Form.Item name="dob" label="Date of Birth">
+                      <DatePicker placeholder="Select date of birth" />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={8} sm={12} md={8}>
+                    <Form.Item
+                      name="age"
+                      label="Age"
+                      rules={[{ required: true, message: 'Age is required' }]}
+                    >
+                      <InputNumber
+                        placeholder="Enter age"
+                        min={0}
+                        max={120}
+                        style={{ width: '100%' }}
+                      />
+                    </Form.Item>
+                  </Col>
 
-            Object.keys(payload).forEach((key) => {
-                if (typeof payload[key] === "object" && payload[key] !== null) {
-                    payload[key] = JSON.stringify(payload[key]);
-                }
-            });
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name="gender" label="Gender" rules={[{ required: true }]}>
+                      <Select placeholder="Select gender">
+                        <Option value="male">Male</Option>
+                        <Option value="female">Female</Option>
+                        <Option value="other">Other</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name="bloodGroup" label="Blood Group">
+                      <Select placeholder="Select blood group" allowClear>
+                        {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map((bg) => (
+                          <Option key={bg} value={bg}>
+                            {bg}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item
+                      name="phone"
+                      label="Phone"
+                      rules={[
+                        { required: true, message: 'Phone number is required' },
+                        {
+                          pattern: /^[0-9]{10}$/,
+                          message: 'Phone number must be exactly 10 digits',
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Enter 10 digit phone number"
+                        maxLength={10}
+                        inputMode="numeric"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item
+                      name="altPhone"
+                      label="Alt Phone"
+                      rules={[
+                        {
+                          pattern: /^[0-9]{10}$/,
+                          message: 'Phone number must be exactly 10 digits',
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Enter 10 digit phone number"
+                        maxLength={10}
+                        inputMode="numeric"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item
+                      name="email"
+                      label="Email"
+                      rules={[
+                        {
+                          type: 'email',
+                          message: 'Please enter a valid email address',
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Enter email address" autoComplete="email" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Panel>
 
+              <Panel header="Address" key="address">
+                <Row gutter={[16, 10]}>
+                  <Col span={24}>
+                    <Form.Item name={['address', 'line1']} label="Line 1">
+                      <Input placeholder="House / Flat / Street" />
+                    </Form.Item>
+                  </Col>
 
-            let res;
+                  <Col span={24}>
+                    <Form.Item name={['address', 'line2']} label="Line 2">
+                      <Input placeholder="Landmark / Area" />
+                    </Form.Item>
+                  </Col>
 
-            if (isEdit) {
-                res = await dispatch(updatePatient({ id, data: payload })).unwrap();
-            } else {
-                res = await dispatch(createPatient(payload)).unwrap();
-            }
+                  <Col span={12}>
+                    <Form.Item name={['address', 'city']} label="City">
+                      <Input placeholder="Enter city" />
+                    </Form.Item>
+                  </Col>
 
+                  <Col span={12}>
+                    <Form.Item name={['address', 'state']} label="State">
+                      <Input placeholder="Enter state" />
+                    </Form.Item>
+                  </Col>
 
-            if (!res || res.success === false || res.details) {
+                  <Col span={12}>
+                    <Form.Item name={['address', 'zip']} label="ZIP">
+                      <Input placeholder="Enter pincode" />
+                    </Form.Item>
+                  </Col>
 
-                const msg = Array.isArray(res?.details)
-                    ? res.details.map((d) => d.replace(/"/g, "")).join("\n")
-                    : res?.message || "Something went wrong!";
+                  <Col span={12}>
+                    <Form.Item name={['address', 'country']} label="Country">
+                      <Input placeholder="Enter country" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Panel>
 
-                message.error({
-                    content: msg,
-                    duration: 3,
-                    style: { whiteSpace: "pre-line" }
-                });
+              <Panel header="Vitals" key="vitals">
+                <Row gutter={[16, 10]}>
+                  <Col xs={12} md={8}>
+                    <Form.Item
+                      name={['vitals', 'height']}
+                      label="Height (cm)"
+                      rules={[
+                        {
+                          type: 'number',
+                          min: 30,
+                          max: 300,
+                          message: 'Height must be between 30–300 cm',
+                        },
+                      ]}
+                    >
+                      <InputNumber
+                        placeholder="Enter height in cm"
+                        min={30}
+                        style={{ width: '100%' }}
+                      />
+                    </Form.Item>
+                  </Col>
 
-                return; // STOP → no success, no navigation
-            }
+                  <Col xs={12} md={8}>
+                    <Form.Item
+                      name={['vitals', 'weight']}
+                      label="Weight (kg)"
+                      rules={[
+                        {
+                          type: 'number',
+                          min: 1,
+                          max: 500,
+                          message: 'Weight must be between 1–500 kg',
+                        },
+                      ]}
+                    >
+                      <InputNumber
+                        placeholder="Enter weight in kg"
+                        style={{ width: '100%' }}
+                        min={1}
+                      />
+                    </Form.Item>
+                  </Col>
 
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      name={['vitals', 'bloodPressure']}
+                      label="Blood Pressure"
+                      rules={[
+                        {
+                          pattern: /^[0-9]{2,3}\/[0-9]{2,3}$/,
+                          message: 'Format should be like 120/80',
+                        },
+                      ]}
+                    >
+                      <Input placeholder="120/80" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Panel>
 
-            message.success(
-                res.message || (isEdit ? "Patient updated successfully" : "Patient created successfully")
-            );
-
-            navigate("/patitent-onboarding");
-        } catch (err) {
-            let errorMsg = "";
-
-            if (Array.isArray(err?.response?.data?.details)) {
-                errorMsg = err.response.data.details
-                    .map((d) => d.replace(/"/g, ""))
-                    .join("\n");
-            } else {
-                errorMsg =
-                    err?.response?.data?.message ||
-                    err?.message ||
-                    "Failed to save patient";
-            }
-
-            message.error({
-                content: errorMsg,
-                duration: 4,
-                style: { whiteSpace: "pre-line" }
-            });
-        }
-    };
-
-    console.log("doctorNames", doctorNames);
-
-
-    return (
-        <>
-            {loading && (
-                <Spin fullscreen size="large" tip="Loading..." />
-            )}
-            <Breadcrumbs
-                title="View Patient"
-                showBack={true}
-                backTo="/patitent-onboarding"
-                items={[
-                    { label: "Patient List", href: "/patitent-onboarding" },
-                    { label: "View Patient" }
-                ]}
-            />
-
-            <div className="doctor-container patient-container">
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
-                    onValuesChange={handleValuesChange}
-                    disabled={loading}
+              <Panel header="Documents" key="documents">
+                <Form.Item
+                  name="documents"
+                  valuePropName="fileList"
+                  getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
                 >
-                    {/* BASIC INFORMATION */}
-                    <Card title="Basic Information" style={{ marginBottom: 20 }}>
-                        <Row gutter={16}>
-                            <Col span={8}>
-                                <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
-                                    <Input placeholder="Enter first name" />
-                                </Form.Item>
-                            </Col>
+                  <Upload
+                    multiple
+                    accept=".pdf,image/*"
+                    listType="text"
+                    beforeUpload={(file) => {
+                      const isValid =
+                        file.type === 'application/pdf' || file.type.startsWith('image/');
 
-                            <Col span={8}>
-                                <Form.Item name="lastName" label="Last Name">
-                                    <Input placeholder="Enter last name" />
-                                </Form.Item>
-                            </Col>
+                      if (!isValid) {
+                        message.error('Only PDF or Image files are allowed');
+                        return Upload.LIST_IGNORE;
+                      }
 
-                            <Col span={8}>
-                                <Form.Item name="gender" label="Gender" rules={[{ required: true }]}>
-                                    <Select placeholder="Select gender">
-                                        <Option value="male">Male</Option>
-                                        <Option value="female">Female</Option>
-                                        <Option value="other">Other</Option>
-                                    </Select>
-                                </Form.Item>
-                            </Col>
+                      return false; // stop auto upload
+                    }}
+                  >
+                    <Button type="dashed" block>
+                      Upload PDF / Image
+                    </Button>
+                  </Upload>
+                </Form.Item>
+              </Panel>
 
-                            <Col span={8}>
-                                <Form.Item
-                                    name="dob"
-                                    label="Date of Birth"
-                                >
-                                    <DatePicker placeholder="Select DOB" style={{ width: "100%" }} />
-                                </Form.Item>
-                            </Col>
+              <Panel header="Medical History" key="medicalHistory">
+                <Form.Item name="medicalHistory">
+                  <Input placeholder="Diabetes, Hypertension" />
+                </Form.Item>
+              </Panel>
 
-                            <Col span={8}>
-                                <Form.Item
-                                    name="age"
-                                    label="Age"
-                                    rules={[{ required: true, message: "Please enter age" }]}
-                                >
-                                    <Input type="number" placeholder="Enter age" />
-                                </Form.Item>
-                            </Col>
+              <Panel header="Guardian Information" key="guardian">
+                <Row gutter={[16, 10]}>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name={['guardian', 'name']} label="Name">
+                      <Input placeholder="Guardian name" />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item
+                      name={['guardian', 'phone']}
+                      label="Phone"
+                      rules={[
+                        {
+                          pattern: /^[0-9]{10}$/,
+                          message: 'Phone number must be exactly 10 digits',
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Enter 10 digit phone number"
+                        maxLength={10}
+                        inputMode="numeric"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name={['guardian', 'relation']} label="Relation">
+                      <Input placeholder="Father / Mother / Spouse" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Panel>
 
+              <Panel header="Emergency Contact" key="emergencyContact">
+                <Row gutter={[16, 10]}>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name={['emergencyContact', 'name']} label="Name">
+                      <Input placeholder="Emergency contact name" />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item
+                      name={['emergencyContact', 'phone']}
+                      label="Phone"
+                      rules={[
+                        {
+                          pattern: /^[0-9]{10}$/,
+                          message: 'Phone number must be exactly 10 digits',
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Emergency phone number"
+                        maxLength={10}
+                        inputMode="numeric"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name={['emergencyContact', 'relation']} label="Relation">
+                      <Input placeholder="Relation with patient" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Panel>
 
-                            <Col span={8}>
-                                <Form.Item name="bloodGroup" label="Blood Group">
-                                    <Select placeholder="Select blood group">
-                                        {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map((bg) => (
-                                            <Option key={bg}>{bg}</Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                            </Col>
+              <Panel header="Insurance Details" key="insurance">
+                <Row gutter={[16, 10]}>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name={['insurance', 'provider']} label="Provider">
+                      <Input placeholder="Insurance provider name" />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name={['insurance', 'policyNumber']} label="Policy Number">
+                      <Input placeholder="Enter policy number" />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={12} sm={12} md={8}>
+                    <Form.Item name={['insurance', 'expiryDate']} label="Expiry Date">
+                      <DatePicker
+                        style={{ width: '100%' }}
+                        placeholder="Select expiry date"
+                        disabledDate={(current) => current && current < dayjs().startOf('day')}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Panel>
 
-                            <Col span={8}>
-                                <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-                                    <Input placeholder="Primary phone" />
-                                </Form.Item>
-                            </Col>
+              <Panel header="Chronic Diseases" key="chronicDiseases">
+                <Form.Item name="chronicDiseases">
+                  <Input placeholder="Asthma, Arthritis" />
+                </Form.Item>
+              </Panel>
 
-                            <Col span={8}>
-                                <Form.Item name="altPhone" label="Alt Phone">
-                                    <Input placeholder="Alternate phone" />
-                                </Form.Item>
-                            </Col>
+              <Panel header="Allergies" key="allergies">
+                <Form.Item name="allergies">
+                  <Input placeholder="Dust, Pollen, Penicillin" />
+                </Form.Item>
+              </Panel>
 
-                            <Col span={8}>
-                                <Form.Item name="email" label="Email">
-                                    <Input placeholder="Enter email" />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Card>
+              <Panel header="Notes" key="notes">
+                <Form.Item name="notes">
+                  <Input.TextArea rows={4} placeholder="Enter additional notes" />
+                </Form.Item>
+              </Panel>
+            </Collapse>
 
-                    {/* ADDRESS */}
-                    <Card title="Address Information" style={{ marginBottom: 20 }}>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Form.Item
-                                    name={["address", "line1"]}
-                                    label="Address Line 1"
-                                    rules={[{ required: true }]}
-                                >
-                                    <Input placeholder="Line 1" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={12}>
-                                <Form.Item name={["address", "line2"]} label="Address Line 2">
-                                    <Input placeholder="Line 2" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={6}>
-                                <Form.Item name={["address", "city"]} label="City" rules={[{ required: true }]}>
-                                    <Input placeholder="City" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={6}>
-                                <Form.Item name={["address", "state"]} label="State" rules={[{ required: true }]}>
-                                    <Input placeholder="State" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={6}>
-                                <Form.Item name={["address", "zip"]} label="ZIP" rules={[{ required: true }]}>
-                                    <Input placeholder="ZIP Code" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={6}>
-                                <Form.Item
-                                    name={["address", "country"]}
-                                    label="Country"
-                                    rules={[{ required: true }]}
-                                >
-                                    <Input placeholder="Country" />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Card>
-
-                    {/* VITALS */}
-                    <Card title="Vitals" style={{ marginTop: 20 }}>
-                        <Row gutter={16}>
-                            <Col span={8}>
-                                <Form.Item name={["vitals", "height"]} label="Height (cm)">
-                                    <Input type="number" placeholder="Enter height" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={8}>
-                                <Form.Item name={["vitals", "weight"]} label="Weight (kg)">
-                                    <Input type="number" placeholder="Enter weight" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={8}>
-                                <Form.Item name={["vitals", "temperature"]} label="Temperature (°C)">
-                                    <Input type="number" placeholder="Enter temperature" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={8}>
-                                <Form.Item name={["vitals", "bloodPressure"]} label="Blood Pressure">
-                                    <Input placeholder="e.g., 120/80" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={8}>
-                                <Form.Item name={["vitals", "pulse"]} label="Pulse">
-                                    <Input type="number" placeholder="Pulse rate" />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={8}>
-                                <Form.Item name={["vitals", "spo2"]} label="SpO2 (%)">
-                                    <Input type="number" placeholder="Oxygen level" />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Card>
-
-                    {/* CASE TYPE */}
-                    <Card title="Case Type">
-                        <Row gutter={16}>
-                            <Col span={8}>
-                                <Form.Item name="caseType" label="Case Type" rules={[{ required: true }]}>
-                                    <Select placeholder="Select OPD / IPD / Emergency">
-                                        <Option value="opd">OPD</Option>
-                                        <Option value="ipd">IPD</Option>
-                                        <Option value="emergency">Emergency</Option>
-                                        <Option value="appointment">Appointment</Option>
-                                    </Select>
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Card>
-
-                    {/* OPD */}
-                    {caseType === "opd" && (
-                        <Card title="OPD Details" style={{ marginTop: 20 }}>
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <Form.Item name="case" label="Case" rules={[{ required: true }]}>
-                                        <Select placeholder="Select Old / New">
-                                            <Option value="old">Old</Option>
-                                            <Option value="new">New</Option>
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item
-                                        name={["opd", "doctor"]}
-                                        label="Doctor"
-                                        rules={[{ required: true, message: "Please select a doctor" }]}
-                                    >
-                                        <Select
-                                            showSearch
-                                            placeholder="Select Doctor"
-                                            loading={doctorLoading}
-                                            allowClear
-                                            filterOption={false}
-                                            onClick={() => {
-                                                if (doctorNames.length === 0) {
-                                                    fetchDoctorNames();   // API hit on click
-                                                }
-                                            }}
-                                        >
-                                            {doctorNames.map((d) => (
-                                                <Select.Option key={d._id} value={d._id}>
-                                                    {d.name}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={8}>
-                                    <Form.Item name={["opd", "visitReason"]} label="Visit Reason">
-                                        <Input placeholder="Reason for visit" />
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={8}>
-                                    <Form.Item name={["opd", "visitCount"]} label="Visit Count">
-                                        <Input type="number" placeholder="Visit count" />
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={8}>
-                                    <Form.Item name={["opd", "lastVisit"]} label="Last Visit">
-                                        <DatePicker style={{ width: "100%" }} placeholder="Select date" />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-                        </Card>
-                    )}
-
-                    {/* IPD */}
-                    {caseType === "ipd" && (
-                        <Card title="IPD Details" style={{ marginTop: 20 }}>
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <Form.Item
-                                        name={["ipd", "doctor"]}
-                                        label="Doctor"
-                                        rules={[{ required: true, message: "Please select a doctor" }]}
-                                    >
-                                        <Select
-                                            showSearch
-                                            placeholder="Select Doctor"
-                                            loading={doctorLoading}
-                                            allowClear
-                                            filterOption={false}
-                                            onClick={() => {
-                                                if (doctorNames.length === 0) {
-                                                    fetchDoctorNames();
-                                                }
-                                            }}
-                                        >
-                                            {doctorNames.map((d) => (
-                                                <Select.Option key={d.id} value={d.id}>
-                                                    {d.name}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-
-
-                                <Col span={8}>
-                                    <Form.Item name={["ipd", "ward"]} label="Ward">
-                                        <Input placeholder="Ward name" />
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={8}>
-                                    <Form.Item name={["ipd", "roomNumber"]} label="Room Number">
-                                        <Input placeholder="Room number" />
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={8}>
-                                    <Form.Item name={["ipd", "bedNumber"]} label="Bed Number">
-                                        <Input placeholder="Bed number" />
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={8}>
-                                    <Form.Item name={["ipd", "admissionDate"]} label="Admission Date">
-                                        <DatePicker style={{ width: "100%" }} placeholder="Select admission date" />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-                        </Card>
-                    )}
-
-                    {/* EMERGENCY */}
-                    {caseType === "emergency" && (
-                        <Card title="Emergency Details" style={{ marginTop: 20 }}>
-                            <Row gutter={16}>
-                                <Col span={8}>
-                                    <Form.Item name={["emergency", "level"]} label="Emergency Level">
-                                        <Select placeholder="Select level">
-                                            <Option value="low">Low</Option>
-                                            <Option value="medium">Medium</Option>
-                                            <Option value="high">High</Option>
-                                        </Select>
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={8}>
-                                    <Form.Item name={["emergency", "broughtBy"]} label="Brought By">
-                                        <Input placeholder="Name of person" />
-                                    </Form.Item>
-                                </Col>
-
-                                <Col span={24}>
-                                    <Form.Item
-                                        name={["emergency", "conditionNotes"]}
-                                        label="Condition Notes"
-                                    >
-                                        <Input.TextArea placeholder="Enter patient condition notes" rows={3} />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-                        </Card>
-                    )}
-
-                    {/* BUTTONS */}
-                    <div style={{ textAlign: "right", marginTop: 20 }}>
-                        <Button
-                            style={{ marginRight: 10 }}
-                            onClick={() => navigate("/patients-list")}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button type="primary" htmlType="submit" style={{ background: "#001a33" }}>
-                            {isEdit ? "Update Patient" : "Add Patient"}
-                        </Button>
-                    </div>
-                </Form>
+            <div
+              style={{ marginTop: 20, display: 'flex', justifyContent: 'end', marginBottom: 10 }}
+            >
+              <Button
+                htmlType="button"
+                disabled={loading}
+                onClick={() => navigate('/patitent-onboarding')}
+              >
+                Cancel
+              </Button>
+              <Button type="primary" className="btn" htmlType="submit" loading={loading}>
+                {isEdit ? 'Update Patient' : 'Add Patient'}
+              </Button>
             </div>
-        </>
-    );
+          </Form>
+        </Spin>
+      </div>
+    </>
+  );
 }
-
-export default AddEditPatient;

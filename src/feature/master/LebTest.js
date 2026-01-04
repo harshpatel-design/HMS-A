@@ -300,7 +300,13 @@ const LabTest = () => {
 
   return (
     <>
-      <Breadcrumbs title="Lab Tests" />
+     <div className="page-wrapper">
+      <Breadcrumbs
+          title="lab List"
+          showBack
+          backTo="/dashboard"
+          items={[{ label: 'lab List', href: '/lab-master' }, { label: 'lab List' }]}
+        />
 
       <div className="serachbar-bread">
         <Space>
@@ -312,10 +318,10 @@ const LabTest = () => {
               setSearchText(e.target.value);
               debouncedFetch(e.target.value);
             }}
-            style={{ width: 280 }}
+            style={{ maxWidth: 280 , width:"100%" }}
           />
           <Button icon={<ReloadOutlined />} onClick={handleReset} />
-          <Dropdown dropdownRender={() => columnMenu} trigger={["click"]}>
+          <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
             <Button icon={<FilterOutlined />} />
           </Dropdown>
 
@@ -323,7 +329,7 @@ const LabTest = () => {
             type="primary"
             className="btn"
             onClick={() => {
-              setDrawerMode("add");
+              setDrawerMode('add');
               form.resetFields();
               setDrawerOpen(true);
             }}
@@ -333,33 +339,34 @@ const LabTest = () => {
         </Space>
       </div>
 
-      <Table
-        rowKey="_id"
-        columns={filteredColumns}
-        dataSource={labTests}
-        loading={loading}
-        onChange={handleTableChange} 
-        pagination={{
-          current: page,
-          pageSize: limit,
-          total: total,
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50", "100", "500", "1000"],
-          onChange: handlePageChange,
-          onShowSizeChange: handlePageSizeChange,
-          showTotal: (total) => `Total ${total} items`,
-          showQuickJumper: limit > 100 && limit < 500,
-          locale: {
-            items_per_page: "Items / Page",
-          },
-        }}
-      />
-
+      <div className="table-scroll-container">
+        <Table
+          rowKey="_id"
+          columns={filteredColumns}
+          dataSource={labTests}
+          scroll={{ x: 1000, y: 'calc(100vh - 260px)' }}
+          loading={loading}
+          onChange={handleTableChange}
+          pagination={{
+            current: page,
+            pageSize: limit,
+            total: total,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+            onChange: handlePageChange,
+            onShowSizeChange: handlePageSizeChange,
+            showTotal: (total) => `Total ${total} items`,
+            showQuickJumper: limit > 100 && limit < 500,
+            locale: {
+              items_per_page: 'Items / Page',
+            },
+          }}
+        />
+      </div>
       <Drawer
-        title={drawerMode === "add" ? "Add Lab Test" : "Edit Lab Test"}
+        title={drawerMode === 'add' ? 'Add Lab Test' : 'Edit Lab Test'}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        width={420}
       >
         <Form layout="vertical" form={form} onFinish={onFinish}>
           <Form.Item name="name" label="Name" rules={[{ required: true }]}>
@@ -370,11 +377,7 @@ const LabTest = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item
-            name="category"
-            label="Category"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
             <Select>
               {CATEGORIES.map((c) => (
                 <Select.Option key={c} value={c}>
@@ -397,10 +400,10 @@ const LabTest = () => {
           </Form.Item>
 
           <Form.Item name="turnaroundTime" label="TAT (Hours)">
-            <InputNumber min={1} style={{ width: "100%" }} />
+            <InputNumber min={1} style={{ width: '100%' }} />
           </Form.Item>
 
-          {drawerMode === "edit" && (
+          {drawerMode === 'edit' && (
             <Form.Item name="isActive" label="Status">
               <Select>
                 <Select.Option value={true}>Active</Select.Option>
@@ -409,11 +412,12 @@ const LabTest = () => {
             </Form.Item>
           )}
 
-          <Button type="primary" htmlType="submit">
-            {drawerMode === "add" ? "Create" : "Update"}
+          <Button type="primary" htmlType="submit" className="btn">
+            {drawerMode === 'add' ? 'Create' : 'Update'}
           </Button>
         </Form>
       </Drawer>
+      </div>
     </>
   );
 };

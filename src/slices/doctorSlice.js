@@ -78,19 +78,30 @@ const initialState = {
 };
 
 const doctorSlice = createSlice({
-  name: "doctor",
+  name: 'doctor',
   initialState,
   reducers: {
     resetDoctorState: (state) => {
       state.selectedDoctor = null;
       state.success = false;
       state.error = null;
-    }
+    },
+    setSort: (state, action) => {
+      state.orderBy = action.payload.orderBy;
+      state.order = action.payload.order;
+    },
+
+    resetSort: (state) => {
+      state.orderBy = 'createdAt';
+      state.order = 'DESC';
+    },
   },
   extraReducers: (builder) => {
     builder
 
-      .addCase(fetchDoctors.pending, (state) => { state.loading = true; })
+      .addCase(fetchDoctors.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchDoctors.fulfilled, (state, action) => {
         state.loading = false;
         state.doctors = action.payload.doctors || [];
@@ -104,11 +115,13 @@ const doctorSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(fetchDoctorById.pending, (state) => { state.loading = true; })
+      .addCase(fetchDoctorById.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchDoctorById.fulfilled, (state, action) => {
         state.loading = false;
         state.doctor = action.payload;
-        state.selectedDoctor = action.payload
+        state.selectedDoctor = action.payload;
       })
       .addCase(fetchDoctorById.rejected, (state, action) => {
         state.loading = false;
@@ -125,7 +138,7 @@ const doctorSlice = createSlice({
 
       .addCase(updateDoctor.fulfilled, (state, action) => {
         state.success = true;
-        const index = state.doctors.findIndex(d => d._id === action.payload._id);
+        const index = state.doctors.findIndex((d) => d._id === action.payload._id);
         if (index !== -1) state.doctors[index] = action.payload;
       })
       .addCase(updateDoctor.rejected, (state, action) => {
@@ -134,13 +147,13 @@ const doctorSlice = createSlice({
 
       .addCase(deleteDoctor.fulfilled, (state, action) => {
         state.success = true;
-        state.doctors = state.doctors.filter(item => item._id !== action.meta.arg);
+        state.doctors = state.doctors.filter((item) => item._id !== action.meta.arg);
       })
       .addCase(deleteDoctor.rejected, (state, action) => {
         state.error = action.payload;
       });
-  }
+  },
 });
 
-export const { resetDoctorState } = doctorSlice.actions;
+export const { resetDoctorState ,resetSort,setSort } = doctorSlice.actions;
 export default doctorSlice.reducer;

@@ -41,7 +41,7 @@ const AppointmentsWidget = () => {
               <Select.Option value="visit">Visit</Select.Option>
             </Select>
           }
-          bodyStyle={{ padding: 12 }}
+          bodyStyle={{ padding: 16 }}
         >
           <Calendar
             fullscreen={false}

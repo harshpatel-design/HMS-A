@@ -6,7 +6,6 @@ import {
   Space,
   Input,
   Tag,
-  Tooltip,
   Modal,
   message,
   Checkbox,
@@ -38,6 +37,7 @@ import { fetchWards } from "../../slices/wardSlice.js";
 import Breadcrumbs from "../comman/Breadcrumbs";
 import debounce from "lodash/debounce";
 import "../../index.css";
+import"../../hcss.css";
 
 const { Search } = Input;
 
@@ -386,189 +386,192 @@ const BedMaster = () => {
 
   return (
     <>
-      <Breadcrumbs title="Bed List" />
+      <div className="page-wrapper">
+        <Breadcrumbs
+                 title="Bad List"
+                 showBack
+                 backTo="/dashboard"
+                 items={[{ label: 'Bad List', href: '/bad-master' }, { label: 'Bad List' }]}
+               />
 
-      <div className="serachbar-bread">
-        <Space>
-          <Search
-            placeholder="Search bed number"
-            allowClear
-            value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
-              debouncedFetch(e.target.value);
+        <div className="serachbar-bread">
+          <Space>
+            <Search
+              placeholder="Search bed number"
+              allowClear
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                debouncedFetch(e.target.value);
+              }}
+              style={{ maxWidth: 260, width: '100%' }}
+            />
+            <Button icon={<ReloadOutlined />} onClick={handleReset} />
+            <Dropdown dropdownRender={() => columnMenu}>
+              <Button icon={<FilterOutlined />} />
+            </Dropdown>
+            <Button
+              type="primary"
+              className="btn"
+              onClick={() => {
+                setDrawerMode('add');
+                form.resetFields();
+                setDrawerOpen(true);
+              }}
+            >
+              Add Bed
+            </Button>
+          </Space>
+        </div>
+
+        <div className="table-scroll-container">
+          <Table
+            rowKey="_id"
+            scroll={{ x: 1000}}
+            columns={filteredColumns}
+            dataSource={beds}
+            loading={loading}
+            pagination={{
+              current: page,
+              pageSize: limit,
+              total: total,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+              onChange: handleTableChange,
+              showTotal: (totalRecord) => `Total ${totalRecord} items`,
+              showQuickJumper: limit > 100 && limit < 500,
+              locale: {
+                items_per_page: 'Items / Page',
+              },
             }}
-            style={{ width: 280 }}
           />
-          <Button icon={<ReloadOutlined />} onClick={handleReset} />
-          <Dropdown dropdownRender={() => columnMenu}>
-            <Button icon={<FilterOutlined />} />
-          </Dropdown>
-          <Button
-            type="primary"
-            className="btn"
-            onClick={() => {
-              setDrawerMode("add");
-              form.resetFields();
-              setDrawerOpen(true);
-            }}
-          >
-            Add Bed
-          </Button>
-        </Space>
+        </div>
+        <Drawer
+          title={drawerMode === 'add' ? 'Add Bed' : 'Edit Bed'}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+        >
+          <Form layout="vertical" form={form} onFinish={onFinish}>
+            <Form.Item name="bedNumber" label="Bed Number" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="bedType"
+              label="Bed Type"
+              rules={[{ required: true, message: 'Please select bed type' }]}
+            >
+              <Select placeholder="Select Bed Type" allowClear>
+                {BED_TYPES.map((type) => (
+                  <Select.Option key={type} value={type}>
+                    {type}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="floor" label="Floor" rules={[{ required: true }]}>
+              <Select placeholder="Select Floor" loading={floorLoading}>
+                {floors.map((f) => (
+                  <Select.Option key={f._id} value={f._id}>
+                    {f.name} (Floor {f.floorNumber})
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="room"
+              label="Room"
+              rules={[
+                {
+                  required: !selectedWard,
+                  message: 'Please select room or ward',
+                },
+              ]}
+            >
+              <Select
+                placeholder="Select Room"
+                loading={roomLoading} //
+                disabled={!!selectedWard}
+                allowClear
+                onChange={(value) => {
+                  setSelectedRoom(value);
+
+                  if (value) {
+                    setSelectedWard(null);
+                    form.setFieldsValue({ ward: null });
+                  }
+                }}
+                onClear={() => setSelectedRoom(null)}
+              >
+                {rooms.map((r) => (
+                  <Select.Option key={r._id} value={r._id}>
+                    {r.roomNumber} ({r.roomType})
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="ward"
+              label="Ward"
+              rules={[
+                {
+                  required: !selectedRoom,
+                  message: 'Please select ward or room',
+                },
+              ]}
+            >
+              <Select
+                placeholder="Select Ward"
+                loading={wardLoading}
+                disabled={!!selectedRoom}
+                allowClear
+                onChange={(value) => {
+                  setSelectedWard(value);
+
+                  if (value) {
+                    setSelectedRoom(null);
+                    form.setFieldsValue({ room: null });
+                  }
+                }}
+                onClear={() => setSelectedWard(null)}
+              >
+                {wards.map((w) => (
+                  <Select.Option key={w._id} value={w._id}>
+                    {w.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            {drawerMode === 'edit' && (
+              <Form.Item name="isOccupied" label="Occupied" rules={[{ required: true }]}>
+                <Select>
+                  <Select.Option value={true}>Occupied</Select.Option>
+                  <Select.Option value={false}>Vacant</Select.Option>
+                </Select>
+              </Form.Item>
+            )}
+
+            {drawerMode === 'edit' && (
+              <Form.Item name="isActive" label="Active Status" rules={[{ required: true }]}>
+                <Select>
+                  <Select.Option value={true}>Active</Select.Option>
+                  <Select.Option value={false}>Inactive</Select.Option>
+                </Select>
+              </Form.Item>
+            )}
+            <Form.Item name="notes" label="Notes">
+              <Input.TextArea />
+            </Form.Item>
+
+            <Button type="primary"  htmlType="submit"  className="btn">
+              {drawerMode === 'add' ? 'Create' : 'Update'}
+            </Button>
+          </Form>
+        </Drawer>
       </div>
-
-      <Table
-        rowKey="_id"
-        columns={filteredColumns}
-        dataSource={beds}
-        loading={loading}
-        pagination={{
-          current: page,
-          pageSize: limit,
-          total,
-          showSizeChanger: true,
-        }}
-        onChange={handleTableChange}
-      />
-      <Drawer
-        title={drawerMode === "add" ? "Add Bed" : "Edit Bed"}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        width={420}
-      >
-        <Form layout="vertical" form={form} onFinish={onFinish}>
-          <Form.Item
-            name="bedNumber"
-            label="Bed Number"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="bedType"
-            label="Bed Type"
-            rules={[{ required: true, message: "Please select bed type" }]}
-          >
-            <Select placeholder="Select Bed Type" allowClear>
-              {BED_TYPES.map((type) => (
-                <Select.Option key={type} value={type}>
-                  {type}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="floor" label="Floor" rules={[{ required: true }]}>
-            <Select placeholder="Select Floor" loading={floorLoading}>
-              {floors.map((f) => (
-                <Select.Option key={f._id} value={f._id}>
-                  {f.name} (Floor {f.floorNumber})
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="room"
-            label="Room"
-            rules={[
-              {
-                required: !selectedWard,
-                message: "Please select room or ward",
-              },
-            ]}
-          >
-            <Select
-              placeholder="Select Room"
-              loading={roomLoading}//
-              disabled={!!selectedWard}
-              allowClear
-              onChange={(value) => {
-                setSelectedRoom(value);
-
-                if (value) {
-                  setSelectedWard(null);
-                  form.setFieldsValue({ ward: null });
-                }
-              }}
-              onClear={() => setSelectedRoom(null)}
-            >
-              {rooms.map((r) => (
-                <Select.Option key={r._id} value={r._id}>
-                  {r.roomNumber} ({r.roomType})
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="ward"
-            label="Ward"
-            rules={[
-              {
-                required: !selectedRoom,
-                message: "Please select ward or room",
-              },
-            ]}
-          >
-            <Select
-              placeholder="Select Ward"
-              loading={wardLoading}
-              disabled={!!selectedRoom}
-              allowClear
-              onChange={(value) => {
-                setSelectedWard(value);
-
-                if (value) {
-                  setSelectedRoom(null);
-                  form.setFieldsValue({ room: null });
-                }
-              }}
-              onClear={() => setSelectedWard(null)}
-            >
-              {wards.map((w) => (
-                <Select.Option key={w._id} value={w._id}>
-                  {w.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          {drawerMode === "edit" && (
-            <Form.Item
-              name="isOccupied"
-              label="Occupied"
-              rules={[{ required: true }]}
-            >
-              <Select>
-                <Select.Option value={true}>Occupied</Select.Option>
-                <Select.Option value={false}>Vacant</Select.Option>
-              </Select>
-            </Form.Item>
-          )}
-
-          {drawerMode === "edit" && (
-            <Form.Item
-              name="isActive"
-              label="Active Status"
-              rules={[{ required: true }]}
-            >
-              <Select>
-                <Select.Option value={true}>Active</Select.Option>
-                <Select.Option value={false}>Inactive</Select.Option>
-              </Select>
-            </Form.Item>
-          )}
-          <Form.Item name="notes" label="Notes">
-            <Input.TextArea />
-          </Form.Item>
-
-          <Button type="primary" htmlType="submit" className="btn">
-            {drawerMode === "add" ? "Create" : "Update"}
-          </Button>
-        </Form>
-      </Drawer>
     </>
   );
 };

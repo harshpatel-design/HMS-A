@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import patientService from "../services/patientService";
 
-/* =======================================================
-   📌 GET ALL PATIENTS
-======================================================= */
 export const fetchPatients = createAsyncThunk(
   "patient/fetchPatients",
   async (
@@ -23,10 +20,6 @@ export const fetchPatients = createAsyncThunk(
     }
   }
 );
-
-/* =======================================================
-   📌 GET SINGLE PATIENT
-======================================================= */
 export const fetchPatientById = createAsyncThunk(
   "patient/fetchPatientById",
   async (id, { rejectWithValue }) => {
@@ -38,9 +31,6 @@ export const fetchPatientById = createAsyncThunk(
   }
 );
 
-/* =======================================================
-   🟢 CREATE PATIENT
-======================================================= */
 export const createPatient = createAsyncThunk(
   "patient/createPatient",
   async (payload, { rejectWithValue }) => {
@@ -52,9 +42,6 @@ export const createPatient = createAsyncThunk(
   }
 );
 
-/* =======================================================
-   🟡 UPDATE PATIENT
-======================================================= */
 export const updatePatient = createAsyncThunk(
   "patient/updatePatient",
   async ({ id, data }, { rejectWithValue }) => {
@@ -66,9 +53,6 @@ export const updatePatient = createAsyncThunk(
   }
 );
 
-/* =======================================================
-   🔴 DELETE PATIENT
-======================================================= */
 export const deletePatient = createAsyncThunk(
   "patient/deletePatient",
   async (id, { rejectWithValue }) => {
@@ -80,9 +64,6 @@ export const deletePatient = createAsyncThunk(
   }
 );
 
-/* =======================================================
-   INITIAL STATE
-======================================================= */
 const initialState = {
   patients: [],
   patient: null,
@@ -97,9 +78,6 @@ const initialState = {
   success: false,
 };
 
-/* =======================================================
-   SLICE
-======================================================= */
 const patientSlice = createSlice({
   name: "patient",
   initialState,
@@ -108,6 +86,15 @@ const patientSlice = createSlice({
       state.success = false;
       state.error = null;
     },
+     setSort: (state, action) => {
+            state.orderBy = action.payload.orderBy;
+            state.order = action.payload.order;
+        },
+
+        resetSort: (state) => {
+            state.orderBy = "createdAt";
+            state.order = "DESC";
+        },
   },
   extraReducers: (builder) => {
     builder
@@ -208,5 +195,5 @@ const patientSlice = createSlice({
   },
 });
 
-export const { resetPatientState } = patientSlice.actions;
+export const { resetPatientState , setSort ,resetSort} = patientSlice.actions;
 export default patientSlice.reducer;

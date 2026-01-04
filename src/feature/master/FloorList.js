@@ -260,6 +260,7 @@ const FloorList = () => {
     {
       title: "Actions",
       key: "actions",
+      width:100,
       render: (record) => (
         <Space>
           <Button
@@ -331,159 +332,136 @@ const FloorList = () => {
 
   return (
     <>
-      <Breadcrumbs
-        title="Floor List"
-        showBack
-        backTo="/dashboard"
-        items={[
-          { label: "Floor List", href: "/floor-master" },
-          { label: "Floor List" },
-        ]}
-      />
-
-      {/* Top Bar */}
-      <div className="serachbar-bread">
-        <Space>
-          <Search
-            placeholder="Search floor name or code"
-            allowClear
-            value={searchText}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSearchText(value);
-              debouncedFetch(value);
-            }}
-            onSearch={(value) => {
-              setSearchText(value);
-              loadData(1, limit);
-            }}
-            style={{ width: 280 }}
-          />
-
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={handleReset}
-          />
-          <Dropdown dropdownRender={() => columnMenu} trigger={["click"]}>
-            <Button icon={<FilterOutlined />} />
-          </Dropdown>
-          <Button
-            type="primary"
-            className="btn"
-            style={{ width: 160 }}
-            onClick={() => {
-              setDrawerMode("add");
-              setEditingRecord(null);
-              form.resetFields();
-              setDrawerOpen(true);
-            }}
-          >
-            Add Floor
-          </Button>
-        </Space>
-      </div>
-
-      <div className="table-scroll-container">
-        <Table
-          columns={filteredColumns}
-          dataSource={floors}
-          loading={loading}
-          rowKey="_id"
-          pagination={{
-            current: page,
-            pageSize: limit,
-            total: total,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100", "500", "1000"],
-            onChange: handleTableChange,
-            showTotal: (totalRecord) => `Total ${totalRecord} items`,
-            showQuickJumper: limit > 100 && limit < 500,
-            locale: {
-              items_per_page: "Items / Page",
-            },
-          }}
+      <div className="page-wrapper">
+        <Breadcrumbs
+          title="Floor List"
+          showBack
+          backTo="/dashboard"
+          items={[{ label: 'Floor List', href: '/floor-master' }, { label: 'Floor List' }]}
         />
 
+        <div className="serachbar-bread">
+          <Space>
+            <Search
+              placeholder="Search floor name or code"
+              allowClear
+              value={searchText}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchText(value);
+                debouncedFetch(value);
+              }}
+              onSearch={(value) => {
+                setSearchText(value);
+                loadData(1, limit);
+              }}
+              style={{ width: '100%', maxWidth: 260 }}
+            />
 
-        <Drawer
-          title={drawerMode === "add" ? "Add Floor" : "Edit Floor"}
-          width={420}
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          destroyOnClose
-        >
-          <Form
-            layout="vertical"
-            form={form}
-            onFinish={async (values) => {
-              try {
-                if (drawerMode === "add") {
-                  await dispatch(createFloor(values)).unwrap();
-                  message.success("Floor created successfully");
-                } else {
-                  await dispatch(
-                    updateFloor({ id: editingRecord._id, data: values })
-                  ).unwrap();
-                  message.success("Floor updated successfully");
-                }
+            <Button icon={<ReloadOutlined />} onClick={handleReset} />
+            <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
+              <Button icon={<FilterOutlined />} />
+            </Dropdown>
+            <Button
+              type="primary"
+              className="btn"
+              onClick={() => {
+                setDrawerMode('add');
+                setEditingRecord(null);
+                form.resetFields();
+                setDrawerOpen(true);
+              }}
+            >
+              Add Floor
+            </Button>
+          </Space>
+        </div>
 
-                setDrawerOpen(false);
-                dispatch(fetchFloors({ page, limit }));
-              } catch (err) {
-                message.error(err?.message || "Something went wrong");
-              }
+        <div className="table-scroll-container">
+          <Table
+            columns={filteredColumns}
+            scroll={{ x: 1000}}
+            dataSource={floors}
+            loading={loading}
+            rowKey="_id"
+            pagination={{
+              current: page,
+              pageSize: limit,
+              total: total,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+              onChange: handleTableChange,
+              showTotal: (totalRecord) => `Total ${totalRecord} items`,
+              showQuickJumper: limit > 100 && limit < 500,
+              locale: {
+                items_per_page: 'Items / Page',
+              },
             }}
+          />
+
+          <Drawer
+            title={drawerMode === 'add' ? 'Add Floor' : 'Edit Floor'}
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            destroyOnClose
           >
-            <Form.Item
-              name="name"
-              label="Floor Name"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
+            <Form
+              layout="vertical"
+              form={form}
+              onFinish={async (values) => {
+                try {
+                  if (drawerMode === 'add') {
+                    await dispatch(createFloor(values)).unwrap();
+                    message.success('Floor created successfully');
+                  } else {
+                    await dispatch(updateFloor({ id: editingRecord._id, data: values })).unwrap();
+                    message.success('Floor updated successfully');
+                  }
 
-            <Form.Item
-              name="code"
-              label="Floor Code"
-              rules={[{ required: true }]}
+                  setDrawerOpen(false);
+                  dispatch(fetchFloors({ page, limit }));
+                } catch (err) {
+                  message.error(err?.message || 'Something went wrong');
+                }
+              }}
             >
-              <Input disabled={drawerMode === "edit"} />
-            </Form.Item>
-
-            <Form.Item
-              name="floorNumber"
-              label="Floor Number"
-              rules={[{ required: true }]}
-            >
-              <Input type="number" />
-            </Form.Item>
-
-            {drawerMode === "edit" && (
-              <Form.Item
-                name="isActive"
-                label="Active Status"
-                rules={[{ required: true, message: "Please select active status" }]}
-              >
-                <Select placeholder="Select Active Status">
-                  <Select.Option value={true}>Active</Select.Option>
-                  <Select.Option value={false}>Inactive</Select.Option>
-                </Select>
+              <Form.Item name="name" label="Floor Name" rules={[{ required: true }]}>
+                <Input />
               </Form.Item>
-            )}
-            <Form.Item name="notes" label="Notes">
-              <Input.TextArea rows={3} />
-            </Form.Item>
 
-            <Space>
-              <Button type="primary" htmlType="submit" className="btn">
-                {drawerMode === "add" ? "Create" : "Update"}
-              </Button>
-              <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
-            </Space>
-          </Form>
-        </Drawer>
+              <Form.Item name="code" label="Floor Code" rules={[{ required: true }]}>
+                <Input disabled={drawerMode === 'edit'} />
+              </Form.Item>
 
+              <Form.Item name="floorNumber" label="Floor Number" rules={[{ required: true }]}>
+                <Input type="number" />
+              </Form.Item>
 
+              {drawerMode === 'edit' && (
+                <Form.Item
+                  name="isActive"
+                  label="Active Status"
+                  rules={[{ required: true, message: 'Please select active status' }]}
+                >
+                  <Select placeholder="Select Active Status">
+                    <Select.Option value={true}>Active</Select.Option>
+                    <Select.Option value={false}>Inactive</Select.Option>
+                  </Select>
+                </Form.Item>
+              )}
+              <Form.Item name="notes" label="Notes">
+                <Input.TextArea rows={3} />
+              </Form.Item>
+
+              <Space>
+                <Button type="primary" htmlType="submit" className="btn">
+                  {drawerMode === 'add' ? 'Create' : 'Update'}
+                </Button>
+                <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+              </Space>
+            </Form>
+          </Drawer>
+        </div>
       </div>
     </>
   );

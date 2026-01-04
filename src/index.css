@@ -76,13 +76,6 @@ body {
   padding-bottom: 30px;
 }
 
-/* Page wrapper full height */
-.page-wrapper {
-  min-height: 100vh;
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
 /* Utility spacing */
 .mt-20 {
   margin-top: 20px;

@@ -12,7 +12,7 @@ export default function PatientView() {
     const dispatch = useDispatch();
 
     const { patient, loading } = useSelector((state) => state.patient);
-    const data = patient; // since slice already stores actual object
+    const data = patient;
 
     useEffect(() => {
         if (id) dispatch(fetchPatientById(id));

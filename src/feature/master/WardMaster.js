@@ -331,160 +331,169 @@ const WardMaster = () => {
 
 
     return (
-        <>
-            <Breadcrumbs title="Ward List" items={[{ label: "Ward List" }]} />
+      <>
+        <div className="page-wrapper">
+          <Breadcrumbs
+            title="Ward List"
+            showBack
+            backTo="/dashboard"
+            items={[{ label: 'Ward List', href: '/ward-master' }, { label: 'Ward List' }]}
+          />
 
-            <div className="serachbar-bread ">
-                <Space>
-                    <Search
-                        placeholder="Search ward"
-                        allowClear
-                        value={searchText}
-                        onChange={(e) => {
-                            setSearchText(e.target.value);
-                            debouncedFetch(e.target.value);
-                        }}
-                        style={{ width: 260 }}
-                    />
-
-                    <Button icon={<ReloadOutlined />} onClick={handleReset} />
-
-                    <Dropdown dropdownRender={() => columnMenu}>
-                        <Button icon={<FilterOutlined />} />
-                    </Dropdown>
-
-                    <Button
-                        type="primary"
-                        className="btn"
-                        style={{ width: 160 }}
-                        onClick={() => {
-                            setDrawerMode("add");
-                            setEditingRecord(null);
-                            form.resetFields();
-                            setDrawerOpen(true);
-                        }}
-                    >
-                        Add Ward
-                    </Button>
-                </Space>
-            </div>
-
-            <Table
-                rowKey="_id"
-                columns={filteredColumns}
-                className="wardTabel"
-                dataSource={wards}
-                loading={loading}
-                onChange={handleTableChange}
-                pagination={{
-                    current: page,
-                    pageSize: limit,
-                    total,
-                    showSizeChanger: true,
-                    pageSizeOptions: ["5", "10", "20", "50", "100"],
-                    showTotal: (total, range) =>
-                        `${range[0]}-${range[1]} of ${total} wards`,
+          <div className="serachbar-bread ">
+            <Space>
+              <Search
+                placeholder="Search ward"
+                allowClear
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  debouncedFetch(e.target.value);
                 }}
+                style={{ maxWidth: 260  , width:"100%"}}
+              />
+
+              <Button icon={<ReloadOutlined />} onClick={handleReset} />
+
+              <Dropdown dropdownRender={() => columnMenu}>
+                <Button icon={<FilterOutlined />} />
+              </Dropdown>
+
+              <Button
+                type="primary"
+                className="btn"
+                style={{ width: 160 }}
+                onClick={() => {
+                  setDrawerMode('add');
+                  setEditingRecord(null);
+                  form.resetFields();
+                  setDrawerOpen(true);
+                }}
+              >
+                Add Ward
+              </Button>
+            </Space>
+          </div>
+
+          <div className="table-scroll-container">
+            <Table
+              rowKey="_id"
+              columns={filteredColumns}
+              scroll={{ x: 1000 }}
+              className="wardTabel"
+              dataSource={wards}
+              loading={loading}
+              onChange={handleTableChange}
+              pagination={{
+                current: page,
+                pageSize: limit,
+                total,
+                showSizeChanger: true,
+                pageSizeOptions: ['5', '10', '20', '50', '100'],
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} wards`,
+              }}
             />
-            <Drawer
-                title={drawerMode === "add" ? "Add Ward" : "Edit Ward"}
-                width={420}
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                destroyOnClose
-            >
-                {loading ? (
-                    <div style={{ textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-                        <Spin />
-                    </div>
-                ) : (
-                    <Form
-                        layout="vertical"
-                        form={form}
-                        onFinish={async (values) => {
-                            try {
-                                if (drawerMode === "add") {
-                                    await dispatch(createWard(values)).unwrap();
-                                    message.success("Ward created");
-                                } else {
-                                    await dispatch(
-                                        updateWard({ id: editingRecord._id, data: values })
-                                    ).unwrap();
-                                    message.success("Ward updated");
-                                }
+          </div>
+          <Drawer
+            title={drawerMode === 'add' ? 'Add Ward' : 'Edit Ward'}
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            destroyOnClose
+          >
+            {loading ? (
+              <div
+                style={{
+                  textAlign: 'center',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                <Spin />
+              </div>
+            ) : (
+              <Form
+                layout="vertical"
+                form={form}
+                onFinish={async (values) => {
+                  try {
+                    if (drawerMode === 'add') {
+                      await dispatch(createWard(values)).unwrap();
+                      message.success('Ward created');
+                    } else {
+                      await dispatch(updateWard({ id: editingRecord._id, data: values })).unwrap();
+                      message.success('Ward updated');
+                    }
 
-                                setDrawerOpen(false);
-                                dispatch(fetchWards({ page, limit }));
-                            } catch (err) {
-                                message.error(err?.message || "Failed");
-                            }
-                        }}
-                    >
+                    setDrawerOpen(false);
+                    dispatch(fetchWards({ page, limit }));
+                  } catch (err) {
+                    message.error(err?.message || 'Failed');
+                  }
+                }}
+              >
+                <Form.Item
+                  name="floor"
+                  label="Floor"
+                  rules={[{ required: true, message: 'Please select floor' }]}
+                >
+                  <Select placeholder="Select Floor" loading={floorLoading} allowClear>
+                    {floors.map((floor) => (
+                      <Select.Option key={floor._id} value={floor._id}>
+                        {floor.name} (Floor {floor.floorNumber})
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item name="name" label="Ward Name" rules={[{ required: true }]}>
+                  <Input />
+                </Form.Item>
 
-                        <Form.Item
-                            name="floor"
-                            label="Floor"
-                            rules={[{ required: true, message: "Please select floor" }]}
-                        >
-                            <Select
-                                placeholder="Select Floor"
-                                loading={floorLoading}
-                                allowClear
-                            >
-                                {floors.map((floor) => (
-                                    <Select.Option key={floor._id} value={floor._id}>
-                                        {floor.name} (Floor {floor.floorNumber})
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                        <Form.Item name="name" label="Ward Name" rules={[{ required: true }]}>
-                            <Input />
-                        </Form.Item>
+                <Form.Item name="code" label="Ward Code" rules={[{ required: true }]}>
+                  <Input disabled={drawerMode === 'edit'} />
+                </Form.Item>
 
-                        <Form.Item name="code" label="Ward Code" rules={[{ required: true }]}>
-                            <Input disabled={drawerMode === "edit"} />
-                        </Form.Item>
-
-                        <Form.Item
-                            name="wardType"
-                            label="Ward Type"
-                            rules={[{ required: true, message: "Please select ward type" }]}
-                        >
-                            <Select placeholder="Select Ward Type">
-                                {WARD_TYPES.map((type) => (
-                                    <Select.Option key={type} value={type}>
-                                        {type}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                        {drawerMode === "edit" && (
-                            <Form.Item
-                                name="isActive"
-                                label="Active Status"
-                                rules={[{ required: true, message: "Please select active status" }]}
-                            >
-                                <Select placeholder="Select Active Status">
-                                    <Select.Option value={true}>Active</Select.Option>
-                                    <Select.Option value={false}>Inactive</Select.Option>
-                                </Select>
-                            </Form.Item>
-                        )}
-                        <Form.Item name="notes" label="Notes">
-                            <Input.TextArea rows={3} />
-                        </Form.Item>
-
-                        <Space>
-                            <Button type="primary" htmlType="submit" loading={loading} >
-                                {drawerMode === "add" ? "Create" : "Update"}
-                            </Button>
-                            <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
-                        </Space>
-                    </Form>
+                <Form.Item
+                  name="wardType"
+                  label="Ward Type"
+                  rules={[{ required: true, message: 'Please select ward type' }]}
+                >
+                  <Select placeholder="Select Ward Type">
+                    {WARD_TYPES.map((type) => (
+                      <Select.Option key={type} value={type}>
+                        {type}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                {drawerMode === 'edit' && (
+                  <Form.Item
+                    name="isActive"
+                    label="Active Status"
+                    rules={[{ required: true, message: 'Please select active status' }]}
+                  >
+                    <Select placeholder="Select Active Status">
+                      <Select.Option value={true}>Active</Select.Option>
+                      <Select.Option value={false}>Inactive</Select.Option>
+                    </Select>
+                  </Form.Item>
                 )}
-            </Drawer>
-        </>
+                <Form.Item name="notes" label="Notes">
+                  <Input.TextArea rows={3} />
+                </Form.Item>
+
+                <Space>
+                  <Button type="primary" htmlType="submit" className="btn" loading={loading}>
+                    {drawerMode === 'add' ? 'Create' : 'Update'}
+                  </Button>
+                  <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+                </Space>
+              </Form>
+            )}
+          </Drawer>
+        </div>
+      </>
     );
 };
 

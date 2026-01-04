@@ -314,196 +314,203 @@ useEffect(() => {
 
   return (
     <>
-      <Breadcrumbs
-        title={isEdit ? 'Edit Docotr' : 'Add New Doctor'}
-        showBack={true}
-        backTo="/doctor-onbording"
-        items={[
-          { label: 'Doctors', href: '/doctor-onbording' },
-          { label: isEdit ? 'Edit Doctor' : 'Add New Doctor' },
-        ]}
-      />
+      <div className="page-wrapper">
+        <Breadcrumbs
+          title={isEdit ? 'Edit Charge' : 'Charge List'}
+          showBack={true}
+          backTo="/charge-master"
+          items={[
+            { label: 'Charge', href: '/charge-master' },
+            { label: 'Charge List' },
+          ]}
+        />
 
-      <div className="serachbar-bread">
-        <Space>
-          <Search
-            placeholder="Search charge"
-            allowClear
-            value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
-              debouncedFetch(e.target.value);
-            }}
-            style={{ width: 280 }}
-          />
-          <Button icon={<ReloadOutlined />} onClick={handleReset} />
-          <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
-            <Button icon={<FilterOutlined />} />
-          </Dropdown>
-          <Button
-            type="primary"
-            className="btn"
-            onClick={() => {
-              setDrawerMode('add');
-              form.resetFields();
-              setDrawerOpen(true);
-            }}
-          >
-            Add Charge
-          </Button>
-        </Space>
-      </div>
-
-      <Table
-        rowKey="_id"
-        columns={filteredColumns}
-        dataSource={chargeMasters}
-        loading={loading}
-        onChange={handleTableChange}
-        pagination={{
-          current: page,
-          pageSize: limit,
-          total,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
-          showTotal: (totalRecord) => `Total ${totalRecord} items`,
-          showQuickJumper: limit > 100 && limit < 500,
-          locale: {
-            items_per_page: 'Items / Page',
-          },
-        }}
-      />
-
-      <Drawer
-        title={drawerMode === 'add' ? 'Add Charge' : 'Edit Charge'}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        width={420}
-      >
-        <Form layout="vertical" form={form} onFinish={onFinish}>
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="code"
-            label="Code"
-            rules={[
-              { required: true },
-              { pattern: /^[A-Z0-9_]+$/, message: 'Only uppercase letters & numbers' },
-            ]}
-          >
-            <Input onChange={(e) => form.setFieldsValue({ code: e.target.value.toUpperCase() })} />
-          </Form.Item>
-
-          <Form.Item name="doctor" label="Doctor">
-            <Select allowClear placeholder="Select Doctor">
-              {doctors.map((d) => (
-                <Select.Option key={d.doctorid} value={d.doctorid}>
-                  {d?.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="department" label="Department">
-            <Select allowClear placeholder="Select Department">
-              {departments.map((d) => (
-                <Select.Option key={d._id} value={d._id}>
-                  {d.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="labTest" label="Lab Test">
-            <Select allowClear placeholder="Select Lab Test">
-              {labTests.map((t) => (
-                <Select.Option key={t._id} value={t._id}>
-                  {t.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="chargeType" label="Charge Type" rules={[{ required: true }]}>
-            <Select>
-              {CHARGE_TYPES.map((c) => (
-                <Select.Option key={c} value={c}>
-                  {c}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="amount" label="Amount" rules={[{ required: true }]}>
-            <InputNumber min={0} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item name="gstApplicable" label="GST Applicable" valuePropName="checked">
-            <Switch
-              onChange={(checked) => {
-                if (!checked) {
-                  form.setFieldsValue({
-                    gstRate: 0,
-                    gstType: 'CGST_SGST',
-                    hsnCode: undefined,
-                  });
-                }
+        <div className="serachbar-bread">
+          <Space>
+            <Search
+              placeholder="Search charge"
+              allowClear
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                debouncedFetch(e.target.value);
               }}
+              style={{ maxWidth:200 , width:"100%" }}
             />
-          </Form.Item>
+            <Button icon={<ReloadOutlined />} onClick={handleReset} />
+            <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
+              <Button icon={<FilterOutlined />} />
+            </Dropdown>
+            <Button
+              type="primary"
+              className="btn"
+              onClick={() => {
+                setDrawerMode('add');
+                form.resetFields();
+                setDrawerOpen(true);
+              }}
+            >
+              Add Charge
+            </Button>
+          </Space>
+        </div>
 
-          <Form.Item shouldUpdate>
-            {({ getFieldValue }) =>
-              getFieldValue('gstApplicable') && (
-                <>
-                  <Form.Item name="gstRate" label="GST Rate" rules={[{ required: true }]}>
-                    <Select>
-                      {GST_RATES.map((r) => (
-                        <Select.Option key={r} value={r}>
-                          {r}%
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+        <div className="table-scroll-container">
+          <Table
+            rowKey="_id"
+            columns={filteredColumns}
+             scroll={{ x: 1200}}
+            dataSource={chargeMasters}
+            loading={loading}
+            onChange={handleTableChange}
+            pagination={{
+              current: page,
+              pageSize: limit,
+              total,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+              showTotal: (totalRecord) => `Total ${totalRecord} items`,
+              showQuickJumper: limit > 100 && limit < 500,
+              locale: {
+                items_per_page: 'Items / Page',
+              },
+            }}
+          />
+        </div>
 
-                  <Form.Item name="gstType" label="GST Type">
-                    <Select>
-                      {GST_TYPES.map((t) => (
-                        <Select.Option key={t} value={t}>
-                          {t}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+        <Drawer
+          title={drawerMode === 'add' ? 'Add Charge' : 'Edit Charge'}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          width={420}
+        >
+          <Form layout="vertical" form={form} onFinish={onFinish}>
+            <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
 
-                  <Form.Item name="hsnCode" label="HSN / SAC">
-                    <Input />
-                  </Form.Item>
-                </>
-              )
-            }
-          </Form.Item>
+            <Form.Item
+              name="code"
+              label="Code"
+              rules={[
+                { required: true },
+                { pattern: /^[A-Z0-9_]+$/, message: 'Only uppercase letters & numbers' },
+              ]}
+            >
+              <Input
+                onChange={(e) => form.setFieldsValue({ code: e.target.value.toUpperCase() })}
+              />
+            </Form.Item>
 
-          <Form.Item name="taxInclusive" label="Tax Inclusive" valuePropName="checked">
-            <Switch />
-          </Form.Item>
+            <Form.Item name="doctor" label="Doctor">
+              <Select allowClear placeholder="Select Doctor">
+                {doctors.map((d) => (
+                  <Select.Option key={d.doctorid} value={d.doctorid}>
+                    {d?.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-          {drawerMode === 'edit' && (
-            <Form.Item name="isActive" label="Status" valuePropName="checked">
+            <Form.Item name="department" label="Department">
+              <Select allowClear placeholder="Select Department">
+                {departments.map((d) => (
+                  <Select.Option key={d._id} value={d._id}>
+                    {d.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="labTest" label="Lab Test">
+              <Select allowClear placeholder="Select Lab Test">
+                {labTests.map((t) => (
+                  <Select.Option key={t._id} value={t._id}>
+                    {t.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="chargeType" label="Charge Type" rules={[{ required: true }]}>
+              <Select>
+                {CHARGE_TYPES.map((c) => (
+                  <Select.Option key={c} value={c}>
+                    {c}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="amount" label="Amount" rules={[{ required: true }]}>
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item name="gstApplicable" label="GST Applicable" valuePropName="checked">
+              <Switch
+                onChange={(checked) => {
+                  if (!checked) {
+                    form.setFieldsValue({
+                      gstRate: 0,
+                      gstType: 'CGST_SGST',
+                      hsnCode: undefined,
+                    });
+                  }
+                }}
+              />
+            </Form.Item>
+
+            <Form.Item shouldUpdate>
+              {({ getFieldValue }) =>
+                getFieldValue('gstApplicable') && (
+                  <>
+                    <Form.Item name="gstRate" label="GST Rate" rules={[{ required: true }]}>
+                      <Select>
+                        {GST_RATES.map((r) => (
+                          <Select.Option key={r} value={r}>
+                            {r}%
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
+                    <Form.Item name="gstType" label="GST Type">
+                      <Select>
+                        {GST_TYPES.map((t) => (
+                          <Select.Option key={t} value={t}>
+                            {t}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
+                    <Form.Item name="hsnCode" label="HSN / SAC">
+                      <Input />
+                    </Form.Item>
+                  </>
+                )
+              }
+            </Form.Item>
+
+            <Form.Item name="taxInclusive" label="Tax Inclusive" valuePropName="checked">
               <Switch />
             </Form.Item>
-          )}
 
-          <div style={{ display: 'flex', justifyContent: 'end' }}>
-            {' '}
-            <Button type="primary" htmlType="submit" className="btn">
-              {drawerMode === 'add' ? 'Create' : 'Update'}
-            </Button>
-          </div>
-        </Form>
-      </Drawer>
+            {drawerMode === 'edit' && (
+              <Form.Item name="isActive" label="Status" valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'end' }}>
+              {' '}
+              <Button type="primary" htmlType="submit" className="btn">
+                {drawerMode === 'add' ? 'Create' : 'Update'}
+              </Button>
+            </div>
+          </Form>
+        </Drawer>
+      </div>
     </>
   );
 };
