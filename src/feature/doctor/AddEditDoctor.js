@@ -747,6 +747,7 @@ export default function AddEditDoctor() {
                 htmlType="button"
                 disabled={loading}
                 onClick={() => navigate('/doctor-onbording')}
+                style={{marginRight:10 }}
               >
                 Cancel
               </Button>

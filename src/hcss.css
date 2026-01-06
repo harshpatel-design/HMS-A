@@ -635,7 +635,6 @@ h6 {
     height: 32px !important;
     cursor: pointer;
     transition: 0.1s;
-    margin-left: 10px;
     transform: scale(1);
 }
 
@@ -2032,4 +2031,5 @@ section {
     .sess-details .ant-picker {
         width: 100% !important;
     }
+
 }

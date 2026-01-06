@@ -287,6 +287,7 @@ export default function AddEditRecipient() {
             <Button
                 htmlType="button"
                 disabled={loading}
+                 style={{marginRight:10 }}
                 onClick={() => navigate('/recipient-onboarding')}
               >
                 Cancel

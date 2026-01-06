@@ -586,6 +586,7 @@ export default function AddEditPatient() {
               <Button
                 htmlType="button"
                 disabled={loading}
+                 style={{marginRight:10 }}
                 onClick={() => navigate('/patitent-onboarding')}
               >
                 Cancel
