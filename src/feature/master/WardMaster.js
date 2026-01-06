@@ -483,8 +483,8 @@ const WardMaster = () => {
                   <Input.TextArea rows={3} />
                 </Form.Item>
 
-                <Space>
-                  <Button type="primary" htmlType="submit" className="btn" loading={loading}>
+               <Space className="width-space">
+                  <Button type="primary" htmlType="submit" className="btn-full" loading={loading}>
                     {drawerMode === 'add' ? 'Create' : 'Update'}
                   </Button>
                   <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>

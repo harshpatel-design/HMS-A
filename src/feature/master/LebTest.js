@@ -343,8 +343,9 @@ const LabTest = () => {
         <Table
           rowKey="_id"
           columns={filteredColumns}
+          // className="my-custom-table"
           dataSource={labTests}
-          scroll={{ x: 1000, y: 'calc(100vh - 260px)' }}
+          scroll={{ x: 1000}}
           loading={loading}
           onChange={handleTableChange}
           pagination={{
@@ -412,9 +413,12 @@ const LabTest = () => {
             </Form.Item>
           )}
 
-          <Button type="primary" htmlType="submit" className="btn">
+          <Space className="width-space">
+          <Button type="primary" htmlType="submit" className="btn-full">
             {drawerMode === 'add' ? 'Create' : 'Update'}
           </Button>
+           <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+          </Space>
         </Form>
       </Drawer>
       </div>

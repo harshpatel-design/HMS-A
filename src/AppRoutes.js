@@ -39,6 +39,8 @@ import WardMaster from './feature/master/WardMaster';
 import LebTest from './feature/master/LebTest';
 import ChargeMaster from './feature/chargemaster/ChargeMaster';
 import ViewDoctor from './feature/doctor/ViewDoctor';
+import PatientVisit from './feature/patientvisit/PatientVisit';
+import ChargeList from './feature/charge/ChargeList';
 
 export function AppRoutes() {
   return (
@@ -66,6 +68,9 @@ export function AppRoutes() {
           <Route path="/add-edit-patitent/:id" element={<AddEditPatient />} />
           <Route path="/view-patitent/:id" element={<PatientView />} />
 
+          {/* p\Patient Visit */}
+          <Route path="/patient-visit" element={<PatientVisit />} />
+
           {/* Appointments */}
           <Route path="/appointments" element={<AppointmentList />} />
           <Route path="/add-appointment" element={<AddEditAppointment />} />
@@ -88,6 +93,8 @@ export function AppRoutes() {
 
           {/* Charge Master routes */}
           <Route path="/charge-master" element={<ChargeMaster />} />
+          <Route path="/charge-list" element={<ChargeList />} />
+
         </Route>
       </Route>
 

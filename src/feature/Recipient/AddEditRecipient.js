@@ -284,6 +284,13 @@ export default function AddEditRecipient() {
 
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 , marginBottom:10}}>
+            <Button
+                htmlType="button"
+                disabled={loading}
+                onClick={() => navigate('/recipient-onboarding')}
+              >
+                Cancel
+              </Button>
             <Button type="primary" htmlType="submit" className="btn">
               {isEdit ? 'Update Recipient' : 'Create Recipient'}
             </Button>

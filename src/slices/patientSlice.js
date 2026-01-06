@@ -1,10 +1,18 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import patientService from "../services/patientService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import patientService from '../services/patientService';
 
 export const fetchPatients = createAsyncThunk(
-  "patient/fetchPatients",
+  'patient/fetchPatients',
   async (
-    { page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" },
+    {
+      page = 1,
+      limit = 10,
+      orderBy = 'createdAt',
+      order = 'DESC',
+      search = '',
+      startDate = null,
+      endDate = null,
+    },
     { rejectWithValue }
   ) => {
     try {
@@ -14,60 +22,78 @@ export const fetchPatients = createAsyncThunk(
         orderBy,
         order,
         search,
+        startDate,
+        endDate,
       });
     } catch (err) {
-      return rejectWithValue(err.message || "Failed to fetch patients");
+      return rejectWithValue(
+        err?.message || 'Failed to fetch patients'
+      );
     }
   }
 );
+
 export const fetchPatientById = createAsyncThunk(
-  "patient/fetchPatientById",
+  'patient/fetchPatientById',
   async (id, { rejectWithValue }) => {
     try {
       return await patientService.getPatientById(id);
     } catch (err) {
-      return rejectWithValue(err.message || "Failed to fetch patient");
+      return rejectWithValue(err.message || 'Failed to fetch patient');
     }
   }
 );
 
 export const createPatient = createAsyncThunk(
-  "patient/createPatient",
+  'patient/createPatient',
   async (payload, { rejectWithValue }) => {
     try {
       return await patientService.createPatient(payload);
     } catch (err) {
-      return rejectWithValue(err.message || "Failed to create patient");
+      return rejectWithValue(err.message || 'Failed to create patient');
     }
   }
 );
 
 export const updatePatient = createAsyncThunk(
-  "patient/updatePatient",
+  'patient/updatePatient',
   async ({ id, data }, { rejectWithValue }) => {
     try {
       return await patientService.updatePatient(id, data);
     } catch (err) {
-      return rejectWithValue(err.message || "Failed to update patient");
+      return rejectWithValue(err.message || 'Failed to update patient');
     }
   }
 );
 
 export const deletePatient = createAsyncThunk(
-  "patient/deletePatient",
+  'patient/deletePatient',
   async (id, { rejectWithValue }) => {
     try {
       return await patientService.deletePatient(id);
     } catch (err) {
-      return rejectWithValue(err.message || "Failed to delete patient");
+      return rejectWithValue(err.message || 'Failed to delete patient');
     }
   }
 );
 
+export const fetchPatientName = createAsyncThunk(
+  "patient/patientName",
+  async ({ search = "" } = {}, { rejectWithValue }) => {
+    try {
+      const res = await patientService.getPatientNames({ search });
+      return res;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Failed to load patient name"
+      );
+    }
+  })
+
 const initialState = {
   patients: [],
   patient: null,
-
+  patientName: [],
   total: 0,
   totalPages: 1,
   page: 1,
@@ -79,27 +105,37 @@ const initialState = {
 };
 
 const patientSlice = createSlice({
-  name: "patient",
+  name: 'patient',
   initialState,
   reducers: {
     resetPatientState: (state) => {
       state.success = false;
       state.error = null;
     },
-     setSort: (state, action) => {
-            state.orderBy = action.payload.orderBy;
-            state.order = action.payload.order;
-        },
+    setSort: (state, action) => {
+      state.orderBy = action.payload.orderBy;
+      state.order = action.payload.order;
+    },
 
-        resetSort: (state) => {
-            state.orderBy = "createdAt";
-            state.order = "DESC";
-        },
+    resetSort: (state) => {
+      state.orderBy = 'createdAt';
+      state.order = 'DESC';
+    },
   },
   extraReducers: (builder) => {
     builder
-
-      /* ================= FETCH ALL ================= */
+      .addCase(fetchPatientName.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPatientName.fulfilled, (state, action) => {
+        state.loading = false;
+        state.patientName = action.payload; // 👈 SET HERE
+      })
+      .addCase(fetchPatientName.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(fetchPatients.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -117,8 +153,6 @@ const patientSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ================= FETCH BY ID ================= */
       .addCase(fetchPatientById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -160,9 +194,7 @@ const patientSlice = createSlice({
         state.success = true;
 
         const updated = action.payload.patient;
-        const index = state.patients.findIndex(
-          (p) => p._id === updated?._id
-        );
+        const index = state.patients.findIndex((p) => p._id === updated?._id);
 
         if (index !== -1) {
           state.patients[index] = updated;
@@ -184,9 +216,7 @@ const patientSlice = createSlice({
         state.loading = false;
         state.success = true;
 
-        state.patients = state.patients.filter(
-          (p) => p._id !== action.meta.arg
-        );
+        state.patients = state.patients.filter((p) => p._id !== action.meta.arg);
       })
       .addCase(deletePatient.rejected, (state, action) => {
         state.loading = false;
@@ -195,5 +225,5 @@ const patientSlice = createSlice({
   },
 });
 
-export const { resetPatientState , setSort ,resetSort} = patientSlice.actions;
+export const { resetPatientState, setSort, resetSort } = patientSlice.actions;
 export default patientSlice.reducer;

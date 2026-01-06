@@ -18,6 +18,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPatient, fetchPatientById, updatePatient } from '../../slices/patientSlice';
+import { fetchDoctorsName } from '../../slices/doctorSlice';
 import Breadcrumbs from '../comman/Breadcrumbs';
 
 const { Panel } = Collapse;
@@ -29,9 +30,14 @@ export default function AddEditPatient() {
   const isEdit = Boolean(id);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [search, setSearch] = useState('');
 
   const { loading, patient } = useSelector((state) => state.patient);
   const handleValuesChange = () => {};
+
+  useEffect(() => {
+    dispatch(fetchDoctorsName(search));
+  }, [dispatch, search]);
 
   useEffect(() => {
     if (isEdit) {
@@ -68,6 +74,7 @@ export default function AddEditPatient() {
     'chronicDiseases',
     'medicalHistory',
     'allergies',
+    'caseDetails',
   ];
 
   const onFinishFailed = ({ errorFields }) => {
@@ -85,16 +92,19 @@ export default function AddEditPatient() {
       ...values,
     };
 
+    // DOB
     if (values.dob) {
       payload.dob = values.dob.toISOString();
     } else {
-      delete payload.dob; // 🔥 null kabhi mat bhejo
+      delete payload.dob;
     }
 
-    /* ===================== ARRAYS ===================== */
+    // Arrays
     const toArray = (val) => {
       if (Array.isArray(val)) return val;
-      if (typeof val === 'string' && val.trim() !== '') return val.split(',').map((i) => i.trim());
+      if (typeof val === 'string' && val.trim() !== '') {
+        return val.split(',').map((i) => i.trim());
+      }
       return [];
     };
 
@@ -102,7 +112,7 @@ export default function AddEditPatient() {
     payload.medicalHistory = toArray(values.medicalHistory);
     payload.chronicDiseases = toArray(values.chronicDiseases);
 
-    /* ===================== INSURANCE DATE ===================== */
+    // Insurance expiry
     if (values.insurance?.expiryDate) {
       payload.insurance = {
         ...values.insurance,
@@ -110,16 +120,20 @@ export default function AddEditPatient() {
       };
     }
 
+    // Documents
     if (Array.isArray(values.documents)) {
       payload.documents = values.documents.map((f) => f.originFileObj).filter(Boolean);
     }
 
-    console.log('✅ FINAL PAYLOAD:', payload);
+    // 🔥 CREATE vs UPDATE
+    const action = isEdit ? updatePatient({ id, data: payload }) : createPatient(payload);
 
-    dispatch(createPatient(payload))
+    dispatch(action)
       .unwrap()
       .then(() => {
-        message.success('Patient created successfully ✅');
+        message.success(
+          isEdit ? 'Patient updated successfully ✅' : 'Patient created successfully ✅'
+        );
         navigate('/patient-onboarding');
       })
       .catch((err) => {
@@ -261,39 +275,99 @@ export default function AddEditPatient() {
                 </Row>
               </Panel>
 
+              <Panel header="Case Details" key="caseDetails">
+                <Row gutter={[16, 10]}>
+                  {/* Doctor */}
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      name="doctor"
+                      label="Doctor"
+                      rules={[{ required: true, message: 'Doctor is required' }]}
+                    >
+                      <Select
+                        showSearch
+                        placeholder="Select doctor"
+                        filterOption={false}
+                        onSearch={(value) => setSearch(value)}
+                      >
+                        {(useSelector((state) => state.doctor.doctorNames) || []).map((doc) => (
+                          <Option key={doc._id} value={doc._id}>
+                            {doc.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  {/* Case Type */}
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      name="caseType"
+                      label="Case Type"
+                      rules={[{ required: true, message: 'Case type is required' }]}
+                    >
+                      <Select placeholder="Select case type">
+                        <Option value="OPD">OPD</Option>
+                        <Option value="IPD">IPD</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  {/* Case Status */}
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      name="caseStatus"
+                      label="Case Status"
+                      rules={[{ required: true, message: 'Case status is required' }]}
+                    >
+                      <Select placeholder="Select case status">
+                        <Option value="new">New</Option>
+                        <Option value="old">Old</Option>
+                        <Option value="followup">Follow-up</Option>
+                        <Option value="emergency">Emergency</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Panel>
+
               <Panel header="Address" key="address">
                 <Row gutter={[16, 10]}>
-                  <Col span={24}>
+                  <Col xs={24} md={8}>
                     <Form.Item name={['address', 'line1']} label="Line 1">
                       <Input placeholder="House / Flat / Street" />
                     </Form.Item>
                   </Col>
 
-                  <Col span={24}>
+                  <Col xs={24} md={8}>
                     <Form.Item name={['address', 'line2']} label="Line 2">
                       <Input placeholder="Landmark / Area" />
                     </Form.Item>
                   </Col>
 
-                  <Col span={12}>
-                    <Form.Item name={['address', 'city']} label="City">
+                  <Col md={8} xs={12}>
+                    <Form.Item
+                      name={['address', 'city']}
+                      label="City"
+                      rules={[{ required: true , message: 'Enter city name' }]}
+                    >
                       <Input placeholder="Enter city" />
                     </Form.Item>
                   </Col>
 
-                  <Col span={12}>
+                   <Col md={8} xs={12}>
                     <Form.Item name={['address', 'state']} label="State">
                       <Input placeholder="Enter state" />
                     </Form.Item>
                   </Col>
 
-                  <Col span={12}>
+                  <Col md={8} xs={12}>
                     <Form.Item name={['address', 'zip']} label="ZIP">
                       <Input placeholder="Enter pincode" />
                     </Form.Item>
                   </Col>
 
-                  <Col span={12}>
+                  <Col md={8} xs={12}>
                     <Form.Item name={['address', 'country']} label="Country">
                       <Input placeholder="Enter country" />
                     </Form.Item>

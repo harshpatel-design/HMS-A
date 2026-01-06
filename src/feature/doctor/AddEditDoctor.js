@@ -480,7 +480,7 @@ export default function AddEditDoctor() {
                         },
                       ]}
                     >
-                      <Input placeholder="Pincode"maxLength={6} disabled={loading} />
+                      <Input placeholder="Pincode" maxLength={6} disabled={loading} />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -734,7 +734,6 @@ export default function AddEditDoctor() {
               </Panel>
             </Collapse>
 
-            {/* SUBMIT */}
             <div
               style={{
                 textAlign: 'right',
@@ -744,6 +743,13 @@ export default function AddEditDoctor() {
                 justifyContent: 'end',
               }}
             >
+              <Button
+                htmlType="button"
+                disabled={loading}
+                onClick={() => navigate('/doctor-onbording')}
+              >
+                Cancel
+              </Button>
               <Button
                 type="primary"
                 style={{ marginBottom: 10 }}

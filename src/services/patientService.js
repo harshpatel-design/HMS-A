@@ -62,17 +62,23 @@ const getPatients = async ({
   orderBy = "createdAt",
   order = "DESC",
   search = "",
+  startDate = null,
+  endDate = null,
 }) => {
-  const ordering = order === 'DESC' ? `-${orderBy}` : orderBy;
+  const ordering = order === "DESC" ? `-${orderBy}` : orderBy;
+
   return await axiosClient.get("/api/patients/patients", {
     params: {
       page,
       limit,
       search,
       ordering,
+      ...(startDate && { startDate }),
+      ...(endDate && { endDate }),
     },
   });
 };
+
 
 const getPatientById = async (id) => {
   if (!id) throw new Error('Patient ID is required');
@@ -87,20 +93,19 @@ const createPatient = async (payload) => {
   Object.entries(payload).forEach(([key, value]) => {
     if (key === 'documents') return;
 
-    if (typeof value === 'object' && value !== null) {
+    if (value === undefined || value === null) return
+
+    if (typeof value === "object") {
       formData.append(key, JSON.stringify(value));
     } else {
-      formData.append(key, value ?? '');
+      formData.append(key, String(value));
     }
   });
 
   if (payload.documents?.length > 0) {
     payload.documents.forEach((file) => formData.append('documents', file));
   }
-
-  return await axiosClient.post('/api/patients/patients', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  return await axiosClient.post('/api/patients/patients', formData);
 };
 
 const updatePatient = async (id, payload) => {
@@ -138,8 +143,16 @@ const deletePatient = async (id) => {
 };
 
 const getPatientNames = async ({ search = '' } = {}) => {
-  return await axiosClient.get('/api/patients/patients-names', { params: { search } });
+  const res = await axiosClient.get(
+    '/api/patients/patients-names',
+    {
+      params: { search },
+    }
+  );
+
+  return res;
 };
+
 
 const patientService = {
   getPatients,

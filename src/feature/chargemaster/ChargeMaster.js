@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Table,
   Button,
@@ -15,13 +15,8 @@ import {
   Form,
   InputNumber,
   Switch,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  ReloadOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
+} from 'antd';
+import { EditOutlined, DeleteOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
 
 import {
   fetchChargeMasters,
@@ -30,73 +25,71 @@ import {
   updateChargeMaster,
   deleteChargeMaster,
   resetChargeMasterState,
-} from "../../slices/chargeMasterSlice";
-import { fetchLabTests } from "../../slices/labTestSlice";
-import { fetchDoctors } from "../../slices/doctorSlice";
-import { fetchDepartments } from "../../slices/departmentSlice";
+} from '../../slices/chargeMasterSlice';
+import { fetchLabTests } from '../../slices/labTestSlice';
+import { fetchDoctors } from '../../slices/doctorSlice';
+import { fetchDepartments } from '../../slices/departmentSlice';
 
-
-import Breadcrumbs from "../comman/Breadcrumbs";
-import debounce from "lodash/debounce";
-import "../../index.css";
-import { useParams } from "react-router-dom";
+import Breadcrumbs from '../comman/Breadcrumbs';
+import debounce from 'lodash/debounce';
+import '../../index.css';
+import { useParams } from 'react-router-dom';
 
 const { Search } = Input;
 
-const CHARGE_TYPES = [
-  "OPD",
-  "IPD",
-  "EMERGENCY",
-  "APPOINTMENT",
-  "LAB",
-  "PROCEDURE",
-  "SERVICE",
+const CHARGE_TYPES = ['OPD', 'IPD', 'EMERGENCY', 'APPOINTMENT', 'LAB', 'PROCEDURE', 'SERVICE'];
+
+export const CHARGE_STATUS_OPTIONS = [
+  { label: 'Old', value: 'old' },
+  { label: 'New', value: 'new' },
+  { label: 'Follow Up', value: 'followup' },
+  { label: 'Emergency', value: 'emergency' },
 ];
 
 const GST_RATES = [0, 5, 12, 18];
-const CASE_CATEGORIES = ["NEW", "OLD"];
-const GST_TYPES = ["CGST_SGST", "IGST"];
+const GST_TYPES = ['CGST_SGST', 'IGST'];
 
 const ChargeMaster = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-    const { id } = useParams();
-    const isEdit = Boolean(id);
+  const { id } = useParams();
+  const isEdit = Boolean(id);
 
-  const { chargeMasters, loading, page, limit, total, selectedChargeMaster } =
-    useSelector((state) => state.chargeMaster);
+  const { chargeMasters, loading, page, limit, total, selectedChargeMaster } = useSelector(
+    (state) => state.chargeMaster
+  );
   const { labTests } = useSelector((state) => state.labTest);
   const { doctors } = useSelector((state) => state.doctor);
   const { departments } = useSelector((state) => state.department);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState("add");
+  const [drawerMode, setDrawerMode] = useState('add');
   const [editingRecord, setEditingRecord] = useState(null);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     dispatch(fetchChargeMasters({ page: 1, limit: 20 }));
   }, [dispatch]);
 
- useEffect(() => {
-   if (drawerOpen) {
-     dispatch(fetchLabTests({page : 1,pazeSize:400}));
-     dispatch(fetchDoctors({page:1,limit:500}));
-     dispatch(fetchDepartments());
-   }
- }, [drawerOpen, dispatch]);
+  useEffect(() => {
+    if (drawerOpen) {
+      dispatch(fetchLabTests({ page: 1, pazeSize: 400 }));
+      dispatch(fetchDoctors({ page: 1, limit: 500 }));
+      dispatch(fetchDepartments());
+    }
+  }, [drawerOpen, dispatch]);
 
-useEffect(() => {
-  if (drawerMode === "edit" && selectedChargeMaster) {
-    form.setFieldsValue({
-      ...selectedChargeMaster,
-      gstApplicable: !!selectedChargeMaster.gstApplicable,
-      taxInclusive: !!selectedChargeMaster.taxInclusive,
-      isActive: selectedChargeMaster.isActive ?? true,
-    });
-  }
-}, [drawerMode, selectedChargeMaster, form]);
-
+  useEffect(() => {
+    if (drawerMode === 'edit' && selectedChargeMaster) {
+      form.setFieldsValue({
+        ...selectedChargeMaster,
+        gstApplicable: !!selectedChargeMaster.gstApplicable,
+        taxInclusive: !!selectedChargeMaster.taxInclusive,
+        isActive: selectedChargeMaster.isActive ?? true,
+        caseStatus: selectedChargeMaster.caseStatus || "",
+      });
+    }
+  }, [drawerMode, selectedChargeMaster, form]);
 
   const debouncedFetch = useMemo(
     () =>
@@ -109,12 +102,12 @@ useEffect(() => {
   useEffect(() => () => debouncedFetch.cancel(), [debouncedFetch]);
 
   const handleReset = () => {
-    setSearchText("");
+    setSearchText('');
     dispatch(fetchChargeMasters({ page: 1, limit: 20 }));
   };
 
   const handleEdit = (record) => {
-    setDrawerMode("edit");
+    setDrawerMode('edit');
     setEditingRecord(record);
     setDrawerOpen(true);
     dispatch(fetchChargeMasterById(record._id));
@@ -122,29 +115,29 @@ useEffect(() => {
 
   const handleDelete = (record) => {
     Modal.confirm({
-      title: "Delete Charge?",
+      title: 'Delete Charge?',
       content: `Delete "${record.name}"?`,
-      okType: "danger",
+      okType: 'danger',
       onOk: async () => {
         try {
           await dispatch(deleteChargeMaster(record._id)).unwrap();
-          message.success("Charge deleted");
+          message.success('Charge deleted');
           dispatch(fetchChargeMasters({ page, limit }));
         } catch (err) {
-          message.error(err?.message || "Delete failed");
+          message.error(err?.message || 'Delete failed');
         }
       },
     });
   };
 
   const defaultChecked = [
-    "name",
-    "code",
-    "chargeType",
-    "amount",
-    "gstRate",
-    "taxInclusive",
-    "isActive",
+    'name',
+    'code',
+    'caseType',
+    'amount',
+    'gstRate',
+    'taxInclusive',
+    'isActive',
   ];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
@@ -154,8 +147,8 @@ useEffect(() => {
     { title: 'Code', dataIndex: 'code', key: 'code', sorter: true },
     {
       title: 'Type',
-      dataIndex: 'chargeType',
-      key: 'chargeType',
+      dataIndex: 'caseType',
+      key: 'caseType',
       render: (v) => <Tag color="blue">{v}</Tag>,
     },
     {
@@ -180,7 +173,7 @@ useEffect(() => {
       title: 'Tax Inclusive',
       dataIndex: 'taxInclusive',
       key: 'taxInclusive',
-      width:60,
+      width: 60,
       render: (v) => (v ? 'Yes' : 'No'),
     },
     {
@@ -205,53 +198,48 @@ useEffect(() => {
       key: 'isActive',
       render: (v) => (v ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>),
     },
-   {
-  title: 'Actions',
-  key: 'actions',
-  render: (record) => {
-    return (
-      <Space>
-        <Button
-          type="text"
-          icon={<EditOutlined />}
-          onClick={() => handleEdit(record)}
-        />
-        <Button
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(record)}
-        />
-      </Space>
-    );
-  },
-}
-
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (record) => {
+        return (
+          <Space>
+            <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record)}
+            />
+          </Space>
+        );
+      },
+    },
   ];
 
   const filteredColumns = allColumns.filter(
-    (c) => selectedColumns.includes(c.key) || c.key === "actions"
+    (c) => selectedColumns.includes(c.key) || c.key === 'actions'
   );
 
   const onFinish = async (values) => {
     try {
       let res;
-      if (drawerMode === "add") {
+      if (drawerMode === 'add') {
         res = await dispatch(createChargeMaster(values)).unwrap();
-        message.success(res?.message || "Charge created");
+        message.success(res?.message || 'Charge created');
       } else {
         res = await dispatch(
           updateChargeMaster({ id: editingRecord._id, payload: values })
         ).unwrap();
-        message.success(res?.message || "Charge updated");
+        message.success(res?.message || 'Charge updated');
       }
       form.resetFields();
       setDrawerOpen(false);
-      setDrawerMode("add");
+      setDrawerMode('add');
       dispatch(fetchChargeMasters({ page, limit }));
       dispatch(resetChargeMasterState());
     } catch (err) {
-      message.error(err?.message || "Something went wrong");
+      message.error(err?.message || 'Something went wrong');
     }
   };
 
@@ -259,7 +247,7 @@ useEffect(() => {
     <div className="column-filter-menu">
       <div className="column-filter-grid">
         {allColumns
-          .filter((c) => c.key !== "actions")
+          .filter((c) => c.key !== 'actions')
           .map((col) => (
             <div key={col.key} className="column-filter-item">
               <Checkbox
@@ -268,9 +256,7 @@ useEffect(() => {
                   if (e.target.checked) {
                     setSelectedColumns([...selectedColumns, col.key]);
                   } else {
-                    setSelectedColumns(
-                      selectedColumns.filter((c) => c !== col.key)
-                    );
+                    setSelectedColumns(selectedColumns.filter((c) => c !== col.key));
                   }
                 }}
               >
@@ -282,35 +268,30 @@ useEffect(() => {
 
       <div className="column-filter-divider" />
 
-      <Button
-        type="link"
-        style={{ padding: 0 }}
-        onClick={() => setSelectedColumns(defaultChecked)}
-      >
+      <Button type="link" style={{ padding: 0 }} onClick={() => setSelectedColumns(defaultChecked)}>
         Reset to default
       </Button>
     </div>
   );
 
   const handleTableChange = (pagination, filters, sorter) => {
-  let ordering = "-createdAt";
+    let ordering = '-createdAt';
 
-  if (sorter?.order === 'ascend') {
-    ordering = sorter.field;
-  } else if (sorter?.order === 'descend') {
-    ordering = `-${sorter.field}`;
-  }
+    if (sorter?.order === 'ascend') {
+      ordering = sorter.field;
+    } else if (sorter?.order === 'descend') {
+      ordering = `-${sorter.field}`;
+    }
 
-  dispatch(
-    fetchChargeMasters({
-      page: pagination.current,
-      limit: pagination.pageSize,
-      search: searchText,
-      ordering,
-    })
-  );
-};
-
+    dispatch(
+      fetchChargeMasters({
+        page: pagination.current,
+        limit: pagination.pageSize,
+        search: searchText,
+        ordering,
+      })
+    );
+  };
 
   return (
     <>
@@ -318,13 +299,8 @@ useEffect(() => {
         <Breadcrumbs
           title={isEdit ? 'Edit Charge' : 'Charge List'}
           showBack={true}
-          backTo="/charge-master"
-          items={[
-            { label: 'Charge', href: '/charge-master' },
-            { label: 'Charge List' },
-          ]}
+          items={[{ label: 'Charge', href: '/charge-master' }, { label: 'Charge List' }]}
         />
-
         <div className="serachbar-bread">
           <Space>
             <Search
@@ -335,7 +311,7 @@ useEffect(() => {
                 setSearchText(e.target.value);
                 debouncedFetch(e.target.value);
               }}
-              style={{ maxWidth:200 , width:"100%" }}
+              style={{ maxWidth: 200, width: '100%' }}
             />
             <Button icon={<ReloadOutlined />} onClick={handleReset} />
             <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
@@ -354,12 +330,11 @@ useEffect(() => {
             </Button>
           </Space>
         </div>
-
         <div className="table-scroll-container">
           <Table
             rowKey="_id"
             columns={filteredColumns}
-             scroll={{ x: 1200}}
+            scroll={{ x: 1200 }}
             dataSource={chargeMasters}
             loading={loading}
             onChange={handleTableChange}
@@ -377,7 +352,6 @@ useEffect(() => {
             }}
           />
         </div>
-
         <Drawer
           title={drawerMode === 'add' ? 'Add Charge' : 'Edit Charge'}
           open={drawerOpen}
@@ -432,14 +406,27 @@ useEffect(() => {
               </Select>
             </Form.Item>
 
-            <Form.Item name="chargeType" label="Charge Type" rules={[{ required: true }]}>
-              <Select>
+            <Form.Item name="caseType" label="Charge Type" rules={[{ required: true }]}>
+              <Select
+                placeholder="Select charge status">
                 {CHARGE_TYPES.map((c) => (
                   <Select.Option key={c} value={c}>
                     {c}
                   </Select.Option>
                 ))}
               </Select>
+
+            </Form.Item>
+            <Form.Item
+              name="caseStatus"
+              label="Case Status"
+              rules={[{ required: true, message: 'Charge status is required' }]}
+            >
+              <Select
+                placeholder="Select charge status"
+                options={CHARGE_STATUS_OPTIONS}
+                allowClear
+              />
             </Form.Item>
 
             <Form.Item name="amount" label="Amount" rules={[{ required: true }]}>
@@ -502,12 +489,12 @@ useEffect(() => {
               </Form.Item>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'end' }}>
-              {' '}
-              <Button type="primary" htmlType="submit" className="btn">
+           <Space className="width-space">
+              <Button type="primary" htmlType="submit" className="btn-full">
                 {drawerMode === 'add' ? 'Create' : 'Update'}
               </Button>
-            </div>
+               <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            </Space>
           </Form>
         </Drawer>
       </div>

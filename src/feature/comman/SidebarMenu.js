@@ -1,12 +1,12 @@
-import { Menu } from "antd";
+import { Menu } from 'antd';
 import {
   DashboardOutlined,
   UserOutlined,
   CalendarOutlined,
   AppstoreOutlined,
-} from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+} from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 export default function SidebarMenu({ collapsed, onMenuClick }) {
   const navigate = useNavigate();
@@ -14,13 +14,14 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
   const [openKeys, setOpenKeys] = useState([]);
 
   const rootSubmenuKeys = [
-    "master",
-    "chargeMaster",
-    "doctor",
-    "recipient",
-    "patient",
-    "appointments",
-    "services",
+    'master',
+    'chargeMaster',
+    'doctor',
+    'recipient',
+    'patient',
+    'appointments',
+    'services',
+    'charge',
   ];
 
   const handleMenuClick = ({ key }) => {
@@ -31,20 +32,22 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
   // 🔥 AUTO OPEN MENU BASED ON URL
   const getOpenKey = () => {
     if (
-      location.pathname.startsWith("/floor") ||
-      location.pathname.startsWith("/ward") ||
-      location.pathname.startsWith("/room") ||
-      location.pathname.startsWith("/bed") ||
-      location.pathname.startsWith("/lab") ||
-      location.pathname.startsWith("/department")
-    ) return ["master"];
+      location.pathname.startsWith('/floor') ||
+      location.pathname.startsWith('/ward') ||
+      location.pathname.startsWith('/room') ||
+      location.pathname.startsWith('/bed') ||
+      location.pathname.startsWith('/lab') ||
+      location.pathname.startsWith('/department')
+    )
+      return ['master'];
 
-    if (location.pathname.startsWith("/charge")) return ["chargeMaster"];
-    if (location.pathname.startsWith("/doctor")) return ["doctor"];
-    if (location.pathname.startsWith("/recipient")) return ["recipient"];
-    if (location.pathname.startsWith("/patitent")) return ["patient"];
-    if (location.pathname.startsWith("/appointments")) return ["appointments"];
-    if (location.pathname.startsWith("/services")) return ["services"];
+    if (location.pathname.startsWith('/charge')) return ['chargeMaster'];
+    if (location.pathname.startsWith('/doctor')) return ['doctor'];
+    if (location.pathname.startsWith('/recipient')) return ['recipient'];
+    if (location.pathname.startsWith('/patitent')) return ['patient'];
+    if (location.pathname.startsWith('/appointments')) return ['appointments'];
+    if (location.pathname.startsWith('/services')) return ['services'];
+    if (location.pathname.startsWith("/charges")) return ["charge"];
 
     return [];
   };
@@ -55,9 +58,7 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
 
   // 🔥 ONLY ONE MAIN MENU OPEN
   const onOpenChange = (keys) => {
-    const latestOpenKey = keys.find(
-      (key) => !openKeys.includes(key)
-    );
+    const latestOpenKey = keys.find((key) => !openKeys.includes(key));
 
     if (rootSubmenuKeys.includes(latestOpenKey)) {
       setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
@@ -67,14 +68,15 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
   };
 
   const parentRouteMap = {
-  master: "/floor-master",
-  chargeMaster: "/charge-master",
-  doctor: "/doctor-onbording",
-  recipient: "/recipient-onboarding",
-  patient: "/patitent-onboarding",
-  appointments: "/appointments",
-  services: "/services",
-};
+    master: '/floor-master',
+    chargeMaster: '/charge-master',
+    doctor: '/doctor-onbording',
+    recipient: '/recipient-onboarding',
+    patient: '/patitent-onboarding',
+    appointments: '/appointments',
+    services: '/services',
+    charge: '/charge',
+  };
 
   const handleTitleClick = ({ key }) => {
     const route = parentRouteMap[key];
@@ -95,45 +97,59 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
       onClick={handleMenuClick}
       onTitleClick={handleTitleClick}
       items={[
-        { key: "/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
+        { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
         {
-          key: "master",
+          key: 'master',
           icon: <UserOutlined />,
-          label: "Master",
+          label: 'Master',
           children: [
-            { key: "/floor-master", label: "Floor" },
-            { key: "/ward-master", label: "Ward" },
-            { key: "/room-master", label: "Room" },
-            { key: "/bed-master", label: "Bed" },
-            { key: "/lab-test", label: "Lab Test" },
-            { key: "/department-master", label: "Department" },
+            { key: '/floor-master', label: 'Floor' },
+            { key: '/ward-master', label: 'Ward' },
+            { key: '/room-master', label: 'Room' },
+            { key: '/bed-master', label: 'Bed' },
+            { key: '/lab-test', label: 'Lab Test' },
+            { key: '/department-master', label: 'Department' },
           ],
         },
         {
-          key: "chargeMaster",
+          key: 'chargeMaster',
           icon: <UserOutlined />,
-          label: "Charge Master",
-          children: [{ key: "/charge-master", label: "Charge" }],
+          label: 'Charge Master',
+          children: [{ key: '/charge-master', label: 'Charge' }],
         },
         {
-          key: "doctor",
-          icon: <UserOutlined />,
-          label: "Doctor",
-          children: [{ key: "/doctor-onbording", label: "Doctor List" }],
+          key: 'charge',
+          icon: <AppstoreOutlined />,
+          label: 'Charges',
+          children: [
+            { key: '/charge-list', label: 'Charge List' },
+          ],
         },
         {
-          key: "recipient",
+          key: 'doctor',
           icon: <UserOutlined />,
-          label: "Recipient",
-          children: [{ key: "/recipient-onboarding", label: "Recipient List" }],
+          label: 'Doctor',
+          children: [{ key: '/doctor-onbording', label: 'Doctor List' }],
         },
         {
-          key: "patient",
+          key: 'recipient',
           icon: <UserOutlined />,
-          label: "Patients",
-          children: [{ key: "/patitent-onboarding", label: "Patient List" }],
+          label: 'Recipient',
+          children: [{ key: '/recipient-onboarding', label: 'Recipient List' }],
         },
-        // {
+        {
+          key: 'patient',
+          icon: <UserOutlined />,
+          label: 'Patients',
+          children: [{ key: '/patitent-onboarding', label: 'Patient List' }],
+        },
+        {
+          key: 'visit',
+          icon: <UserOutlined />,
+          label: 'Patients Visit',
+          children: [{ key: '/patient-visit', label: 'Patient Visit' }],
+        },
+        // {xx
         //   key: "appointments",
         //   icon: <CalendarOutlined />,
         //   label: "Appointments",
@@ -151,7 +167,7 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
         //     { key: "/add-service", label: "Add Service" },
         //   ],
         // },
-        { key: "/profile", icon: <UserOutlined />, label: "Profile" },
+        { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
       ]}
     />
   );

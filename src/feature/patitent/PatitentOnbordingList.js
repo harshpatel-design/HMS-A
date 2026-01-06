@@ -36,7 +36,6 @@ import {
   resetSort,
 } from '../../slices/patientSlice';
 
-/* 🔥 MOVE DEFAULT COLUMNS OUTSIDE COMPONENT */
 const DEFAULT_PATIENT_COLUMNS = [
   'name',
   'phone',
@@ -92,7 +91,7 @@ const PatientOnboardingList = () => {
     {
       title: 'Full Name',
       key: 'name',
-      width:140,
+      width: 140,
       render: (r) => (
         <Tooltip title={`${r.firstName} ${r.lastName}`}>
           <span>
@@ -249,7 +248,7 @@ const PatientOnboardingList = () => {
           ]}
         />
         <div className="serachbar-bread">
-          <Space style={{flexWrap:"wrap"}} >
+          <Space style={{ flexWrap: 'wrap' }}>
             <Search
               placeholder="Search patient"
               onSearch={(v) => {
@@ -272,14 +271,15 @@ const PatientOnboardingList = () => {
             </Dropdown>
 
             <RangePicker
+              format="YYYY-MM-DD"
               onChange={(dates) => {
                 dispatch(
                   fetchPatients({
                     page: 1,
                     limit: 10,
                     search: searchText,
-                    startDate: dates?.[0]?.toISOString(),
-                    endDate: dates?.[1]?.toISOString(),
+                    startDate: dates?.[0]?.format('YYYY-MM-DD'),
+                    endDate: dates?.[1]?.format('YYYY-MM-DD'),
                   })
                 );
               }}
@@ -297,7 +297,7 @@ const PatientOnboardingList = () => {
           <Table
             rowKey="_id"
             columns={filteredColumns}
-            scroll={{ x: 1000  }}
+            scroll={{ x: 1000 }}
             dataSource={patients}
             loading={loading}
             pagination={{

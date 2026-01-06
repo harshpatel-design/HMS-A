@@ -7,7 +7,6 @@ const axiosClient = axios.create({
     baseURL: API_URL,
 });
 
-/* ---------------------- TOKEN INTERCEPTOR ---------------------- */
 axiosClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("auth_token");
@@ -19,7 +18,6 @@ axiosClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-/* ---------------------- RESPONSE INTERCEPTOR ---------------------- */
 axiosClient.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -30,7 +28,6 @@ axiosClient.interceptors.response.use(
     }
 );
 
-/* ---------------------- HELPERS ---------------------- */
 const getCurrentUser = () => {
     try {
         return JSON.parse(localStorage.getItem("user")) || {};
@@ -44,9 +41,6 @@ const isAdmin = () => getRole()?.toLowerCase() === "admin";
 const isDoctorOrAdmin = () =>
     ["admin", "doctor", "staff"].includes(getRole()?.toLowerCase());
 
-/* =======================================================
-📌 GET ALL APPOINTMENTS
-======================================================= */
 const getAppointments = async ({
     page = 1,
     limit = 10,

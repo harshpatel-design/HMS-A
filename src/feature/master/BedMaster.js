@@ -566,7 +566,7 @@ const BedMaster = () => {
               <Input.TextArea />
             </Form.Item>
 
-            <Button type="primary"  htmlType="submit"  className="btn">
+            <Button type="primary"  htmlType="submit"  className="btn-full">
               {drawerMode === 'add' ? 'Create' : 'Update'}
             </Button>
           </Form>

@@ -79,10 +79,10 @@ const getDegrees = ({ search = "", sort = "asc", page = 1, limit = 20 } = {}) =>
     .then(res => res.data);
 };
 
-const getDoctorNames = ({ search = "", sort = "asc" } = {}) => {
+const getDoctorNames = ( search ) => {
   return axiosClient
     .get("/api/doctors/names", {
-      params: { search, sort },
+      params: { search },
     })
     .then(res => res.data);
 };

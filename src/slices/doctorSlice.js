@@ -1,69 +1,85 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import doctorService from "../services/doctorService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import doctorService from '../services/doctorService';
 
 export const fetchDoctors = createAsyncThunk(
-  "doctor/fetchDoctors",
-  async ({ page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" } = {}, { rejectWithValue }) => {
+  'doctor/fetchDoctors',
+  async (
+    { page = 1, limit = 10, orderBy = 'createdAt', order = 'DESC', search = '' } = {},
+    { rejectWithValue }
+  ) => {
     try {
       const res = await doctorService.getDoctors({ page, limit, orderBy, order, search });
 
       return res;
     } catch (err) {
-      return rejectWithValue(err.message || "Failed to load doctors");
+      return rejectWithValue(err.message || 'Failed to load doctors');
     }
   }
 );
 
 export const fetchDoctorById = createAsyncThunk(
-  "doctor/fetchDoctorById",
+  'doctor/fetchDoctorById',
   async (id, { rejectWithValue }) => {
     try {
       const res = await doctorService.getDoctorById(id);
       return res;
     } catch (err) {
-      return rejectWithValue(err.message || "Doctor not found");
+      return rejectWithValue(err.message || 'Doctor not found');
     }
   }
 );
 
 export const createDoctor = createAsyncThunk(
-  "doctor/createDoctor",
+  'doctor/createDoctor',
   async (payload, { rejectWithValue }) => {
     try {
       const res = await doctorService.createDoctor(payload);
       return res;
     } catch (err) {
-      return rejectWithValue(err.message || "Only admin can create doctor");
+      return rejectWithValue(err.message || 'Only admin can create doctor');
     }
   }
 );
 
 export const updateDoctor = createAsyncThunk(
-  "doctor/updateDoctor",
+  'doctor/updateDoctor',
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const res = await doctorService.updateDoctor(id, data);
       return res;
     } catch (err) {
       console.log(err);
-      return rejectWithValue(err.response?.data || { message: "Update Failed" });
+      return rejectWithValue(err.response?.data || { message: 'Update Failed' });
     }
   }
 );
 
 export const deleteDoctor = createAsyncThunk(
-  "doctor/deleteDoctor",
+  'doctor/deleteDoctor',
   async (id, { rejectWithValue }) => {
     try {
       const res = await doctorService.deleteDoctor(id);
       return res;
     } catch (err) {
-      return rejectWithValue(err.message || "Delete failed");
+      return rejectWithValue(err.message || 'Delete failed');
+    }
+  }
+);
+
+export const fetchDoctorsName = createAsyncThunk(
+  'doctor/fetchDoctorsName',
+  async ( search  = {}, { rejectWithValue }) => {
+    try {
+      const res = await doctorService.getDoctorNames(search);
+      return res;
+    } catch (err) {
+      return rejectWithValue(err.message || 'Failed to load doctors');
     }
   }
 );
 
 const initialState = {
+  doctorNames: [],
   doctors: [],
   total: 0,
   totalPages: 1,
@@ -98,7 +114,17 @@ const doctorSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-
+      .addCase(fetchDoctorsName.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDoctorsName.fulfilled, (state, action) => {
+        state.loading = false;
+        state.doctorNames = action.payload.doctors || [];
+      })
+      .addCase(fetchDoctorsName.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(fetchDoctors.pending, (state) => {
         state.loading = true;
       })
@@ -155,5 +181,5 @@ const doctorSlice = createSlice({
   },
 });
 
-export const { resetDoctorState ,resetSort,setSort } = doctorSlice.actions;
+export const { resetDoctorState, resetSort, setSort } = doctorSlice.actions;
 export default doctorSlice.reducer;

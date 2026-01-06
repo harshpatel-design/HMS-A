@@ -453,11 +453,11 @@ const FloorList = () => {
                 <Input.TextArea rows={3} />
               </Form.Item>
 
-              <Space>
-                <Button type="primary" htmlType="submit" className="btn">
+              <Space className="width-space">
+                <Button type="primary" htmlType="submit" className="btn-full">
                   {drawerMode === 'add' ? 'Create' : 'Update'}
                 </Button>
-                <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+                <Button onClick={() => setDrawerOpen(false)} style={{display:"block"}}>Cancel</Button>
               </Space>
             </Form>
           </Drawer>

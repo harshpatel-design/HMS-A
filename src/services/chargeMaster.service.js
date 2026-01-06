@@ -71,11 +71,12 @@ const updateChargeMaster = (id, payload) => {
 };
 
 const deleteChargeMaster = (id) => {
+
   if (!isAdmin()) {
     throw new Error('Admin Only Access ❌');
   }
 
-  return axiosClient.delete(`api/charge-masters/${id}`).then((res) => res.data);
+  return axiosClient.delete(`/api/charge-master/${id}`).then((res) => res.data);
 };
 
 const chargeMasterService = {
