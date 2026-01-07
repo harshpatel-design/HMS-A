@@ -641,7 +641,7 @@ h6 {
 .btn-full {
     width: 100% !important;
     max-width: unset !important;
-     margin-left: 0px;
+    margin-left: 0px;
 }
 
 .width-space {
@@ -655,9 +655,10 @@ h6 {
 .width-space .ant-space-item {
     width: 100%;
 }
- .ant-space-item {
+
+.ant-space-item {
     display: flex;
- }
+}
 
 
 .ant-space {
@@ -723,7 +724,7 @@ h6 {
 }
 
 .sidebar {
-    background: #001A33 !important;
+    background: #001529 !important;
     height: 100vh;
     overflow-y: auto;
     top: 60px;
@@ -1829,10 +1830,16 @@ section {
 .breadcrumbs-separator {
     color: #999;
 }
+
 .searchbar-search {
     width: 100%;
     max-width: 260px;
 }
+
+.PatientChargeLedger {
+    margin-top: 10px;
+}
+
 
 
 @media (max-width: 768px) {
@@ -1908,10 +1915,10 @@ section {
     }
 
     .ant-space {
-    width: 100% !important;
-    flex-wrap: wrap;
-    justify-content: start;
-}
+        width: 100% !important;
+        flex-wrap: wrap;
+        justify-content: start;
+    }
 
     .content.collapsed,
     .content {
@@ -2053,8 +2060,9 @@ section {
 
     .searchbar-search {
         width: 100%;
-        max-width: 200px;
+        max-width: 220px !important;
     }
+
     .ant-picker {
         width: 100% !important;
     }

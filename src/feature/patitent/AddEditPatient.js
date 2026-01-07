@@ -92,14 +92,12 @@ export default function AddEditPatient() {
       ...values,
     };
 
-    // DOB
     if (values.dob) {
       payload.dob = values.dob.toISOString();
     } else {
       delete payload.dob;
     }
 
-    // Arrays
     const toArray = (val) => {
       if (Array.isArray(val)) return val;
       if (typeof val === 'string' && val.trim() !== '') {
@@ -111,8 +109,6 @@ export default function AddEditPatient() {
     payload.allergies = toArray(values.allergies);
     payload.medicalHistory = toArray(values.medicalHistory);
     payload.chronicDiseases = toArray(values.chronicDiseases);
-
-    // Insurance expiry
     if (values.insurance?.expiryDate) {
       payload.insurance = {
         ...values.insurance,
@@ -120,12 +116,9 @@ export default function AddEditPatient() {
       };
     }
 
-    // Documents
     if (Array.isArray(values.documents)) {
       payload.documents = values.documents.map((f) => f.originFileObj).filter(Boolean);
     }
-
-    // 🔥 CREATE vs UPDATE
     const action = isEdit ? updatePatient({ id, data: payload }) : createPatient(payload);
 
     dispatch(action)
@@ -134,7 +127,7 @@ export default function AddEditPatient() {
         message.success(
           isEdit ? 'Patient updated successfully ✅' : 'Patient created successfully ✅'
         );
-        navigate('/patient-onboarding');
+        navigate('/patitent-onboarding');
       })
       .catch((err) => {
         message.error(err || 'Validation failed ❌');
@@ -307,8 +300,8 @@ export default function AddEditPatient() {
                       rules={[{ required: true, message: 'Case type is required' }]}
                     >
                       <Select placeholder="Select case type">
-                        <Option value="OPD">OPD</Option>
-                        <Option value="IPD">IPD</Option>
+                        <Option value="opd">OPD</Option>
+                        <Option value="ipd">IPD</Option>
                       </Select>
                     </Form.Item>
                   </Col>

@@ -313,12 +313,13 @@ const LabTest = () => {
           <Search
             placeholder="Search lab test"
             allowClear
+             className='searchbar-search'
             value={searchText}
             onChange={(e) => {
               setSearchText(e.target.value);
               debouncedFetch(e.target.value);
             }}
-            style={{ maxWidth: 280 , width:"100%" }}
+           
           />
           <Button icon={<ReloadOutlined />} onClick={handleReset} />
           <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>

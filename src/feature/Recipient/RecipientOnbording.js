@@ -154,11 +154,11 @@ export default function RecipientOnboarding() {
             placeholder="Search Recipient"
             allowClear
             value={searchText}
+             className='searchbar-search'
             onChange={(e) => {
               setSearchText(e.target.value);
               debouncedFetch(e.target.value);
             }}
-            style={{ width: "100%" , maxWidth:280 }}
           />
 
           <Button

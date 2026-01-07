@@ -174,7 +174,7 @@ export default function DoctorOnbordingList() {
             allowClear
             onChange={(e) => debouncedSearch(e.target.value)}
             onSearch={(v) => debouncedSearch(v)}
-           className='searchbar-search'
+            className="searchbar-search"
           />
 
           <Button
@@ -188,26 +188,28 @@ export default function DoctorOnbordingList() {
         </Space>
       </div>
 
-      <Table
-        rowKey="doctorid"
-        columns={columns}
-        dataSource={doctors}
-        loading={loading}
-        scroll={{ x: 'max-content' }}
-        pagination={{
-          current: page,
-          pageSize: limit,
-          total: total,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
-          onChange: handleTableChange,
-          showTotal: (totalRecord) => `Total ${totalRecord} items`,
-          showQuickJumper: limit > 100 && limit < 500,
-          locale: {
-            items_per_page: 'Items / Page',
-          },
-        }}
-      />
+      <div className="table-scroll-container">
+        <Table
+          rowKey="doctorid"
+          columns={columns}
+          dataSource={doctors}
+          loading={loading}
+          scroll={{ x: 'max-content' }}
+          pagination={{
+            current: page,
+            pageSize: limit,
+            total: total,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+            onChange: handleTableChange,
+            showTotal: (totalRecord) => `Total ${totalRecord} items`,
+            showQuickJumper: limit > 100 && limit < 500,
+            locale: {
+              items_per_page: 'Items / Page',
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }

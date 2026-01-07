@@ -37,7 +37,16 @@ import { useParams } from 'react-router-dom';
 
 const { Search } = Input;
 
-const CHARGE_TYPES = ['OPD', 'IPD', 'EMERGENCY', 'APPOINTMENT', 'LAB', 'PROCEDURE', 'SERVICE'];
+const CHARGE_TYPES = ['opd', 'ipd', 'emergency', 'appointment', 'lab', 'procedure', 'service'];
+
+const chargeCategories = [
+  { label: 'Consultancy', value: 'consultancy' },
+  { label: 'Lab', value: 'lab' },
+  { label: 'Room', value: 'room' },
+  { label: 'Procedure', value: 'procedure' },
+  { label: 'Service', value: 'service' },
+  { label: 'Other', value: 'other' },
+];
 
 export const CHARGE_STATUS_OPTIONS = [
   { label: 'Old', value: 'old' },
@@ -86,7 +95,7 @@ const ChargeMaster = () => {
         gstApplicable: !!selectedChargeMaster.gstApplicable,
         taxInclusive: !!selectedChargeMaster.taxInclusive,
         isActive: selectedChargeMaster.isActive ?? true,
-        caseStatus: selectedChargeMaster.caseStatus || "",
+        caseStatus: selectedChargeMaster.caseStatus || '',
       });
     }
   }, [drawerMode, selectedChargeMaster, form]);
@@ -134,10 +143,12 @@ const ChargeMaster = () => {
     'name',
     'code',
     'caseType',
+    'caseStatus',
     'amount',
     'gstRate',
     'taxInclusive',
     'isActive',
+    'chargeCategory'
   ];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
@@ -146,10 +157,22 @@ const ChargeMaster = () => {
     { title: 'Name', dataIndex: 'name', key: 'name', sorter: true },
     { title: 'Code', dataIndex: 'code', key: 'code', sorter: true },
     {
-      title: 'Type',
+      title: 'Charge Category',
+      dataIndex: 'chargeCategory',
+      key: 'chargeCategory',
+      render: (v) => v
+    },
+    {
+      title: 'Case Type',
       dataIndex: 'caseType',
       key: 'caseType',
       render: (v) => <Tag color="blue">{v}</Tag>,
+    },
+    {
+      title: 'Case Status',
+      dataIndex: 'caseStatus',
+      key: 'caseStatus',
+      render: (v) => <Tag color="orange">{v}</Tag>,
     },
     {
       title: 'Amount',
@@ -201,6 +224,7 @@ const ChargeMaster = () => {
     {
       title: 'Actions',
       key: 'actions',
+      width: '100px',
       render: (record) => {
         return (
           <Space>
@@ -407,16 +431,28 @@ const ChargeMaster = () => {
             </Form.Item>
 
             <Form.Item name="caseType" label="Charge Type" rules={[{ required: true }]}>
-              <Select
-                placeholder="Select charge status">
+              <Select placeholder="Select charge status">
                 {CHARGE_TYPES.map((c) => (
                   <Select.Option key={c} value={c}>
                     {c}
                   </Select.Option>
                 ))}
               </Select>
-
             </Form.Item>
+            <Form.Item
+              name="chargeCategory"
+              label="Charge Category"
+              rules={[{ required: true, message: 'Charge category is required' }]}
+            >
+              <Select placeholder="Select categories">
+                {chargeCategories.map((item) => (
+                  <Select.Option key={item.value} value={item.value}>
+                    {item.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
             <Form.Item
               name="caseStatus"
               label="Case Status"
@@ -489,11 +525,11 @@ const ChargeMaster = () => {
               </Form.Item>
             )}
 
-           <Space className="width-space">
+            <Space className="width-space">
               <Button type="primary" htmlType="submit" className="btn-full">
                 {drawerMode === 'add' ? 'Create' : 'Update'}
               </Button>
-               <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+              <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
             </Space>
           </Form>
         </Drawer>

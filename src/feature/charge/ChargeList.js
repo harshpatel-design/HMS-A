@@ -436,7 +436,7 @@ const ChargeList = () => {
                 setSearchText(e.target.value);
                 debouncedFetch(e.target.value);
               }}
-              style={{ maxWidth: 280 , width:"100%" }}
+              style={{ maxWidth: 220 , width:"100%" }}
             />
 
             <Button icon={<ReloadOutlined />} onClick={handleReset} />

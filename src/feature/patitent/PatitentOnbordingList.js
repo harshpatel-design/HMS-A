@@ -20,6 +20,7 @@ import {
   EyeOutlined,
   ReloadOutlined,
   FilterOutlined,
+  CreditCardOutlined,
 } from '@ant-design/icons';
 
 import dayjs from 'dayjs';
@@ -65,6 +66,11 @@ const PatientOnboardingList = () => {
     return () => dispatch(resetPatientState());
   }, []);
 
+  // useEffect((id) => {
+  //   if (isId) {
+  //     useDispatch(fetchChargeById(id))
+  //   }
+  // })
   const loadPatients = (pageValue = 1, searchValue = '') => {
     dispatch(
       fetchPatients({
@@ -120,7 +126,7 @@ const PatientOnboardingList = () => {
     {
       title: 'Address',
       key: 'address',
-      render: (r) => `${r.address?.line1 || ''}, ${r.address?.city || ''}`,
+      render: (r) => `${r.address?.line1 || ''} ${r.address?.city || ''}`,
     },
     {
       title: 'Blood Group',
@@ -142,18 +148,23 @@ const PatientOnboardingList = () => {
     {
       title: 'Actions',
       key: 'actions',
-
+      width:180,
       render: (_, r) => (
         <Space>
           <Button
             type="link"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/view-patitent/${r._id}`)}
+            icon={<CreditCardOutlined  />}
+            onClick={() => navigate(`/chargeby-patient/${r._id}`)}
           />
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => navigate(`/add-edit-patitent/${r._id}`)}
+          />
+          <Button
+            type="link"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/view-patitent/${r._id}`)}
           />
           <Popconfirm title="Delete patient?" onConfirm={() => handleDelete(r._id)}>
             <Button danger type="link" icon={<DeleteOutlined />} />
@@ -251,12 +262,12 @@ const PatientOnboardingList = () => {
           <Space style={{ flexWrap: 'wrap' }}>
             <Search
               placeholder="Search patient"
+              className='searchbar-search'
               onSearch={(v) => {
                 setSearchText(v);
                 loadPatients(1, v);
               }}
               allowClear
-              style={{ width: '100%', maxWidth: 260 }}
             />
 
             <Button

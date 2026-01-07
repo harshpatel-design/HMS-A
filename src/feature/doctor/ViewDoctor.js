@@ -2,13 +2,12 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { fetchDoctorById } from '../../slices/doctorSlice';
-import { Button, Card, Col, Divider, Row, Spin, Tag } from 'antd';
+import { Button, Card, Col, Row, Spin, Tag } from 'antd';
 import Breadcrumbs from '../comman/Breadcrumbs';
 import '../../hcss.css';
 import { PhoneOutlined } from '@ant-design/icons';
 import e1 from "../../images/Vector 7.png"
 import e2 from "../../images/Vector 8.png"
-import Availability from '../../components/Availability';
 
 function ViewDoctor() {
   const { id } = useParams();
@@ -29,10 +28,6 @@ function ViewDoctor() {
   const imageUrl = doctor.image
     ? `${process.env.REACT_APP_API_URL}${doctor.image}`
     : `https://ui-avatars.com/api/?name=${doctor.name}&background=random&color=fff`;
-
-    console.log('====================================');
-    console.log("doctor",selectedDoctor);
-    console.log('====================================');
 
   return (
     <>
@@ -102,7 +97,7 @@ function ViewDoctor() {
               </div>
             </div>
           </Col>
-          <Col span={6} xs={0} xm={0} className="profile-action ">
+          <Col md={6} xs={0}  className="profile-action ">
             <div className="flex-column-between">
               <p className="education-degree"> {selectedDoctor.doctor.user.email}</p>
               <div className="flex-end">

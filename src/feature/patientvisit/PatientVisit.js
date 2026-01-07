@@ -15,7 +15,13 @@ import {
   Checkbox,
   Dropdown,
 } from 'antd';
-import { EditOutlined, DeleteOutlined, FilterOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  FilterOutlined,
+  ReloadOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import debounce from 'lodash/debounce';
 import Breadcrumbs from '../comman/Breadcrumbs';
 
@@ -63,6 +69,15 @@ const PatientVisit = () => {
 
   const [selectedColumns, setSelectedColumns] = useState(DEFAULT_PATIENT_COLUMNS);
 
+  const chargeCategories = [
+    { label: 'Consultancy', value: 'consultancy' },
+    { label: 'Lab', value: 'lab' },
+    { label: 'Room', value: 'room' },
+    { label: 'Procedure', value: 'procedure' },
+    { label: 'Service', value: 'service' },
+    { label: 'Other', value: 'other' },
+  ];
+
   useEffect(() => {
     dispatch(fetchPatientVisits({ page: 1, limit: 10, search: search }));
   }, [dispatch, search]);
@@ -85,6 +100,7 @@ const PatientVisit = () => {
         caseType: editingRecord.caseType,
         caseStatus: editingRecord.caseStatus,
         visitReason: editingRecord.visitReason,
+        chargeCategory: editingRecord.chargeCategory,
         nextFollowUpDate: editingRecord.nextFollowUpDate
           ? dayjs(editingRecord.nextFollowUpDate)
           : null,
@@ -366,12 +382,12 @@ const PatientVisit = () => {
             <Search
               placeholder="Search visit"
               allowClear
+               className='searchbar-search'
               value={searchText}
               onChange={(e) => {
                 setSearchText(e.target.value);
                 debouncedFetch(e.target.value);
               }}
-              style={{ width: '100%', maxWidth: 260 }}
             />
             <Button
               icon={<ReloadOutlined />}
@@ -484,11 +500,24 @@ const PatientVisit = () => {
               rules={[{ required: true, message: 'Case type is required' }]}
             >
               <Select placeholder="Select case type">
-                <Option value="OPD">OPD</Option>
-                <Option value="IPD">IPD</Option>
+                <Option value="opd">OPD</Option>
+                <Option value="ipd">IPD</Option>
               </Select>
             </Form.Item>
 
+            <Form.Item
+              name="chargeCategory"
+              label="Charge Category"
+              rules={[{ required: true, message: 'Charge category is required' }]}
+            >
+              <Select placeholder="Select categories">
+                {chargeCategories.map((item) => (
+                  <Select.Option key={item.value} value={item.value}>
+                    {item.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
             <Form.Item
               name="caseStatus"
               label="Case Status"
@@ -510,7 +539,7 @@ const PatientVisit = () => {
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
 
-           <Space className="width-space">
+            <Space className="width-space">
               <Button type="primary" htmlType="submit" className="btn-full">
                 {drawerMode === 'add' ? 'Create' : 'Update'}
               </Button>

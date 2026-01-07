@@ -399,12 +399,12 @@ const BedMaster = () => {
             <Search
               placeholder="Search bed number"
               allowClear
+               className='searchbar-search'
               value={searchText}
               onChange={(e) => {
                 setSearchText(e.target.value);
                 debouncedFetch(e.target.value);
               }}
-              style={{ maxWidth: 260, width: '100%' }}
             />
             <Button icon={<ReloadOutlined />} onClick={handleReset} />
             <Dropdown dropdownRender={() => columnMenu}>

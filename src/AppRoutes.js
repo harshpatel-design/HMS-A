@@ -41,6 +41,7 @@ import ChargeMaster from './feature/chargemaster/ChargeMaster';
 import ViewDoctor from './feature/doctor/ViewDoctor';
 import PatientVisit from './feature/patientvisit/PatientVisit';
 import ChargeList from './feature/charge/ChargeList';
+import ChargeByPatient from './feature/charge/ChargeByPatient';
 
 export function AppRoutes() {
   return (
@@ -94,6 +95,7 @@ export function AppRoutes() {
           {/* Charge Master routes */}
           <Route path="/charge-master" element={<ChargeMaster />} />
           <Route path="/charge-list" element={<ChargeList />} />
+          <Route path="/chargeby-patient/:id" element={<ChargeByPatient />} />
 
         </Route>
       </Route>

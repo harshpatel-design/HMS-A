@@ -62,8 +62,6 @@ export const updateCharge = createAsyncThunk(
   async ({ id, payload }, { rejectWithValue }) => {
     try {
       const res = await chargeService.updateCharge(id, payload);
-      console.log('data', payload);
-
       return res;
     } catch (err) {
       return rejectWithValue(err.message || 'Update failed');
@@ -71,9 +69,6 @@ export const updateCharge = createAsyncThunk(
   }
 );
 
-/* =========================
-   INITIAL STATE
-========================= */
 
 const initialState = {
   charges: [],
@@ -93,14 +88,9 @@ const initialState = {
   success: false,
 };
 
-/* =========================
-   SLICE
-========================= */
-
 const chargeSlice = createSlice({
   name: 'charge',
   initialState,
-
   reducers: {
     resetChargeState: (state) => {
       state.success = false;

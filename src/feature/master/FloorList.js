@@ -345,6 +345,7 @@ const FloorList = () => {
             <Search
               placeholder="Search floor name or code"
               allowClear
+               className='searchbar-search'
               value={searchText}
               onChange={(e) => {
                 const value = e.target.value;
@@ -355,7 +356,6 @@ const FloorList = () => {
                 setSearchText(value);
                 loadData(1, limit);
               }}
-              style={{ width: '100%', maxWidth: 260 }}
             />
 
             <Button icon={<ReloadOutlined />} onClick={handleReset} />
