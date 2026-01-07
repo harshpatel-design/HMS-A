@@ -181,12 +181,12 @@ export default function AddEditPatient() {
                     </Form.Item>
                   </Col>
 
-                  <Col xs={16} sm={12} md={8}>
+                  <Col xs={24} sm={12} md={8}>
                     <Form.Item name="dob" label="Date of Birth">
-                      <DatePicker placeholder="Select date of birth" />
+                      <DatePicker style={{width:"100%"}} placeholder="Select date of birth" />
                     </Form.Item>
                   </Col>
-                  <Col xs={8} sm={12} md={8}>
+                  <Col xs={12} sm={12} md={8}>
                     <Form.Item
                       name="age"
                       label="Age"

@@ -174,7 +174,7 @@ export default function DoctorOnbordingList() {
             allowClear
             onChange={(e) => debouncedSearch(e.target.value)}
             onSearch={(v) => debouncedSearch(v)}
-            style={{ width: 240 }}
+           className='searchbar-search'
           />
 
           <Button

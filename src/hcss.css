@@ -406,7 +406,7 @@ h6 {
 .serachbar-bread {
     display: flex;
     align-items: end;
-    justify-content: end;
+    justify-content: end !important;
     padding-top: 0px;
     margin-bottom: 10px;
 }
@@ -654,6 +654,16 @@ h6 {
 
 .width-space .ant-space-item {
     width: 100%;
+}
+ .ant-space-item {
+    display: flex;
+ }
+
+
+.ant-space {
+    width: 100% !important;
+    flex-wrap: wrap;
+    justify-content: end;
 }
 
 .width-space button {
@@ -1819,6 +1829,10 @@ section {
 .breadcrumbs-separator {
     color: #999;
 }
+.searchbar-search {
+    width: 100%;
+    max-width: 260px;
+}
 
 
 @media (max-width: 768px) {
@@ -1893,6 +1907,11 @@ section {
         display: none;
     }
 
+    .ant-space {
+    width: 100% !important;
+    flex-wrap: wrap;
+    justify-content: start;
+}
 
     .content.collapsed,
     .content {
@@ -2000,7 +2019,7 @@ section {
     }
 
     .serachbar-bread {
-        justify-content: center;
+        justify-content: end !important;
     }
 
     .sess-details {
@@ -2032,4 +2051,11 @@ section {
         width: 100% !important;
     }
 
+    .searchbar-search {
+        width: 100%;
+        max-width: 200px;
+    }
+    .ant-picker {
+        width: 100% !important;
+    }
 }

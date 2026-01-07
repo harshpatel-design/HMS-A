@@ -260,6 +260,7 @@ const RoomMaster = () => {
                 placeholder="Search room"
                 allowClear
                 value={searchText}
+                className="searchbar-search"
                 onChange={(e) => {
                   setSearchText(e.target.value);
                   debouncedFetch(e.target.value);
@@ -267,7 +268,7 @@ const RoomMaster = () => {
                 onSearch={(value) => {
                   setSearchText(value);
                 }}
-                style={{  maxWidth:280 , width:"100%"  }}
+      
               />
 
               <Space wrap size={8}>

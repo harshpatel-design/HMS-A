@@ -241,7 +241,7 @@ const PatientOnboardingList = () => {
         <Breadcrumbs
           title="Patient List"
           showBack={true}
-          backTo="/patitent-onboarding"
+          backTo="/dashboard"
           items={[
             { label: 'Patient List', href: '/patitent-onboarding' },
             { label: 'View Patient' },
