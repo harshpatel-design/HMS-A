@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Button, Space, Input, Tag, Modal, Dropdown, message, Avatar } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Input, Tag, Modal, message, Avatar } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 
@@ -136,6 +136,20 @@ export default function RecipientOnboarding() {
     );
   };
 
+    const handleTableChange = (pagination, filters, sorter) => {
+      if (!sorter.order) {
+        dispatch(
+          fetchRecipients({
+            page: pagination.current,
+            limit: pagination.pageSize,
+            orderBy: 'createdAt',
+            order: 'DESC',
+          })
+        );
+        return;
+      }
+    };
+
   return (
     <div className="page-wrapper">
       <Breadcrumbs
@@ -154,7 +168,7 @@ export default function RecipientOnboarding() {
             placeholder="Search Recipient"
             allowClear
             value={searchText}
-             className='searchbar-search'
+            className="searchbar-search"
             onChange={(e) => {
               setSearchText(e.target.value);
               debouncedFetch(e.target.value);
@@ -172,22 +186,28 @@ export default function RecipientOnboarding() {
         </Space>
       </div>
 
-      <Table
-        rowKey="_id"
-        columns={columns}
-        dataSource={recipients}
-        loading={loading}
-        scroll={{ x: 1200 }}
-        pagination={{
-          current: page,
-          pageSize: limit,
-          total,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '20', '50', '100'],
-          onChange: handlePageChange,
-          showTotal: (total) => `Total ${total} recipients`,
-        }}
-      />
+      <div className="table-scroll-container">
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={recipients}
+          loading={loading}
+          scroll={{ x: 1000 }}
+          pagination={{
+            current: page,
+            pageSize: limit,
+            total: total,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+            onChange: handleTableChange,
+            showTotal: (totalRecord) => `Total ${totalRecord} items`,
+            showQuickJumper: limit > 100 && limit < 500,
+            locale: {
+              items_per_page: 'Items / Page',
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }

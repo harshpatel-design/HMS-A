@@ -1,18 +1,17 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import bedService from "../services/bad.service";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import bedService from '../services/bad.service';
 
 export const fetchBeds = createAsyncThunk(
-  "bed/fetchBeds",
+  'bed/fetchBeds',
   async (
     {
       page = 1,
       limit = 10,
-      orderBy = "createdAt",
-      order = "DESC",
+      orderBy = 'createdAt',
+      order = 'DESC',
       search,
-      floor,
-      ward,
-      room,
+      wardId,
+      roomId,
     },
     { rejectWithValue }
   ) => {
@@ -23,68 +22,57 @@ export const fetchBeds = createAsyncThunk(
         orderBy,
         order,
         search,
-        floor,
-        ward,
-        room,
+        wardId,
+        roomId,
       });
       return res;
     } catch (err) {
-      return rejectWithValue(err.message || "Failed to load beds");
+      return rejectWithValue(err.message || 'Failed to load beds');
     }
   }
 );
 
 export const fetchBedById = createAsyncThunk(
-  "bed/fetchBedById",
+  'bed/fetchBedById',
   async (id, { rejectWithValue }) => {
     try {
       const res = await bedService.getBedById(id);
       return res;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || err.message || "Bed not found"
-      );
+      return rejectWithValue(err.response?.data?.message || err.message || 'Bed not found');
     }
   }
 );
 
-export const createBed = createAsyncThunk(
-  "bed/createBed",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const res = await bedService.createBed(payload);
-      return res;
-    } catch (err) {
-      return rejectWithValue(err.message || "Only admin can create bed");
-    }
+export const createBed = createAsyncThunk('bed/createBed', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await bedService.createBed(payload);
+    return res;
+  } catch (err) {
+    return rejectWithValue(err?.response?.data || { message: 'Server error' });
   }
-);
+});
 
 export const updateBed = createAsyncThunk(
-  "bed/updateBed",
+  'bed/updateBed',
   async ({ id, payload }, { rejectWithValue }) => {
     try {
       const res = await bedService.updateBed(id, payload);
       return res;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data || { message: "Update failed" }
-      );
+      return rejectWithValue(err.response?.data || { message: 'Update failed' });
     }
   }
 );
 
-export const deleteBed = createAsyncThunk(
-  "bed/deleteBed",
-  async (id, { rejectWithValue }) => {
-    try {
-      const res = await bedService.deleteBed(id);
-      return res;
-    } catch (err) {
-      return rejectWithValue(err.message || "Delete failed");
-    }
+export const deleteBed = createAsyncThunk('bed/deleteBed', async (id, { rejectWithValue }) => {
+  try {
+    const res = await bedService.deleteBed(id);
+    return res;
+  } catch (err) {
+    return rejectWithValue(err.message || 'Delete failed');
   }
-);
+});
 
 const initialState = {
   beds: [],
@@ -96,9 +84,9 @@ const initialState = {
   page: 1,
   limit: 10,
 
-  orderBy: "createdAt",
-  order: "DESC",
-  search: "",
+  orderBy: 'createdAt',
+  order: 'DESC',
+  search: '',
 
   loading: false,
   error: null,
@@ -106,7 +94,7 @@ const initialState = {
 };
 
 const bedSlice = createSlice({
-  name: "bed",
+  name: 'bed',
   initialState,
   reducers: {
     resetBedState: (state) => {
@@ -120,8 +108,8 @@ const bedSlice = createSlice({
     },
 
     resetSort: (state) => {
-      state.orderBy = "createdAt";
-      state.order = "DESC";
+      state.orderBy = 'createdAt';
+      state.order = 'DESC';
     },
   },
 

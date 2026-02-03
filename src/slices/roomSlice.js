@@ -1,15 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import roomService from "../services/roomService";
 
-/* =========================
-   ASYNC THUNKS
-========================= */
 
-// 🔹 Fetch all rooms
 export const fetchRooms = createAsyncThunk(
     "room/fetchRooms",
     async (
-        { page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" },
+        { page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" , floorId = ''} ,
         { rejectWithValue }
     ) => {
         try {
@@ -19,6 +15,7 @@ export const fetchRooms = createAsyncThunk(
                 orderBy,
                 order,
                 search,
+                floorId
             });
             return res;
         } catch (err) {
@@ -27,7 +24,6 @@ export const fetchRooms = createAsyncThunk(
     }
 );
 
-// 🔹 Fetch room by id
 export const fetchRoomById = createAsyncThunk(
     "room/fetchRoomById",
     async (id, { rejectWithValue }) => {
@@ -40,7 +36,6 @@ export const fetchRoomById = createAsyncThunk(
     }
 );
 
-// 🔹 Create room
 export const createRoom = createAsyncThunk(
     "room/createRoom",
     async (payload, { rejectWithValue }) => {
@@ -53,7 +48,6 @@ export const createRoom = createAsyncThunk(
     }
 );
 
-// 🔹 Update room
 export const updateRoom = createAsyncThunk(
     "room/updateRoom",
     async ({ id, data }, { rejectWithValue }) => {
@@ -68,7 +62,6 @@ export const updateRoom = createAsyncThunk(
     }
 );
 
-// 🔹 Delete room
 export const deleteRoom = createAsyncThunk(
     "room/deleteRoom",
     async (id, { rejectWithValue }) => {
@@ -80,10 +73,6 @@ export const deleteRoom = createAsyncThunk(
         }
     }
 );
-
-/* =========================
-   INITIAL STATE
-========================= */
 
 const initialState = {
     rooms: [],
@@ -103,9 +92,6 @@ const initialState = {
     success: false,
 };
 
-/* =========================
-   SLICE
-========================= */
 
 const roomSlice = createSlice({
     name: "room",

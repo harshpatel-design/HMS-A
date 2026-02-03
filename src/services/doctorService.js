@@ -52,7 +52,6 @@ const deleteDoctor = (id) => {
   if (!isAdmin()) {
     throw new Error("Admin Only Access ❌");
   }
-
   return axiosClient
     .delete(`api/doctors/doctors/${id}`)
     .then(res => res.data);

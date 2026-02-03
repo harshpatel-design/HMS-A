@@ -21,21 +21,17 @@ axiosClient.interceptors.request.use((req) => {
 const getRole = () => JSON.parse(localStorage.getItem("user"))?.role;
 const isAdmin = () => getRole() === "admin";
 
-/**
- * =============================
- * GET ROOMS (LIST)
- * =============================
- */
 const getRooms = ({
   page = 1,
   limit = 10,
   search = "",
   orderBy = "createdAt",
   order = "DESC",
+  floorId = ""
 } = {}) => {
   return axiosClient
     .get("api/rooms", {
-      params: { page, limit, search, orderBy, order },
+      params: { page, limit, search, orderBy, order, floorId },
     })
     .then((res) => res.data);
 };

@@ -42,6 +42,10 @@ import ViewDoctor from './feature/doctor/ViewDoctor';
 import PatientVisit from './feature/patientvisit/PatientVisit';
 import ChargeList from './feature/charge/ChargeList';
 import ChargeByPatient from './feature/charge/ChargeByPatient';
+import IpdAddmissionList from './feature/ipdadmission/IpdAddmissionList';
+import ReceiveCharge from './feature/charge/ReceiveCharge';
+import PatientPaymentHistoryPage from './feature/charge/PatientPaymentHistoryPage';
+import PatientLedger from './feature/charge/Patientledger';
 
 export function AppRoutes() {
   return (
@@ -92,11 +96,17 @@ export function AppRoutes() {
           <Route path="/add-edit-floor" element={<AddEdtiFloor />} />
           <Route path="/add-edit-floor/:id" element={<AddEdtiFloor />} />
 
+          {/* ipd routes */}
+          <Route path="/ipd-patient-list" element={<IpdAddmissionList />} />
+
           {/* Charge Master routes */}
           <Route path="/charge-master" element={<ChargeMaster />} />
           <Route path="/charge-list" element={<ChargeList />} />
           <Route path="/chargeby-patient/:id" element={<ChargeByPatient />} />
-
+          <Route path="/receive-charge" element={<ReceiveCharge />} />
+          <Route path="/receive-charge/:id" element={<ReceiveCharge />} />
+          <Route path="/patient-payment-history/:id" element={<PatientPaymentHistoryPage />} />
+          <Route path="/patient-ledger" element={<PatientLedger />} />
         </Route>
       </Route>
 

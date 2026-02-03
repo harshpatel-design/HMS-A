@@ -193,7 +193,29 @@ const PatientVisit = () => {
       key: 'caseType',
       dataIndex: 'caseType',
       sorter: true,
-      render: (v) => <Tag color="blue">{v}</Tag>,
+      render: (v) => {
+        if (v === 'opd') {
+          return (
+            <Tag style={{ width: '100%', textAlign: 'center' }} color="blue">
+              OPD
+            </Tag>
+          );
+        } else if (v === 'ipd') {
+          return (
+            <Tag style={{ width: '100%', textAlign: 'center' }} color="green">
+              IPD
+            </Tag>
+          );
+        } else {
+          return '—';
+        }
+      },
+    },
+    {
+      title: 'Visit Date',
+      key: 'visitDate',
+      dataIndex: 'visitDate',
+      render: (v) => dayjs(v).format('DD MMM YYYY'),
     },
     {
       title: 'Phone',
@@ -208,33 +230,32 @@ const PatientVisit = () => {
       dataIndex: 'status',
       sorter: true,
       render: (status, record) => (
-        <Select
-          size="small"
-          value={status}
-          style={{ width: 130 }}
-          onChange={async (value) => {
-            try {
-              await dispatch(
-                updatePatientVisit({
-                  visitId: record._id,
-                  payload: { status: value },
-                })
-              ).unwrap();
+        <>
+          <Select
+            size="small"
+            value={status}
+            style={{ width: '100%', textAlign: 'center' }}
+            onChange={async (value) => {
+              try {
+                await dispatch(
+                  updatePatientVisit({
+                    visitId: record._id,
+                    payload: { status: value },
+                  })
+                ).unwrap();
 
-              message.success('Status updated');
-              dispatch(fetchPatientVisits({ page, limit }));
-            } catch (err) {
-              console.log('====================================');
-              console.log('err', err);
-              console.log('====================================');
-              message.error(err?.message || 'Failed to update status');
-            }
-          }}
-        >
-          <Option value="active">Active</Option>
-          <Option value="completed">Completed</Option>
-          <Option value="cancelled">Cancelled</Option>
-        </Select>
+                message.success('Status updated');
+                dispatch(fetchPatientVisits({ page, limit }));
+              } catch (err) {
+                message.error(err?.message || 'Failed to update status');
+              }
+            }}
+          >
+            <Option value="active">Active</Option>
+            <Option value="completed">Completed</Option>
+            <Option value="cancelled">Cancelled</Option>
+          </Select>
+        </>
       ),
     },
 
@@ -255,12 +276,6 @@ const PatientVisit = () => {
       title: 'Created At',
       key: 'createdAt',
       dataIndex: 'createdAt',
-      render: (v) => dayjs(v).format('DD MMM YYYY'),
-    },
-    {
-      title: 'Visit Date',
-      key: 'visitDate',
-      dataIndex: 'visitDate',
       render: (v) => dayjs(v).format('DD MMM YYYY'),
     },
     {
@@ -382,7 +397,7 @@ const PatientVisit = () => {
             <Search
               placeholder="Search visit"
               allowClear
-               className='searchbar-search'
+              className="searchbar-search"
               value={searchText}
               onChange={(e) => {
                 setSearchText(e.target.value);

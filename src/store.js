@@ -14,7 +14,9 @@ import labTestReducer from './slices/labTestSlice';
 import chargeMasterReducer from './slices/chargeMasterSlice';
 import departmentReducer from './slices/departmentSlice';
 import patientVisitReducer from './slices/patientVisitSlice';
-import chargeReducer from "./slices/chargeSlice";
+import chargeReducer from './slices/chargeSlice';
+import ipdReducer from './slices/ipdAdmission.slice';
+import paymentReducer from './slices/payment.slice';
 
 const rootReducer = {
   auth: authReducer,
@@ -32,6 +34,8 @@ const rootReducer = {
   department: departmentReducer,
   patientVisit: patientVisitReducer,
   charge: chargeReducer,
+  ipd: ipdReducer,
+  payment: paymentReducer,
 };
 
 const store = configureStore({

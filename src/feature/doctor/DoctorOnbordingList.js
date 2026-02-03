@@ -23,8 +23,8 @@ export default function DoctorOnbordingList() {
     dispatch(fetchDoctors({ page: 1, limit: 12 }));
   }, [dispatch]);
 
-  const handleDelete = async (id) => {
-    await dispatch(deleteDoctor(id));
+  const handleDelete = async (doc) => {
+    await dispatch(deleteDoctor(doc.id));
     dispatch(fetchDoctors({ page, limit, search: searchText }));
   };
 
@@ -117,7 +117,7 @@ export default function DoctorOnbordingList() {
             icon={<EditOutlined />}
             onClick={() => navigate(`/add-edit-doctor/${doc.doctorid}`)}
           />
-          <Popconfirm title="Delete doctor?" onConfirm={() => handleDelete(doc.doctorid)}>
+          <Popconfirm title="Delete doctor?" onConfirm={() => handleDelete(doc)}>
             <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
@@ -138,6 +138,7 @@ export default function DoctorOnbordingList() {
       );
       return;
     }
+
     const sortOrder = sorter.order === 'ascend' ? 'ASC' : 'DESC';
 
     dispatch(

@@ -19,6 +19,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPatient, fetchPatientById, updatePatient } from '../../slices/patientSlice';
 import { fetchDoctorsName } from '../../slices/doctorSlice';
+
+import { fetchFloors } from '../../slices/floorSlice';
+import { fetchWards } from '../../slices/wardSlice';
+import { fetchRooms } from '../../slices/roomSlice';
+import { fetchBeds } from '../../slices/badSlice';
+
 import Breadcrumbs from '../comman/Breadcrumbs';
 
 const { Panel } = Collapse;
@@ -31,13 +37,71 @@ export default function AddEditPatient() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const caseType = Form.useWatch('caseType', form);
 
   const { loading, patient } = useSelector((state) => state.patient);
-  const handleValuesChange = () => {};
+  const { beds } = useSelector((state) => state.bed);
+  const { rooms } = useSelector((state) => state.room);
+  const { wards } = useSelector((state) => state.ward);
+  const { floors } = useSelector((state) => state.floor);
+
+  const selectedFloor = Form.useWatch(['ipdDetails', 'floor'], form);
+  const selectedWard = Form.useWatch(['ipdDetails', 'ward'], form);
+  const selectedRoom = Form.useWatch(['ipdDetails', 'room'], form);
+
+  const filteredWards = React.useMemo(() => {
+    if (!selectedFloor) return [];
+    return wards.filter((w) => w.floor?._id === selectedFloor);
+  }, [wards, selectedFloor]);
+
+  const filteredRooms = React.useMemo(() => {
+    if (!selectedFloor) return [];
+    return rooms.filter((r) => r.floor?._id === selectedFloor);
+  }, [rooms, selectedFloor]);
+
+  const filteredBeds = React.useMemo(() => {
+    if (selectedWard) {
+      return beds.filter((b) => b.ward?._id === selectedWard && !b.isOccupied);
+    }
+
+    if (selectedRoom) {
+      return beds.filter((b) => b.room?._id === selectedRoom && !b.isOccupied);
+    }
+
+    return [];
+  }, [beds, selectedWard, selectedRoom]);
+
+  useEffect(() => {
+    if (selectedFloor) {
+      form.setFieldsValue({
+        ipdDetails: {
+          ward: null,
+          room: null,
+          bed: null,
+        },
+      });
+    }
+  }, [selectedFloor]);
 
   useEffect(() => {
     dispatch(fetchDoctorsName(search));
   }, [dispatch, search]);
+
+  useEffect(() => {
+    dispatch(fetchWards({ page: 1, limit: 100 }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchRooms({ page: 1, limit: 100 }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchBeds({ page: 1, limit: 100 }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchFloors({ page: 1, limit: 100 }));
+  }, [dispatch]);
 
   useEffect(() => {
     if (isEdit) {
@@ -51,6 +115,17 @@ export default function AddEditPatient() {
         ...patient,
 
         dob: patient.dob ? dayjs(patient.dob) : null,
+        ipdDetails: patient.ipdDetails
+          ? {
+              ...patient.ipdDetails,
+              admissionDate: patient.ipdDetails.admissionDate
+                ? dayjs(patient.ipdDetails.admissionDate)
+                : null,
+              dischargeDate: patient.ipdDetails.dischargeDate
+                ? dayjs(patient.ipdDetails.dischargeDate)
+                : null,
+            }
+          : undefined,
 
         insurance: patient.insurance
           ? {
@@ -75,6 +150,7 @@ export default function AddEditPatient() {
     'medicalHistory',
     'allergies',
     'caseDetails',
+    'ipdDetails',
   ];
 
   const onFinishFailed = ({ errorFields }) => {
@@ -92,10 +168,24 @@ export default function AddEditPatient() {
       ...values,
     };
 
-    if (values.dob) {
-      payload.dob = values.dob.toISOString();
+    if (values.dob) payload.dob = values.dob.toISOString();
+    else delete payload.dob;
+
+    if (values.caseType === 'ipd' && values.ipdDetails) {
+      payload.ipdDetails = {
+        ...values.ipdDetails,
+        admissionDate: values.ipdDetails.admissionDate?.toISOString(),
+        dischargeDate: values.ipdDetails.dischargeDate?.toISOString(),
+      };
     } else {
-      delete payload.dob;
+      delete payload.ipdDetails;
+    }
+
+    if (values.insurance?.expiryDate) {
+      payload.insurance = {
+        ...values.insurance,
+        expiryDate: values.insurance.expiryDate.toISOString(),
+      };
     }
 
     const toArray = (val) => {
@@ -109,12 +199,6 @@ export default function AddEditPatient() {
     payload.allergies = toArray(values.allergies);
     payload.medicalHistory = toArray(values.medicalHistory);
     payload.chronicDiseases = toArray(values.chronicDiseases);
-    if (values.insurance?.expiryDate) {
-      payload.insurance = {
-        ...values.insurance,
-        expiryDate: values.insurance.expiryDate.toISOString(),
-      };
-    }
 
     if (Array.isArray(values.documents)) {
       payload.documents = values.documents.map((f) => f.originFileObj).filter(Boolean);
@@ -148,13 +232,7 @@ export default function AddEditPatient() {
         />
 
         <Spin spinning={loading} tip="Saving patient...">
-          <Form
-            layout="vertical"
-            form={form}
-            onFinish={onFinish}
-            onValuesChange={handleValuesChange}
-            onFinishFailed={onFinishFailed}
-          >
+          <Form layout="vertical" form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
             <Collapse defaultActiveKey={allPanels} accordion={false}>
               <Panel header="Basic Information" key="basic">
                 <Row gutter={[16, 10]}>
@@ -176,7 +254,7 @@ export default function AddEditPatient() {
 
                   <Col xs={24} sm={12} md={8}>
                     <Form.Item name="dob" label="Date of Birth">
-                      <DatePicker style={{width:"100%"}} placeholder="Select date of birth" />
+                      <DatePicker style={{ width: '100%' }} placeholder="Select date of birth" />
                     </Form.Item>
                   </Col>
                   <Col xs={12} sm={12} md={8}>
@@ -270,7 +348,7 @@ export default function AddEditPatient() {
 
               <Panel header="Case Details" key="caseDetails">
                 <Row gutter={[16, 10]}>
-                  {/* Doctor */}
+               
                   <Col xs={24} md={8}>
                     <Form.Item
                       name="doctor"
@@ -292,21 +370,6 @@ export default function AddEditPatient() {
                     </Form.Item>
                   </Col>
 
-                  {/* Case Type */}
-                  <Col xs={24} md={8}>
-                    <Form.Item
-                      name="caseType"
-                      label="Case Type"
-                      rules={[{ required: true, message: 'Case type is required' }]}
-                    >
-                      <Select placeholder="Select case type">
-                        <Option value="opd">OPD</Option>
-                        <Option value="ipd">IPD</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-
-                  {/* Case Status */}
                   <Col xs={24} md={8}>
                     <Form.Item
                       name="caseStatus"
@@ -321,8 +384,121 @@ export default function AddEditPatient() {
                       </Select>
                     </Form.Item>
                   </Col>
+
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      name="caseType"
+                      label="Case Type"
+                      rules={[{ required: true, message: 'Case type is required' }]}
+                    >
+                      <Select placeholder="Select case type">
+                        <Option value="opd">OPD</Option>
+                        <Option value="ipd">IPD</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
                 </Row>
               </Panel>
+
+              {caseType === 'ipd' && (
+                <Panel header="IPD Details" key="ipdDetails">
+                  <Row gutter={[16, 10]}>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        name={['ipdDetails', 'admissionDate']}
+                        label="Admission Date"
+                        rules={[{ required: true, message: 'Admission date is required' }]}
+                      >
+                        <DatePicker style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} md={8}>
+                      <Form.Item name={['ipdDetails', 'dischargeDate']} label="Discharge Date">
+                        <DatePicker style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        name={['ipdDetails', 'floor']}
+                        label="Floor"
+                        rules={[{ required: true, message: 'Floor is required' }]}
+                      >
+                        <Select placeholder="Select Floor">
+                          {floors.map((f) => (
+                            <Select.Option key={f._id} value={f._id}>
+                              {f.name}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} md={8}>
+                      <Form.Item name={['ipdDetails', 'ward']} label="Ward">
+                        <Select
+                          placeholder="Select Ward"
+                          allowClear
+                          disabled={!selectedFloor}
+                          onChange={() => {
+                            form.setFieldsValue({
+                              ipdDetails: { room: null, bed: null },
+                            });
+                          }}
+                        >
+                          {filteredWards.map((w) => (
+                            <Select.Option key={w._id} value={w._id}>
+                              {w.name}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} md={8}>
+                      <Form.Item name={['ipdDetails', 'room']} label="Room">
+                        <Select
+                          placeholder="Select Room"
+                          allowClear
+                          disabled={!selectedFloor}
+                          onChange={() => {
+                            form.setFieldsValue({
+                              ipdDetails: { ward: null, bed: null },
+                            });
+                          }}
+                        >
+                          {filteredRooms.map((r) => (
+                            <Select.Option key={r._id} value={r._id}>
+                              {r.roomNumber}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        name={['ipdDetails', 'bed']}
+                        label="Bed"
+                        rules={[{ required: true, message: 'Bed is required' }]}
+                      >
+                        <Select placeholder="Select Bed" disabled={!selectedWard && !selectedRoom}>
+                          {filteredBeds.map((b) => (
+                            <Select.Option key={b._id} value={b._id}>
+                              {b.bedNumber} ({b.bedType})
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} md={8}>
+                      <Form.Item name={['ipdDetails', 'attendantName']} label="Attendant Name">
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Panel>
+              )}
 
               <Panel header="Address" key="address">
                 <Row gutter={[16, 10]}>
@@ -342,13 +518,13 @@ export default function AddEditPatient() {
                     <Form.Item
                       name={['address', 'city']}
                       label="City"
-                      rules={[{ required: true , message: 'Enter city name' }]}
+                      rules={[{ required: true, message: 'Enter city name' }]}
                     >
                       <Input placeholder="Enter city" />
                     </Form.Item>
                   </Col>
 
-                   <Col md={8} xs={12}>
+                  <Col md={8} xs={12}>
                     <Form.Item name={['address', 'state']} label="State">
                       <Input placeholder="Enter state" />
                     </Form.Item>
@@ -579,7 +755,7 @@ export default function AddEditPatient() {
               <Button
                 htmlType="button"
                 disabled={loading}
-                 style={{marginRight:10 }}
+                style={{ marginRight: 10 }}
                 onClick={() => navigate('/patitent-onboarding')}
               >
                 Cancel

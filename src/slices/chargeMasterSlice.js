@@ -1,16 +1,10 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import chargeMasterService from "../services/chargeMaster.service";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import chargeMasterService from '../services/chargeMaster.service';
 
 export const fetchChargeMasters = createAsyncThunk(
-  "chargeMaster/fetchChargeMasters",
+  'chargeMaster/fetchChargeMasters',
   async (
-    {
-      page = 1,
-      limit = 20,
-      ordering = "-createdAt",
-      search = "",
-      chargeType,
-    } = {},
+    { page = 1, limit = 20, ordering = '-createdAt', search = '', chargeType } = {},
     { rejectWithValue }
   ) => {
     try {
@@ -24,70 +18,60 @@ export const fetchChargeMasters = createAsyncThunk(
       return res;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to load charge masters"
+        err.response?.data?.message || err.message || 'Failed to load charge masters'
       );
     }
   }
 );
 
 export const fetchChargeMasterById = createAsyncThunk(
-  "chargeMaster/fetchChargeMasterById",
+  'chargeMaster/fetchChargeMasterById',
   async (id, { rejectWithValue }) => {
     try {
       const res = await chargeMasterService.getChargeMasterById(id);
       return res;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message ||
-          err.message ||
-          "Charge master not found"
+        err.response?.data?.message || err.message || 'Charge master not found'
       );
     }
   }
 );
 
 export const createChargeMaster = createAsyncThunk(
-  "chargeMaster/createChargeMaster",
+  'chargeMaster/createChargeMaster',
   async (payload, { rejectWithValue }) => {
     try {
       const res = await chargeMasterService.createChargeMaster(payload);
       return res;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message ||
-          err.message ||
-          "Only admin/accountant can create charge"
+        err.response?.data?.message || err.message || 'Only admin/accountant can create charge'
       );
     }
   }
 );
 
 export const updateChargeMaster = createAsyncThunk(
-  "chargeMaster/updateChargeMaster",
+  'chargeMaster/updateChargeMaster',
   async ({ id, payload }, { rejectWithValue }) => {
     try {
       const res = await chargeMasterService.updateChargeMaster(id, payload);
       return res;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || err.message || "Update failed"
-      );
+      return rejectWithValue(err.response?.data?.message || err.message || 'Update failed');
     }
   }
 );
 
 export const deleteChargeMaster = createAsyncThunk(
-  "chargeMaster/deleteChargeMaster",
+  'chargeMaster/deleteChargeMaster',
   async (id, { rejectWithValue }) => {
     try {
       const res = await chargeMasterService.deleteChargeMaster(id);
       return res;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || err.message || "Delete failed"
-      );
+      return rejectWithValue(err.response?.data?.message || err.message || 'Delete failed');
     }
   }
 );
@@ -100,8 +84,8 @@ const initialState = {
   page: 1,
   limit: 10,
 
-  ordering: "-createdAt",
-  search: "",
+  ordering: '-createdAt',
+  search: '',
   chargeType: null,
 
   loading: false,
@@ -110,7 +94,7 @@ const initialState = {
 };
 
 const chargeMasterSlice = createSlice({
-  name: "chargeMaster",
+  name: 'chargeMaster',
   initialState,
   reducers: {
     resetChargeMasterState: (state) => {
@@ -123,7 +107,7 @@ const chargeMasterSlice = createSlice({
     },
 
     resetOrdering: (state) => {
-      state.ordering = "-createdAt";
+      state.ordering = '-createdAt';
     },
 
     setChargeType: (state, action) => {
@@ -140,11 +124,11 @@ const chargeMasterSlice = createSlice({
       .addCase(fetchChargeMasters.fulfilled, (state, action) => {
         state.loading = false;
         state.chargeMasters = action.payload.data || [];
-      state.total = action.payload.pagination.total;
-  state.page = action.payload.pagination.page;
-  state.limit = action.payload.pagination.limit;
-  state.totalPages = action.payload.pagination.totalPages;
-  state.ordering = action.meta.arg?.ordering ?? state.ordering;
+        state.total = action.payload.pagination.total;
+        state.page = action.payload.pagination.page;
+        state.limit = action.payload.pagination.limit;
+        state.totalPages = action.payload.pagination.totalPages;
+        state.ordering = action.meta.arg?.ordering ?? state.ordering;
       })
       .addCase(fetchChargeMasters.rejected, (state, action) => {
         state.loading = false;
@@ -158,8 +142,7 @@ const chargeMasterSlice = createSlice({
         state.loading = false;
         state.chargeMaster = action.payload.charge || action.payload;
         state.selectedChargeMaster = action.payload.charge || action.payload;
-        console.log("state.selectedChargeMaster",state.selectedChargeMaster);
-
+        console.log('state.selectedChargeMaster', state.selectedChargeMaster);
       })
       .addCase(fetchChargeMasterById.rejected, (state, action) => {
         state.loading = false;
@@ -197,11 +180,7 @@ const chargeMasterSlice = createSlice({
   },
 });
 
-export const {
-  resetChargeMasterState,
-  setOrdering,
-  resetOrdering,
-  setChargeType,
-} = chargeMasterSlice.actions;
+export const { resetChargeMasterState, setOrdering, resetOrdering, setChargeType } =
+  chargeMasterSlice.actions;
 
 export default chargeMasterSlice.reducer;

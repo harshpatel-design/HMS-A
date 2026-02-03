@@ -1,15 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import wardService from "../services/wardService";
 
-/* =========================
-   ASYNC THUNKS
-========================= */
-
-// 🔹 Fetch all wards
 export const fetchWards = createAsyncThunk(
   "ward/fetchWards",
   async (
-    { page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" },
+    { page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = ""  ,floorId= ""},
     { rejectWithValue }
   ) => {
     try {
@@ -19,6 +14,7 @@ export const fetchWards = createAsyncThunk(
         orderBy,
         order,
         search,
+        floorId,
       });
       return res;
     } catch (err) {
@@ -27,7 +23,6 @@ export const fetchWards = createAsyncThunk(
   }
 );
 
-// 🔹 Fetch ward by id
 export const fetchWardById = createAsyncThunk(
   "ward/fetchWardById",
   async (id, { rejectWithValue }) => {
@@ -40,7 +35,6 @@ export const fetchWardById = createAsyncThunk(
   }
 );
 
-// 🔹 Create ward
 export const createWard = createAsyncThunk(
   "ward/createWard",
   async (payload, { rejectWithValue }) => {
@@ -53,7 +47,6 @@ export const createWard = createAsyncThunk(
   }
 );
 
-// 🔹 Update ward
 export const updateWard = createAsyncThunk(
   "ward/updateWard",
   async ({ id, data }, { rejectWithValue }) => {
@@ -68,7 +61,6 @@ export const updateWard = createAsyncThunk(
   }
 );
 
-// 🔹 Delete ward
 export const deleteWard = createAsyncThunk(
   "ward/deleteWard",
   async (id, { rejectWithValue }) => {
@@ -81,9 +73,6 @@ export const deleteWard = createAsyncThunk(
   }
 );
 
-/* =========================
-   INITIAL STATE
-========================= */
 
 const initialState = {
   wards: [],
@@ -102,10 +91,6 @@ const initialState = {
   error: null,
   success: false,
 };
-
-/* =========================
-   SLICE
-========================= */
 
 const wardSlice = createSlice({
   name: "ward",
@@ -126,7 +111,7 @@ const wardSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // 🔹 Fetch wards
+
       .addCase(fetchWards.pending, (state) => {
         state.loading = true;
       })
@@ -143,7 +128,6 @@ const wardSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 🔹 Fetch ward by id
       .addCase(fetchWardById.pending, (state) => {
         state.loading = true;
       })
@@ -156,7 +140,6 @@ const wardSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 🔹 Create ward
       .addCase(createWard.fulfilled, (state, action) => {
         state.success = true;
         state.wards.unshift(action.payload.data || action.payload);
@@ -165,7 +148,6 @@ const wardSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 🔹 Update ward
       .addCase(updateWard.fulfilled, (state, action) => {
         state.success = true;
         const index = state.wards.findIndex(
@@ -177,7 +159,6 @@ const wardSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 🔹 Delete ward
       .addCase(deleteWard.fulfilled, (state, action) => {
         state.success = true;
         state.wards = state.wards.filter(

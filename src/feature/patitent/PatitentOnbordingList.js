@@ -21,6 +21,7 @@ import {
   ReloadOutlined,
   FilterOutlined,
   CreditCardOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 
 import dayjs from 'dayjs';
@@ -43,8 +44,7 @@ const DEFAULT_PATIENT_COLUMNS = [
   'gender',
   'caseType',
   'address',
-  'bloodGroup',
-  'isActive',
+  'caseNumber',
   'createdAt',
 ];
 
@@ -115,7 +115,15 @@ const PatientOnboardingList = () => {
       title: 'Gender',
       key: 'gender',
       dataIndex: 'gender',
-      render: (v) => <Tag>{v?.toUpperCase()}</Tag>,
+      width: 100,
+      render: (v) => v?.toUpperCase(),
+    },
+    {
+      title: 'Case Number',
+      key: 'caseNumber',
+      dataIndex: 'caseNumber',
+      widht: 150,
+      render: (v) => v,
     },
     {
       title: 'Case',
@@ -148,13 +156,18 @@ const PatientOnboardingList = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width:180,
+      width: 220,
       render: (_, r) => (
         <Space>
           <Button
             type="link"
-            icon={<CreditCardOutlined  />}
-            onClick={() => navigate(`/chargeby-patient/${r._id}`)}
+            icon={<CreditCardOutlined />}
+            onClick={() => navigate(`/receive-charge/${r._id}`)}
+          />
+          <Button
+            type="link"
+            icon={<HistoryOutlined />}
+            onClick={() => navigate(`/patient-payment-history/${r._id}`)}
           />
           <Button
             type="link"
@@ -262,7 +275,7 @@ const PatientOnboardingList = () => {
           <Space style={{ flexWrap: 'wrap' }}>
             <Search
               placeholder="Search patient"
-              className='searchbar-search'
+              className="searchbar-search"
               onSearch={(v) => {
                 setSearchText(v);
                 loadPatients(1, v);

@@ -34,6 +34,10 @@ import Breadcrumbs from '../comman/Breadcrumbs';
 import debounce from 'lodash/debounce';
 import '../../index.css';
 import { useParams } from 'react-router-dom';
+import { fetchFloors } from '../../slices/floorSlice';
+import { fetchWards } from '../../slices/wardSlice';
+import { fetchRooms } from '../../slices/roomSlice';
+import { fetchBeds } from '../../slices/badSlice';
 
 const { Search } = Input;
 
@@ -75,6 +79,10 @@ const ChargeMaster = () => {
   const [drawerMode, setDrawerMode] = useState('add');
   const [editingRecord, setEditingRecord] = useState(null);
   const [searchText, setSearchText] = useState('');
+
+  const [selectedFloor, setSelectedFloor] = useState(null);
+  const [selectedWard, setSelectedWard] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
     dispatch(fetchChargeMasters({ page: 1, limit: 20 }));
@@ -148,7 +156,8 @@ const ChargeMaster = () => {
     'gstRate',
     'taxInclusive',
     'isActive',
-    'chargeCategory'
+    'chargeCategory',
+    'bed',
   ];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
@@ -160,19 +169,47 @@ const ChargeMaster = () => {
       title: 'Charge Category',
       dataIndex: 'chargeCategory',
       key: 'chargeCategory',
-      render: (v) => v
+      render: (v) => v && v.charAt(0).toUpperCase() + v.slice(1),
     },
     {
       title: 'Case Type',
       dataIndex: 'caseType',
       key: 'caseType',
-      render: (v) => <Tag color="blue">{v}</Tag>,
+      render: (v) => v && v.charAt(0).toUpperCase() + v.slice(1),
     },
     {
       title: 'Case Status',
       dataIndex: 'caseStatus',
       key: 'caseStatus',
-      render: (v) => <Tag color="orange">{v}</Tag>,
+      render: (v) => v && v.charAt(0).toUpperCase() + v.slice(1),
+    },
+    {
+      title: 'Floor',
+      key: 'floor',
+      render: (_, record) => {
+        return record?.floor?.name || '-';
+      },
+    },
+    {
+      title: 'Ward',
+      key: 'ward',
+      render: (_, record) => {
+        return record?.ward?.name || '-';
+      },
+    },
+    {
+      title: 'Room',
+      key: 'room',
+      render: (_, record) => {
+        return record?.room?.name || '-';
+      },
+    },
+    {
+      title: 'Bed',
+      key: 'bed',
+      render: (_, record) => {
+        return record?.bed?.bedNumber || '-';
+      },
     },
     {
       title: 'Amount',
@@ -219,7 +256,14 @@ const ChargeMaster = () => {
       title: 'Status',
       dataIndex: 'isActive',
       key: 'isActive',
-      render: (v) => (v ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>),
+      render: (v) =>
+        v ? (
+          <Tag color="green" style={{ width: '100%', textAlign: 'center' }}>
+            Active
+          </Tag>
+        ) : (
+          <Tag color="red">Inactive</Tag>
+        ),
     },
     {
       title: 'Actions',
@@ -263,7 +307,9 @@ const ChargeMaster = () => {
       dispatch(fetchChargeMasters({ page, limit }));
       dispatch(resetChargeMasterState());
     } catch (err) {
-      message.error(err?.message || 'Something went wrong');
+      console.log("errrr",err);
+      
+      message.error(err || 'Something went wrong');
     }
   };
 
@@ -316,6 +362,66 @@ const ChargeMaster = () => {
       })
     );
   };
+
+  const chargeCategoryValue = Form.useWatch('chargeCategory', form);
+
+  const {
+    floor: { floors, loading: floorLoading },
+    ward: { wards, loading: wardLoading },
+    room: { rooms, loading: roomLoading },
+    bed: { beds, loading: bedLoading },
+  } = useSelector((state) => state);
+
+  const floorOptions = useMemo(
+    () => (floors || []).map((f) => ({ label: f.name, value: f._id })),
+    [floors]
+  );
+
+  const wardOptions = useMemo(
+    () => (wards || []).map((w) => ({ label: w.name, value: w._id })),
+    [wards]
+  );
+
+  const roomOptions = useMemo(
+    () => (rooms || []).map((r) => ({ label: r.roomNumber, value: r._id })),
+    [rooms]
+  );
+
+  const bedOptions = useMemo(
+    () => (beds || []).map((b) => ({ label: b.bedNumber, value: b._id })),
+    [beds]
+  );
+
+  useEffect(() => {
+    if (drawerOpen) {
+      dispatch(fetchFloors({ page: 1, limit: 1000 }));
+    }
+  }, [dispatch, drawerOpen]);
+
+  useEffect(() => {
+    if (selectedFloor) {
+      dispatch(fetchWards({ page: 1, limit: 1000, floorId: selectedFloor }));
+    }
+  }, [dispatch, selectedFloor]);
+
+  useEffect(() => {
+    if (selectedFloor) {
+      dispatch(fetchRooms({ page: 1, limit: 1000, floorId: selectedFloor }));
+    }
+  }, [dispatch, selectedFloor]);
+
+  useEffect(() => {
+    if (selectedFloor && (selectedWard || selectedRoom)) {
+      dispatch(
+        fetchBeds({
+          page: 1,
+          limit: 1000,
+          wardId: selectedWard,
+          roomId: selectedRoom,
+        })
+      );
+    }
+  }, [dispatch, selectedFloor, selectedWard, selectedRoom]);
 
   return (
     <>
@@ -452,6 +558,76 @@ const ChargeMaster = () => {
                 ))}
               </Select>
             </Form.Item>
+
+            {chargeCategoryValue === 'room' && (
+              <>
+                <Form.Item
+                  name="floor"
+                  label="Floor"
+                  rules={[{ required: true, message: 'Please select floor' }]}
+                >
+                  <Select
+                    loading={floorLoading}
+                    options={floorOptions}
+                    allowClear
+                    placeholder="Select Floor"
+                    onChange={(value) => {
+                      setSelectedFloor(value);
+                      setSelectedRoom(null);
+                      setSelectedWard(null);
+                      form.setFieldsValue({
+                        ward: null,
+                        room: null,
+                        bed: null,
+                      });
+                    }}
+                  />
+                </Form.Item>
+
+                <Form.Item name="ward" label="Ward">
+                  <Select
+                    loading={wardLoading}
+                    options={wardOptions}
+                    disabled={!selectedFloor || selectedRoom}
+                    allowClear
+                    placeholder="Select Ward"
+                    onChange={(value) => {
+                      setSelectedWard(value);
+                      setSelectedRoom(null);
+                      form.setFieldsValue({
+                        bed: null,
+                      });
+                    }}
+                  />
+                </Form.Item>
+
+                <Form.Item name="room" label="Room">
+                  <Select
+                    loading={roomLoading}
+                    allowClear
+                    options={roomOptions}
+                    disabled={!selectedFloor || selectedWard}
+                    placeholder="Select Room"
+                    onChange={(value) => {
+                      setSelectedRoom(value);
+                      setSelectedWard(null);
+                      form.setFieldsValue({
+                        bed: null,
+                      });
+                    }}
+                  />
+                </Form.Item>
+
+                <Form.Item name="bed" label="Bed" rules={[{ required: true }]}>
+                  <Select
+                    loading={bedLoading}
+                    options={bedOptions}
+                    allowClear
+                    disabled={!selectedFloor || (!selectedWard && !selectedRoom)}
+                  />
+                </Form.Item>
+              </>
+            )}
 
             <Form.Item
               name="caseStatus"

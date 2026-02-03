@@ -27,10 +27,11 @@ const getWards = ({
   search = "",
   orderBy = "createdAt",
   order = "DESC",
+  floorId = "",
 } = {}) => {
   return axiosClient
     .get("api/wards", {
-      params: { page, limit, search, orderBy, order },
+      params: { page, limit, search, orderBy, order, floorId },
     })
     .then(res => res.data)
 };

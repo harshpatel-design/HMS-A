@@ -52,7 +52,9 @@ export const createCharge = createAsyncThunk(
       const res = await chargeService.createCharge(payload);
       return res;
     } catch (err) {
-      return rejectWithValue(err.message || 'Only admin can create charge');
+      console.log('errrrr', err.response?.data?.message);
+
+      return rejectWithValue(err.response?.data?.message || 'Only admin can create charge');
     }
   }
 );
@@ -68,7 +70,6 @@ export const updateCharge = createAsyncThunk(
     }
   }
 );
-
 
 const initialState = {
   charges: [],

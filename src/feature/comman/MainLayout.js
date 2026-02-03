@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Layout, message, Tooltip } from 'antd';
 import {
-  MenuFoldOutlined,
   MenuUnfoldOutlined,
   LogoutOutlined,
   RightOutlined,
@@ -79,7 +78,7 @@ export default function MainLayout() {
 
       <Layout className="layout-body">
         <Sider
-          collapsed={collapsed} 
+          collapsed={collapsed}
           collapsedWidth={isMobile ? 0 : 75}
           width={isMobile ? '100%' : 240}
           trigger={null}
@@ -101,9 +100,7 @@ export default function MainLayout() {
           <SidebarMenu
             collapsed={collapsed}
             onMenuClick={() => {
-              if (isMobile) {
-                setCollapsed(true); // 🔥 CLOSE SIDEBAR
-              }
+                setCollapsed(true);
             }}
           />
         </Sider>

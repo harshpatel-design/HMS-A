@@ -15,6 +15,7 @@ import {
   Form,
   Spin,
   DatePicker,
+  Tooltip,
 } from 'antd';
 
 import { EditOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
@@ -54,6 +55,7 @@ const ChargeList = () => {
   const [pickerKey, setPickerKey] = useState(0);
 
   const patientNames = patientName.patients;
+  const baseAmount = Form.useWatch('baseAmount', form);
 
   useEffect(() => {
     if (drawerOpen) {
@@ -91,6 +93,7 @@ const ChargeList = () => {
       setEditingRecord(record);
       setDrawerOpen(true);
 
+      // ✅ Fetch patient ledger (this is correct)
       const res = await dispatch(fetchChargeById(record.patient._id)).unwrap();
 
       if (!res?.charges?.length) {
@@ -98,18 +101,21 @@ const ChargeList = () => {
         return;
       }
 
-      const charge = res.charges[0];
+      // ✅ FIND the exact charge document user clicked
+      const charge = res.charges.find((c) => c._id === record._id);
+
+      if (!charge) {
+        message.error('Selected charge not found');
+        return;
+      }
 
       form.setFieldsValue({
         patient: charge.patient._id,
-        chargeMaster: charge.chargeMaster._id,
+        charges: charge.charges.map((c) => c.chargeMaster._id),
         baseAmount: charge.baseAmount,
         discountAmount: charge.discountAmount,
         discountType: charge.discountType,
         finalAmount: charge.finalAmount,
-        paidAmount: charge.paidAmount,
-        paymentStatus: charge.paymentStatus,
-        balanceAmount: charge.balanceAmount,
         caseContext: {
           caseType: charge.caseContext.caseType,
           caseStatus: charge.caseContext.caseStatus,
@@ -121,18 +127,7 @@ const ChargeList = () => {
     }
   };
 
-  const defaultChecked = [
-    'name',
-    'amount',
-    'famount',
-    'damount',
-    'status',
-    'patient',
-    'pamount',
-    'bamount',
-    'paymentStatus',
-    'createdAt',
-  ];
+  const defaultChecked = ['name', 'amount', 'famount', 'damount', 'patient', 'createdAt'];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
 
@@ -146,20 +141,44 @@ const ChargeList = () => {
         return record.patient ? `${record.patient.firstName} ${record.patient.lastName}` : '—';
       },
     },
-    {
-      title: 'Charge Name',
-      dataIndex: ['chargeMaster', 'name'],
-      key: 'name',
-      width: 150,
-      sorter: true,
-    },
 
+    {
+      title: 'Charge Names',
+      key: 'name',
+      maxWidth: 250,
+      render: (_, record) => {
+        return (
+          <Tooltip
+            title={record.charges?.map((c) => (
+              <div key={c._id}>{c.name}</div>
+            ))}
+            placement="topLeft"
+          >
+            <div
+              style={{
+                maxWidth: 250,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                cursor: 'pointer',
+              }}
+            >
+              {record.charges?.map((c, index) => (
+                <span key={c._id || index}>
+                  {c.name}
+                  {index < record.charges.length - 1 ? ', ' : ''}
+                </span>
+              )) || '—'}
+            </div>
+          </Tooltip>
+        );
+      },
+    },
     {
       title: 'Amount',
       dataIndex: 'baseAmount',
       key: 'amount',
       width: 110,
-      sorter: true,
       render: (v) => v,
     },
     {
@@ -176,32 +195,12 @@ const ChargeList = () => {
       width: 130,
       render: (v) => v,
     },
-    {
-      title: 'Paid Amount',
-      dataIndex: 'paidAmount',
-      width: 130,
-      key: 'pamount',
-      render: (v) => v,
-    },
-    {
-      title: 'balance Amount',
-      dataIndex: 'balanceAmount',
-      width: 160,
-      key: 'bamount',
-      render: (v) => v,
-    },
-    {
-      title: 'Payment Status',
-      dataIndex: 'paymentStatus',
-      key: 'paymentStatus',
-      width: 150,
-      sorter: true,
-      render: (v) => v,
-    },
+
     {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
+      width: 150,
       sorter: true,
       render: (v) => {
         return v ? new Date(v).toLocaleDateString() : '—';
@@ -225,23 +224,25 @@ const ChargeList = () => {
   );
 
   const onFinish = async (values) => {
+    console.log('baseAmount', baseAmount);
+
     try {
       let res;
       const payload = {
         patient: values.patient,
-        chargeMaster: values.chargeMaster,
-        balanceAmount: values.balanceAmount,
-        baseAmount: values.baseAmount,
-        paymentStatus: values.paymentStatus,
+        charges: values.charges.map((id) => ({
+          chargeMaster: id,
+        })),
         discountAmount: values.discountAmount || 0,
         discountType: values.discountType || 'none',
+        baseAmount: baseAmount || 0,
         paidAmount: values.paidAmount || 0,
         caseContext: {
           caseType: values.caseContext?.caseType,
           caseStatus: values.caseContext?.caseStatus,
         },
       };
-      console.log('Payload to backend:', payload);
+      console.log('payload', payload);
 
       if (drawerMode === 'add') {
         res = await dispatch(createCharge(payload)).unwrap();
@@ -262,8 +263,8 @@ const ChargeList = () => {
 
       dispatch(fetchCharges({ page, limit }));
     } catch (err) {
-      console.error(err);
-      message.error(err?.message || 'Operation failed');
+      console.error('error in charge drawer submit:', err);
+      message.error(err || 'Operation failed');
     }
   };
 
@@ -304,39 +305,44 @@ const ChargeList = () => {
       const pageNumber = pagination.current;
       const pageSize = pagination.pageSize;
 
-      let ordering = '-createdAt';
+      let orderBy = 'createdAt';
+      let order = 'DESC';
 
-      if (sorter.order) {
-        ordering = sorter.order === 'ascend' ? sorter.field : `-${sorter.field}`;
+      if (sorter && sorter.order && sorter.columnKey) {
+        orderBy = sorter.columnKey;
+        order = sorter.order === 'ascend' ? 'ASC' : 'DESC';
       }
       dispatch(
         fetchCharges({
           page: pageNumber,
           limit: pageSize,
           search: searchText,
-          ordering,
+          orderBy,
+          order,
         })
       );
-      // --------------------------------
     },
-    [dispatch, searchText, searchText, searchText]
+    [dispatch, searchText]
   );
+  const handleChargeSelect = (ids) => {
+    const selectedCharges = chargeMasters.filter((c) => ids.includes(c._id));
 
-  const handleChargeSelect = (chargeId) => {
-    const resolvedId =
-      typeof chargeId === 'object' && chargeId !== null ? chargeId.value : chargeId;
+    const baseAmount = selectedCharges.reduce((sum, c) => sum + (c.amount || 0), 0);
 
-    const selected = chargeMasters.find((item) => item._id === resolvedId);
+    const discountAmount = form.getFieldValue('discountAmount') || 0;
+    const discountType = form.getFieldValue('discountType') || 'none';
 
-    if (!selected) return;
+    let finalAmount = baseAmount;
+
+    if (discountType === 'flat') {
+      finalAmount -= discountAmount;
+    } else if (discountType === 'percentage') {
+      finalAmount -= (baseAmount * discountAmount) / 100;
+    }
 
     form.setFieldsValue({
-      baseAmount: selected.amount,
-      finalAmount: selected.amount,
-
-      discountAmount: 0,
-      discountType: 'none',
-      paymentStatus: 'unpaid',
+      baseAmount,
+      finalAmount: Math.max(finalAmount, 0),
     });
   };
 
@@ -427,7 +433,7 @@ const ChargeList = () => {
         />
 
         <div className="serachbar-bread">
-          <Space style={{flexWrap:"wrap"}}>
+          <Space style={{ flexWrap: 'wrap' }}>
             <Search
               placeholder="Search charges"
               allowClear
@@ -436,13 +442,13 @@ const ChargeList = () => {
                 setSearchText(e.target.value);
                 debouncedFetch(e.target.value);
               }}
-              style={{ maxWidth: 220 , width:"100%" }}
+              style={{ maxWidth: 220, width: '100%' }}
             />
 
             <Button icon={<ReloadOutlined />} onClick={handleReset} />
 
             <Dropdown
-              dropdownRender={() => (
+              popupRender={() => (
                 <div className="column-filter-menu">
                   {allColumns
                     .filter((c) => c.key !== 'actions')
@@ -559,7 +565,7 @@ const ChargeList = () => {
               </Form.Item>
 
               <Form.Item
-                name="chargeMaster"
+                name="charges"
                 label="Charge Master"
                 rules={[{ required: true, message: 'Charge master is required' }]}
               >
@@ -567,6 +573,7 @@ const ChargeList = () => {
                   showSearch
                   placeholder="Select Charge"
                   filterOption={false}
+                  mode="multiple"
                   onSearch={(value) => debouncedChargeSearch(value)}
                   onChange={handleChargeSelect}
                   optionLabelProp="children"
@@ -574,7 +581,7 @@ const ChargeList = () => {
                   {chargeMasters &&
                     chargeMasters.map((doc) => (
                       <Option key={doc._id} value={doc._id}>
-                        {doc.name} (₹ {doc.amount}) {/* show amount separately */}
+                        {doc.name} (₹ {doc.amount})
                       </Option>
                     ))}
                 </Select>
@@ -635,13 +642,6 @@ const ChargeList = () => {
                 <InputNumber min={0} style={{ width: '100%' }} readOnly />
               </Form.Item>
 
-              <Form.Item name="paidAmount" label="Paid Amount">
-                <InputNumber min={0} style={{ width: '100%' }} />
-              </Form.Item>
-              <Form.Item name="balanceAmount" label="Balance Amount">
-                <InputNumber style={{ width: '100%' }} readOnly />
-              </Form.Item>
-
               <Form.Item
                 name={['caseContext', 'caseType']}
                 label="Case Type"
@@ -666,14 +666,6 @@ const ChargeList = () => {
                   <Select.Option value="old">Old</Select.Option>
                   <Select.Option value="followup">Followup</Select.Option>
                   <Select.Option value="emergency">Emergency</Select.Option>
-                </Select>
-              </Form.Item>
-
-              <Form.Item name="paymentStatus" label="Payment Status">
-                <Select disabled>
-                  <Select.Option value="unpaid">Unpaid</Select.Option>
-                  <Select.Option value="partial">Partial</Select.Option>
-                  <Select.Option value="paid">Paid</Select.Option>
                 </Select>
               </Form.Item>
 
