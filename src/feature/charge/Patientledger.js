@@ -79,14 +79,14 @@ function PatientLedger() {
           <Tooltip title="View Payments">
             <Button
               type="link"
-              icon={<CreditCardOutlined />}
+              icon={<HistoryOutlined />}
               onClick={() => navigate(`/patient-payment-history/${r.patient._id}`)}
             />
           </Tooltip>
           <Tooltip title="Recive Payments">
             <Button
               type="link"
-              icon={<HistoryOutlined />}
+              icon={<CreditCardOutlined />}
               onClick={() => navigate(`/receive-charge/${r.patient._id}`)}
             />
           </Tooltip>

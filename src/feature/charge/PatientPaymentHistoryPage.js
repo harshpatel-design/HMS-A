@@ -63,12 +63,13 @@ function PatientPaymentHistoryPage() {
           { label: 'Patient History' },
         ]}
       />
-      <div title="Patient Payment History">
+      <div title="table-scroll-container">
         <Spin spinning={loading}>
           {paymentHistory?.length ? (
             <Table
               rowKey="_id"
               columns={columns}
+              scroll={{ x: 'max-content' }}
               dataSource={paymentHistory}
               pagination={{
                 showTotal: (total) => `Total ${total} items`,

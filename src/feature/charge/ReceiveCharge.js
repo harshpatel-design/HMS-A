@@ -238,7 +238,7 @@ function ReceiveCharge({ setDrawerOpen }) {
                   htmlType="submit"
                   className="btn-full"
                   block
-                  disabled={!selectedPatientId || ledgerSummary.balanceAmount < receiveAmount}
+                  disabled={!selectedPatientId || ledgerSummary.balanceAmount <= 0}
                 >
                   Receive Payment
                 </Button>

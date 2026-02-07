@@ -1,276 +1,371 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import {
+  Form,
+  Input,
+  Row,
+  Col,
+  Button,
+  Select,
+  Collapse,
+  TimePicker,
+  DatePicker,
+  message,
+  Spin,
+} from 'antd';
+import dayjs from 'dayjs';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import Breadcrumbs from '../comman/Breadcrumbs';
 
 import {
-    Form,
-    Input,
-    Button,
-    Select,
-    DatePicker,
-    TimePicker,
-    Card,
-    Row,
-    Col,
-    Divider,
-    Space,
-    Typography,
-    message,
-} from "antd";
+  createAppointment,
+  updateAppointment,
+  fetchAppointmentById,
+} from '../../slices/appointmentSlice';
+import { fetchDepartments } from '../../slices/departmentSlice';
+import { fetchChargeMasters } from '../../slices/chargeMasterSlice';
 
-import dayjs from "dayjs";
-
-import {
-    createAppointment,
-    updateAppointment,
-    fetchAppointmentById,
-} from "../../slices/appointmentSlice";
-
-import doctorService from "../../services/doctorService";
-import patientService from "../../services/patientService";
+import doctorService from '../../services/doctorService';
+import patientService from '../../services/patientService';
 
 const { TextArea } = Input;
-const { Title } = Typography;
 
-const AddEditAppointment = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { id } = useParams();
-    const isEdit = !!id;
+export default function AddEditAppointment() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = Boolean(id);
 
-    const [doctorList, setDoctorList] = useState([]);
-    const [patientList, setPatientList] = useState([]);
+  const [form] = Form.useForm();
+  const { appointment } = useSelector((state) => state.appointment);
+  const { chargeMasters, loading: chargeLoading } = useSelector((state) => state.chargeMaster);
+  const { departments, loading: deptLoading } = useSelector((state) => state.department);
+  const [loading, setLoading] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [patients, setPatients] = useState([]);
 
-    const { appointment, loading } = useSelector((state) => state.appointment);
-    const [form] = Form.useForm();
+  useEffect(() => {
+    if (isEdit) dispatch(fetchAppointmentById(id));
+  }, [id, dispatch, isEdit]);
 
-    useEffect(() => {
-        if (isEdit) dispatch(fetchAppointmentById(id));
-    }, [id]);
+  const loadDepartments = () => {
+    if (departments.length) return;
 
-    useEffect(() => {
-        if (isEdit && appointment) {
+    dispatch(fetchDepartments({ page: 1, limit: 100 }));
+  };
+  const loadChargeMasters = () => {
+    if (chargeMasters.length) return;
 
-            const fullName = `${appointment.patient.firstName} ${appointment.patient.lastName}`;
-
-            setPatientList(prev => {
-                const exists = prev.some(p => p.value === appointment.patient._id);
-                if (!exists) {
-                    return [
-                        ...prev,
-                        { label: fullName, value: appointment.patient._id }
-                    ];
-                }
-                return prev;
-            });
-
-            setDoctorList(prev => {
-                const exists = prev.some(d => d.value === appointment.doctor._id);
-                if (!exists) {
-                    return [
-                        ...prev,
-                        { label: appointment.doctor.name, value: appointment.doctor._id }
-                    ];
-                }
-                return prev;
-            });
-        }
-    }, [appointment]);
-
-
-    useEffect(() => {
-        if (isEdit && appointment) {
-            const start = dayjs(appointment.startTime, "HH:mm");
-            const end = dayjs(appointment.endTime, "HH:mm");
-            fetchDoctorNames();
-            fetchPatientNames();
-
-            form.setFieldsValue({
-                patient: appointment.patient?._id,
-                doctor: appointment.doctor?._id,
-                appointmentDate: dayjs(appointment.appointmentDate),
-                startTime: start,
-                endTime: end,
-                type: appointment.type,
-                reason: appointment.reason,
-                notes: appointment.notes,
-                status: appointment.status,
-            });
-        }
-    }, [appointment]);
-
-    const fetchDoctorNames = async () => {
-        try {
-            if (doctorList.length > 0) return;
-            const res = await doctorService.getDoctorNames();
-            setDoctorList(
-                res.doctors?.map((doc) => ({
-                    label: doc.name.toUpperCase(),
-                    value: doc.id,
-                }))
-            );
-        } catch {
-            message.error("Failed to load doctors");
-        }
-    };
-
-    const fetchPatientNames = async () => {
-        try {
-            const res = await patientService.getPatientNames({ search: "" });
-            setPatientList(
-                res.patients?.map((p) => ({
-                    label: `${p.name}`,
-                    value: p._id,
-                })) || []
-            );
-        } catch {
-            message.error("Failed to load patients");
-        }
-    };
-    const calculateDuration = () => {
-        const { startTime, endTime } = form.getFieldsValue();
-        if (!startTime || !endTime) return 0;
-
-        const diff = dayjs(endTime).diff(dayjs(startTime), "minute");
-        return diff > 0 ? diff : 0;
-    };
-
-    const onFinish = async (values) => {
-        const payload = {
-            patient: values.patient,
-            doctor: values.doctor,
-            appointmentDate: values.appointmentDate.format("YYYY-MM-DD"),
-            startTime: values.startTime.format("HH:mm"),
-            endTime: values.endTime.format("HH:mm"),
-            duration: calculateDuration(),
-            type: values.type ?? "consultation",
-            reason: values.reason ?? "",
-            notes: values.notes ?? "",
-            status: values.status ?? "scheduled",
-        };
-
-        try {
-            if (isEdit) {
-                await dispatch(updateAppointment({ id, data: payload })).unwrap();
-                message.success("Appointment updated successfully");
-            } else {
-                await dispatch(createAppointment(payload)).unwrap();
-                message.success("Appointment created successfully");
-            }
-
-            navigate("/appointments");
-        } catch (err) {
-            console.log("err", err);
-
-            message.error(err);
-        }
-    };
-
-    return (
-        <div className="p-6">
-            <Card style={{ borderRadius: 12 }}>
-                <Title level={3}>{isEdit ? "Edit Appointment" : "Create Appointment"}</Title>
-
-                <Divider />
-
-                <Form layout="vertical" form={form} onFinish={onFinish}>
-                    <Row gutter={16}>
-
-                        <Col span={8}>
-                            <Form.Item name="patient" label="Patient" rules={[{ required: true }]}>
-                                <Select
-                                    placeholder="Select Patient"
-                                    onClick={fetchPatientNames}
-                                    options={patientList}
-                                    showSearch
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item name="doctor" label="Doctor" rules={[{ required: true }]}>
-                                <Select
-                                    placeholder="Select Doctor"
-                                    onClick={fetchDoctorNames}
-                                    options={doctorList}
-                                    showSearch
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item name="type" label="Appointment Type" rules={[{ required: true }]}>
-                                <Select placeholder="Select Type">
-                                    <Select.Option value="consultation">Consultation</Select.Option>
-                                    <Select.Option value="follow-up">Follow-Up</Select.Option>
-                                    <Select.Option value="check-up">Check-Up</Select.Option>
-                                    <Select.Option value="procedure">Procedure</Select.Option>
-                                    <Select.Option value="other">Other</Select.Option>
-                                </Select>
-                            </Form.Item>
-                        </Col>
-
-                        <Col span={4}>
-                            <Form.Item
-                                name="appointmentDate"
-                                label="Date"
-                                rules={[{ required: true }]}
-                            >
-                                <DatePicker
-                                    className="w-full"
-                                    format="YYYY-MM-DD"
-                                    disabledDate={(current) => current && current < dayjs().startOf("day")}
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={4}>
-                            <Form.Item name="startTime" label="Start Time" rules={[{ required: true }]}>
-                                <TimePicker format="HH:mm" className="w-full" disabledTime={() => ({})} />
-                            </Form.Item>
-                        </Col>
-
-                        <Col span={4}>
-                            <Form.Item name="endTime" label="End Time" rules={[{ required: true }]}>
-                                <TimePicker format="HH:mm" className="w-full" disabledTime={() => ({})} />
-                            </Form.Item>
-                        </Col>
-
-
-                        <Col span={4}>
-                            <Form.Item
-                                name="status"
-                                label="Status"
-                                rules={[{ required: true, message: "Please select status" }]}
-                            >
-                                <Select placeholder="Select Status" style={{ paddingLeft: 8, paddingRight: 8 }}>
-                                    <Select.Option value="scheduled">Scheduled</Select.Option>
-                                    <Select.Option value="completed">Completed</Select.Option>
-                                    <Select.Option value="cancelled">Cancelled</Select.Option>
-                                    <Select.Option value="no-show">No Show</Select.Option>
-                                </Select>
-                            </Form.Item>
-                        </Col>
-
-                    </Row>
-
-                    <Form.Item name="reason" label="Reason">
-                        <Input placeholder="Reason for appointment" />
-                    </Form.Item>
-
-                    <Form.Item name="notes" label="Notes">
-                        <TextArea rows={3} />
-                    </Form.Item>
-
-                    <div style={{ textAlign: "right" }}>
-                        <Space>
-                            <Button onClick={() => navigate("/appointments")} style={{ borderRadius: 8, padding: "6px 14px", height: 32 }}>Cancel</Button>
-                            <Button type="primary" htmlType="submit" className="btn" loading={loading}>
-                                {isEdit ? "Update" : "Create"}
-                            </Button>
-                        </Space>
-                    </div>
-                </Form>
-            </Card>
-        </div>
+    dispatch(
+      fetchChargeMasters({
+        page: 1,
+        limit: 100,
+        chargeType: 'consultancy',
+      })
     );
-};
+  };
+  useEffect(() => {
+    if (!isEdit || !appointment) return;
 
-export default AddEditAppointment;
+    setPatients((prev) => {
+      if (prev.some((p) => p.value === appointment.patient?._id)) return prev;
+
+      return [
+        ...prev,
+        {
+          label: `${appointment.patient?.firstName || ''} ${appointment.patient?.lastName || ''}`,
+          value: appointment.patient?._id,
+        },
+      ];
+    });
+
+    setDoctors((prev) => {
+      if (prev.some((d) => d.value === appointment.doctor?._id)) return prev;
+      loadChargeMasters();
+      return [
+        ...prev,
+        {
+          label: appointment.doctor?.user?.name || 'Doctor',
+          value: appointment.doctor?._id,
+        },
+      ];
+    });
+
+    dispatch(fetchDepartments({ page: 1, limit: 100 }));
+
+    form.setFieldsValue({
+      patient: appointment.patient?._id || null,
+      doctor: appointment.doctor?._id || null,
+      department: appointment.department?._id || null,
+      charge: appointment.charge?._id || null,
+
+      appointmentDate: appointment.appointmentDate ? dayjs(appointment.appointmentDate) : null,
+
+      startTime: appointment.timeSlot?.start ? dayjs(appointment.timeSlot.start, 'HH:mm') : null,
+
+      endTime: appointment.timeSlot?.end ? dayjs(appointment.timeSlot.end, 'HH:mm') : null,
+
+      caseStatus: appointment.caseStatus || 'appointment',
+      consultationType: appointment.consultationType || 'in-person',
+      status: appointment.status || 'scheduled',
+      notes: appointment.notes || '',
+    });
+  }, [appointment, isEdit, dispatch, form]);
+
+  const loadDoctors = async () => {
+    if (doctors.length) return;
+    const res = await doctorService.getDoctorNames();
+    setDoctors(res.doctors?.map((d) => ({ label: d.name, value: d._id })) || []);
+  };
+
+  const loadPatients = async () => {
+    const res = await patientService.getPatientNames({ search: '' });
+    setPatients(
+      res.patients?.map((p) => ({
+        label: `${p.name}`,
+        value: p._id,
+      })) || []
+    );
+  };
+
+  const onFinish = async (values) => {
+    console.log('value', values);
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        patient: values.patient,
+        doctor: values.doctor,
+        department: values.department,
+        charge: values.charge,
+        appointmentDate: values.appointmentDate.format('YYYY-MM-DD'),
+        timeSlot: {
+          start: values.startTime.format('HH:mm'),
+          end: values.endTime.format('HH:mm'),
+        },
+        caseStatus: values.caseStatus,
+        consultationType: values.consultationType,
+        status: values.status,
+        notes: values.notes || '',
+      };
+
+      if (isEdit) {
+        await dispatch(updateAppointment({ id, data: payload })).unwrap();
+        message.success('Appointment updated successfully');
+      } else {
+        await dispatch(createAppointment(payload)).unwrap();
+        message.success('Appointment created successfully');
+      }
+
+      navigate('/appointments');
+    } catch (err) {
+      message.error(err?.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="page-wrapper">
+        {loading && <Spin fullscreen tip="Processing..." />}
+
+        <Breadcrumbs
+          title={isEdit ? 'Edit Appointment' : 'Add Appointment'}
+          showBack
+          backTo="/appointments"
+          items={[
+            { label: 'Appointments', href: '/appointments' },
+            { label: isEdit ? 'Edit Appointment' : 'Add Appointment' },
+          ]}
+        />
+
+        <div className="form-wrapper">
+          <Form layout="vertical" form={form} onFinish={onFinish}>
+            <Collapse
+              defaultActiveKey={['basic']}
+              accordion={false}
+              items={[
+                {
+                  key: 'basic',
+                  label: 'Basic Information',
+                  children: (
+                    <Row gutter={[16, 12]}>
+                      <Col md={6} xs={24}>
+                        <Form.Item label="Patient" name="patient" rules={[{ required: true }]}>
+                          <Select
+                            showSearch
+                            placeholder="Select Patient"
+                            onClick={loadPatients}
+                            options={patients}
+                          />
+                        </Form.Item>
+                      </Col>
+
+                      <Col md={6} xs={24}>
+                        <Form.Item label="Doctor" name="doctor" rules={[{ required: true }]}>
+                          <Select
+                            showSearch
+                            placeholder="Select Doctor"
+                            onClick={loadDoctors}
+                            options={doctors}
+                          />
+                        </Form.Item>
+                      </Col>
+
+                      <Col md={6} xs={24}>
+                        <Form.Item
+                          label="Consultation Type"
+                          name="consultationType"
+                          rules={[{ required: true }]}
+                        >
+                          <Select>
+                            <Select.Option value="in-person">In Person</Select.Option>
+                            <Select.Option value="online">Online</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+
+                      <Col md={6} xs={24}>
+                        <Form.Item
+                          label="Department"
+                          name="department"
+                          rules={[{ required: true, message: 'Department is required' }]}
+                        >
+                          <Select
+                            showSearch
+                            placeholder="Select Department"
+                            loading={deptLoading}
+                            onClick={loadDepartments}
+                            options={departments.map((d) => ({
+                              label: d.name,
+                              value: d._id,
+                            }))}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  ),
+                },
+
+                {
+                  key: 'schedule',
+                  label: 'Appointment Schedule',
+                  children: (
+                    <Row gutter={[16, 12]}>
+                      <Col md={6} xs={24}>
+                        <Form.Item label="Date" name="appointmentDate" rules={[{ required: true }]}>
+                          <DatePicker
+                            format="YYYY-MM-DD"
+                            disabledDate={(d) => d && d < dayjs().startOf('day')}
+                            style={{ width: '100%' }}
+                          />
+                        </Form.Item>
+                      </Col>
+
+                      <Col md={6} xs={24}>
+                        <Form.Item label="Start Time" name="startTime" rules={[{ required: true }]}>
+                          <TimePicker format="HH:mm" style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+
+                      <Col md={6} xs={24}>
+                        <Form.Item label="End Time" name="endTime" rules={[{ required: true }]}>
+                          <TimePicker format="HH:mm" style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  ),
+                },
+
+                {
+                  key: 'case',
+                  label: 'Case & Status',
+                  children: (
+                    <Row gutter={[16, 12]}>
+                      <Col md={6} xs={24}>
+                        <Form.Item
+                          label="Case Status"
+                          name="caseStatus"
+                          rules={[{ required: true }]}
+                        >
+                          <Select>
+                            <Select.Option value="appointment">Appointment</Select.Option>
+                            <Select.Option value="new">New</Select.Option>
+                            <Select.Option value="followup">Follow-up</Select.Option>
+                            <Select.Option value="emergency">Emergency</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+
+                      <Col md={6} xs={24}>
+                        <Form.Item label="Status" name="status" rules={[{ required: true }]}>
+                          <Select>
+                            <Select.Option value="scheduled">Scheduled</Select.Option>
+                            <Select.Option value="checked-in">Checked-in</Select.Option>
+                            <Select.Option value="completed">Completed</Select.Option>
+                            <Select.Option value="cancelled">Cancelled</Select.Option>
+                            <Select.Option value="no-show">No Show</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+
+                      <Col md={6} xs={24}>
+                        <Form.Item
+                          label="Consultation Charge"
+                          name="charge"
+                          rules={[{ required: true, message: 'Charge is required' }]}
+                        >
+                          <Select
+                            showSearch
+                            placeholder="Select Charge"
+                            loading={chargeLoading}
+                            allowClear
+                            onClick={loadChargeMasters}
+                            optionFilterProp="label"
+                            options={chargeMasters.map((c) => ({
+                              label: `${c.name} - ₹${c.amount}`,
+                              value: c._id,
+                            }))}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  ),
+                },
+
+                {
+                  key: 'notes',
+                  label: 'Notes',
+                  children: (
+                    <Form.Item name="notes">
+                      <TextArea rows={3} placeholder="Additional notes" />
+                    </Form.Item>
+                  ),
+                },
+              ]}
+            />
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: 20,
+                marginBottom: 10,
+              }}
+            >
+              <Button onClick={() => navigate('/appointments')} style={{ marginRight: 10 }}>
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit" loading={loading} className="btn">
+                {isEdit ? 'Update Appointment' : 'Create Appointment'}
+              </Button>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </>
+  );
+}

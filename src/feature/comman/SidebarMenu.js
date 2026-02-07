@@ -5,6 +5,7 @@ import {
   AppstoreOutlined,
   CreditCardOutlined,
   MedicineBoxOutlined,
+  ScheduleOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
@@ -45,6 +46,20 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
       items={[
         { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
         {
+          key: '/master',
+          icon: <AppstoreOutlined />,
+          label: 'Master',
+          children: [
+            { key: '/floor-master', label: 'Floor' },
+            { key: '/ward-master', label: 'Ward' },
+            { key: '/room-master', label: 'Room' },
+            { key: '/bed-master', label: 'Bed' },
+            { key: '/lab-test', label: 'Lab Test' },
+            { key: '/department-master', label: 'Department' },
+            { key: '/charge-master', label: 'Charge Master' },
+          ],
+        },
+        {
           key: '/user',
           icon: <UserOutlined />,
           label: 'User',
@@ -62,25 +77,18 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
             { key: '/patient-visit', label: 'Patient Visit' },
           ],
         },
-        {
-          key: '/master',
-          icon: <AppstoreOutlined />,
-          label: 'Master',
-          children: [
-            { key: '/floor-master', label: 'Floor' },
-            { key: '/ward-master', label: 'Ward' },
-            { key: '/room-master', label: 'Room' },
-            { key: '/bed-master', label: 'Bed' },
-            { key: '/lab-test', label: 'Lab Test' },
-            { key: '/department-master', label: 'Department' },
-            { key: '/charge-master', label: 'Charge Master' },
-          ],
-        },
+
         {
           key: '/ipd',
           icon: <MedicineBoxOutlined />,
           label: 'IPD Patient',
           children: [{ key: '/ipd-patient-list', label: 'IPD Patient' }],
+        },
+        {
+          key: '/appointment',
+          icon: <ScheduleOutlined  />,
+          label: 'Appointments',
+          children: [{ key: '/appointments', label: 'Appointments' }],
         },
         {
           key: '/chargesList',
