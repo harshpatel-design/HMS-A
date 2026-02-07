@@ -46,6 +46,7 @@ import IpdAddmissionList from './feature/ipdadmission/IpdAddmissionList';
 import ReceiveCharge from './feature/charge/ReceiveCharge';
 import PatientPaymentHistoryPage from './feature/charge/PatientPaymentHistoryPage';
 import PatientLedger from './feature/charge/Patientledger';
+import DoctorWaitingListPage from './feature/waittingList/DoctorWaitingListPage';
 
 export function AppRoutes() {
   return (
@@ -107,6 +108,11 @@ export function AppRoutes() {
           <Route path="/receive-charge/:id" element={<ReceiveCharge />} />
           <Route path="/patient-payment-history/:id" element={<PatientPaymentHistoryPage />} />
           <Route path="/patient-ledger" element={<PatientLedger />} />
+
+
+          <Route path="/watting-list" element={<DoctorWaitingListPage />} />
+
+
         </Route>
       </Route>
 

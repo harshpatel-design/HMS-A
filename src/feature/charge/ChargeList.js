@@ -224,8 +224,6 @@ const ChargeList = () => {
   );
 
   const onFinish = async (values) => {
-    console.log('baseAmount', baseAmount);
-
     try {
       let res;
       const payload = {
@@ -242,8 +240,7 @@ const ChargeList = () => {
           caseStatus: values.caseContext?.caseStatus,
         },
       };
-      console.log('payload', payload);
-
+      
       if (drawerMode === 'add') {
         res = await dispatch(createCharge(payload)).unwrap();
         message.success(res?.message || 'Charge added successfully');

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Spin, Empty, Space, Button, Input, DatePicker, Tooltip } from 'antd';
-import { CreditCardOutlined, HistoryOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Table, Spin, Empty, Space, Button, Input, DatePicker, Tooltip, Select } from 'antd';
+import { CreditCardOutlined, HistoryOutlined, MedicineBoxOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPatientLedger } from '../../slices/payment.slice';
 import Breadcrumbs from '../comman/Breadcrumbs';
 
 const { Search } = Input;
 const { RangePicker } = DatePicker;
+
 function PatientLedger() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -18,61 +19,55 @@ function PatientLedger() {
   const [limit, setLimit] = useState(10);
   const [searchText, setSearchText] = useState('');
   const [dates, setDates] = useState(null);
-  const loadLedger = (p = page, l = limit, s = searchText, d = dates) => {
+  const [caseType, setCaseType] = useState(null);
+
+  /* ================= API CALL (SINGLE SOURCE) ================= */
+  useEffect(() => {
     dispatch(
       getPatientLedger({
-        page: p,
-        limit: l,
-        search: s || undefined,
-        startDate: d?.[0]?.format('YYYY-MM-DD'),
-        endDate: d?.[1]?.format('YYYY-MM-DD'),
+        page,
+        limit,
+        search: searchText || undefined,
+        startDate: dates?.[0]?.format('YYYY-MM-DD'),
+        endDate: dates?.[1]?.format('YYYY-MM-DD'),
+        caseType,
       })
     );
-  };
-
-  useEffect(() => {
-    loadLedger(1, limit);
-    // eslint-disable-next-line
-  }, []);
+  }, [dispatch, page, limit, searchText, dates, caseType]);
 
   const dataSource = ledger?.data || [];
 
+  /* ================= TABLE ================= */
   const columns = [
     {
-      title: 'Patient ID',
+      title: 'Patient',
       dataIndex: 'patient',
       key: 'patient',
       width: 220,
-      render: (v) => v.name || '—',
+      render: (v) => v?.name || '—',
     },
     {
       title: 'Total Amount',
       dataIndex: 'totalAmount',
-      key: 'totalAmount',
       render: (v) => `₹ ${v}`,
     },
     {
       title: 'Paid Amount',
       dataIndex: 'paidAmount',
-      key: 'paidAmount',
       render: (v) => `₹ ${v}`,
     },
     {
       title: 'Discount',
       dataIndex: 'discountAmount',
-      key: 'discountAmount',
       render: (v) => `₹ ${v}`,
     },
     {
       title: 'Balance',
       dataIndex: 'balanceAmount',
-      key: 'balanceAmount',
       render: (v) => `₹ ${v}`,
     },
-
     {
       title: 'Action',
-      key: 'action',
       align: 'center',
       render: (_, r) => (
         <>
@@ -83,7 +78,7 @@ function PatientLedger() {
               onClick={() => navigate(`/patient-payment-history/${r.patient._id}`)}
             />
           </Tooltip>
-          <Tooltip title="Recive Payments">
+          <Tooltip title="Receive Payments">
             <Button
               type="link"
               icon={<CreditCardOutlined />}
@@ -95,25 +90,22 @@ function PatientLedger() {
     },
   ];
 
-  const handleTableChange = (p, l) => {
-    setPage(p);
-    setLimit(l);
-    loadLedger(p, l);
-  };
-
+  /* ================= UI ================= */
   return (
     <div className="page-wrapper">
       <Breadcrumbs
         title="Patient Ledger List"
-        showBack={true}
+        showBack
         backTo="/dashboard"
         items={[
           { label: 'Patient List', href: '/patitent-onboarding' },
           { label: 'Patient Ledger' },
         ]}
       />
+
+      {/* ---------- FILTER BAR ---------- */}
       <div className="serachbar-bread" style={{ marginBottom: 16 }}>
-        <Space style={{ flexWrap: 'wrap' }}>
+        <Space>
           <Search
             placeholder="Search patient"
             allowClear
@@ -121,17 +113,30 @@ function PatientLedger() {
             onSearch={(v) => {
               setSearchText(v);
               setPage(1);
-              loadLedger(1, limit, v, dates);
             }}
           />
-
           <Button
             icon={<ReloadOutlined />}
             onClick={() => {
               setSearchText('');
               setDates(null);
+              setCaseType(null);
               setPage(1);
-              loadLedger(1, limit, '', null);
+            }}
+          />
+          <Select
+            style={{ width: 120, height: 40 }}
+            placeholder="Case Type"
+            suffixIcon={<MedicineBoxOutlined />}
+            allowClear
+            value={caseType}
+            options={[
+              { value: 'opd', label: 'OPD' },
+              { value: 'ipd', label: 'IPD' },
+            ]}
+            onChange={(v) => {
+              setCaseType(v || null);
+              setPage(1);
             }}
           />
 
@@ -141,17 +146,17 @@ function PatientLedger() {
             onChange={(val) => {
               setDates(val);
               setPage(1);
-              loadLedger(1, limit, searchText, val);
             }}
           />
         </Space>
       </div>
 
+      {/* ---------- TABLE ---------- */}
       <Spin spinning={loading}>
         {dataSource.length ? (
           <div className="table-scroll-container">
             <Table
-              rowKey="patient"
+              rowKey={(r) => `${r.patient._id}_${r.caseType}`}
               columns={columns}
               dataSource={dataSource}
               scroll={{ x: 1000 }}
@@ -161,16 +166,16 @@ function PatientLedger() {
                 total: ledger?.pagination?.total,
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50', '100', '500'],
-                onChange: handleTableChange,
-                showTotal: (total) => `Total ${total} items`,
+                onChange: (p, l) => {
+                  setPage(p);
+                  setLimit(l);
+                },
+                showTotal: (t) => `Total ${t} items`,
               }}
             />
           </div>
         ) : (
-          <Empty
-            description="No ledger data found"
-            style={{ paddingTop: 10, borderTop: '1px solid #dadde3' }}
-          />
+          <Empty description="No ledger data found"  style={{background:"white" ,borderRadius:20 , padding:40}}/>
         )}
       </Spin>
     </div>

@@ -188,8 +188,6 @@ export default function AddEditDoctor() {
     reader.readAsDataURL(file);
   };
   const onFinish = async (values) => {
-    console.log('value', values);
-
     try {
       setLoading(true);
       const formData = new FormData();

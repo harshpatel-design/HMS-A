@@ -348,7 +348,6 @@ export default function AddEditPatient() {
 
               <Panel header="Case Details" key="caseDetails">
                 <Row gutter={[16, 10]}>
-               
                   <Col xs={24} md={8}>
                     <Form.Item
                       name="doctor"
@@ -424,7 +423,7 @@ export default function AddEditPatient() {
                         label="Floor"
                         rules={[{ required: true, message: 'Floor is required' }]}
                       >
-                        <Select placeholder="Select Floor">
+                        <Select placeholder="Select Floor" allowClear>
                           {floors.map((f) => (
                             <Select.Option key={f._id} value={f._id}>
                               {f.name}

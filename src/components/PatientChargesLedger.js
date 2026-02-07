@@ -14,7 +14,6 @@ function PatientChargesLedger() {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
 
-  console.log('ledger', ledger);
 
   useEffect(() => {
     if (id) {

@@ -28,6 +28,8 @@ import { fetchChargeMasters } from '../../slices/chargeMasterSlice';
 
 import doctorService from '../../services/doctorService';
 import patientService from '../../services/patientService';
+import appointmentService from '../../services/appointmentService';
+import debounce from 'lodash/debounce';
 
 const { TextArea } = Input;
 
@@ -44,6 +46,45 @@ export default function AddEditAppointment() {
   const [loading, setLoading] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [patients, setPatients] = useState([]);
+
+  const selectedDoctor = Form.useWatch('doctor', form);
+  const appointmentDate = Form.useWatch('appointmentDate', form);
+  const startTime = Form.useWatch('startTime', form);
+  const endTime = Form.useWatch('endTime', form);
+
+  const checkDoctorAvailabilityLive = async () => {
+    if (!selectedDoctor || !appointmentDate || !startTime || !endTime) return;
+
+    const payload = {
+      doctorId: selectedDoctor,
+      appointmentDate: appointmentDate.format('YYYY-MM-DD'),
+      timeSlot: {
+        start: startTime.format('HH:mm'),
+        end: endTime.format('HH:mm'),
+      },
+      ...(isEdit && { excludeId: id }),
+    };
+
+    try {
+      const res = await appointmentService.checkAvailability(payload);
+
+      if (!res.available) {
+        message.error(res.message || 'No doctor is available at this time');
+        form.setFieldsValue({
+          startTime: null,
+          endTime: null,
+        });
+      }
+    } catch (err) {
+      message.error(err.message || 'Availability check failed');
+    }
+  };
+
+  useEffect(() => {
+    const debouncedFn = debounce(checkDoctorAvailabilityLive, 500);
+    debouncedFn();
+    return () => debouncedFn.cancel();
+  }, [selectedDoctor, appointmentDate, startTime, endTime]);
 
   useEffect(() => {
     if (isEdit) dispatch(fetchAppointmentById(id));
@@ -118,20 +159,19 @@ export default function AddEditAppointment() {
     const res = await doctorService.getDoctorNames();
     setDoctors(res.doctors?.map((d) => ({ label: d.name, value: d._id })) || []);
   };
-
   const loadPatients = async () => {
-    const res = await patientService.getPatientNames({ search: '' });
-    setPatients(
-      res.patients?.map((p) => ({
-        label: `${p.name}`,
-        value: p._id,
-      })) || []
-    );
+    if (patients.length === 0) {
+      const res = await patientService.getPatientNames({ search: '' });
+      setPatients(
+        res.patients?.map((p) => ({
+          label: `${p.name}`,
+          value: p._id,
+        })) || []
+      );
+    }
   };
 
   const onFinish = async (values) => {
-    console.log('value', values);
-
     try {
       setLoading(true);
 
@@ -197,6 +237,7 @@ export default function AddEditAppointment() {
                         <Form.Item label="Patient" name="patient" rules={[{ required: true }]}>
                           <Select
                             showSearch
+                            allowClear
                             placeholder="Select Patient"
                             onClick={loadPatients}
                             options={patients}
@@ -208,6 +249,7 @@ export default function AddEditAppointment() {
                         <Form.Item label="Doctor" name="doctor" rules={[{ required: true }]}>
                           <Select
                             showSearch
+                            allowClear
                             placeholder="Select Doctor"
                             onClick={loadDoctors}
                             options={doctors}
@@ -219,9 +261,10 @@ export default function AddEditAppointment() {
                         <Form.Item
                           label="Consultation Type"
                           name="consultationType"
+                          allowClear
                           rules={[{ required: true }]}
                         >
-                          <Select>
+                          <Select allowClear placeholder="Select Consultation Type">
                             <Select.Option value="in-person">In Person</Select.Option>
                             <Select.Option value="online">Online</Select.Option>
                           </Select>
@@ -238,6 +281,7 @@ export default function AddEditAppointment() {
                             showSearch
                             placeholder="Select Department"
                             loading={deptLoading}
+                            allowClear
                             onClick={loadDepartments}
                             options={departments.map((d) => ({
                               label: d.name,
@@ -291,7 +335,7 @@ export default function AddEditAppointment() {
                           name="caseStatus"
                           rules={[{ required: true }]}
                         >
-                          <Select>
+                          <Select allowClear placeholder="Select Case Status">
                             <Select.Option value="appointment">Appointment</Select.Option>
                             <Select.Option value="new">New</Select.Option>
                             <Select.Option value="followup">Follow-up</Select.Option>
@@ -302,7 +346,7 @@ export default function AddEditAppointment() {
 
                       <Col md={6} xs={24}>
                         <Form.Item label="Status" name="status" rules={[{ required: true }]}>
-                          <Select>
+                          <Select allowClear placeholder="Select Status"  >
                             <Select.Option value="scheduled">Scheduled</Select.Option>
                             <Select.Option value="checked-in">Checked-in</Select.Option>
                             <Select.Option value="completed">Completed</Select.Option>

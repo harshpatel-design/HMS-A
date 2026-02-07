@@ -41,7 +41,6 @@ const AddEditService = () => {
     const { service, loading } = useSelector((state) => state.service);
 
     const [form] = Form.useForm();
-    console.log("serviceNameService imported as:", serviceNameService);
 
     /* ------------------------------------------------------
        FETCH SERVICE WHEN EDITING

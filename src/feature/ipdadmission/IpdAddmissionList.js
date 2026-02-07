@@ -52,18 +52,12 @@ function IpdAddmissionList() {
   }, [selectedFloor, selectedWard, selectedRoom, dispatch]);
 
   const { ipdAdmissions, loading, total, page, limit } = useSelector((state) => state.ipd);
-
   const { patientName, loading: patientLoading } = useSelector((state) => state.patient);
-
   const { floors, loading: floorLoading } = useSelector((state) => state.floor);
-
   const { wards, loading: wardLoading } = useSelector((state) => state.ward);
-
   const { rooms, loading: roomLoading } = useSelector((state) => state.room);
-
   const { beds, loading: bedLoading } = useSelector((state) => state.bed);
   const { doctorNames, loading: doctorLoading } = useSelector((state) => state.doctor);
-
   const { chargeMasters, loading: chargeMastersLoading } = useSelector(
     (state) => state.chargeMaster
   );
@@ -163,7 +157,7 @@ function IpdAddmissionList() {
       key: 'name',
       dataIndex: 'patient',
       width: 180,
-      render: (v) => `${v.firstName.toUpperCase()} ${v.lastName.toUpperCase()}`,
+      render: (v) => ` ${v.firstName.toUpperCase()} ${v.lastName.toUpperCase()}`,
     },
     {
       title: 'gender',
@@ -249,7 +243,6 @@ function IpdAddmissionList() {
     dispatch(fetchActiveIpdByPatient(patientId))
       .unwrap()
       .then((res) => {
-        console.log('ACTIVE IPD 👉', res);
 
         form.setFieldsValue({
           admissionDate: res.admissionDate ? dayjs(res.admissionDate) : null,
@@ -293,9 +286,6 @@ function IpdAddmissionList() {
       charges: chargesArray.length ? chargesArray : undefined,
       isActive: values.isActive ?? true,
     };
-
-    console.log('PAYLOAD 👉', payload);
-
     dispatch(createIpdAdmission(payload))
       .unwrap()
       .then(() => {
@@ -311,12 +301,9 @@ function IpdAddmissionList() {
         );
       })
       .catch((err) => {
-        console.log('qqqqqq', err.message);
         message.error(err.message || 'Failed to create IPD');
       });
   };
-
-  console.log('abcd', doctorNames);
 
   return (
     <div className="page-wrapper">

@@ -67,8 +67,6 @@ const createBed = (payload) => {
   }
 
   return axiosClient.post('api/create-bed', payload).then((res) => {
-    console.log('API RES:', res);
-    console.log('API DATA:', res.data);
     return res.data;
   });
 };
@@ -81,8 +79,6 @@ const updateBed = (id, payload) => {
 };
 
 const deleteBed = (id) => {
-  console.log(id);
-
   if (!isAdmin()) {
     throw new Error('Admin Only Access ❌');
   }

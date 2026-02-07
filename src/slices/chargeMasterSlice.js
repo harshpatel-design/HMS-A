@@ -142,7 +142,6 @@ const chargeMasterSlice = createSlice({
         state.loading = false;
         state.chargeMaster = action.payload.charge || action.payload;
         state.selectedChargeMaster = action.payload.charge || action.payload;
-        console.log('state.selectedChargeMaster', state.selectedChargeMaster);
       })
       .addCase(fetchChargeMasterById.rejected, (state, action) => {
         state.loading = false;

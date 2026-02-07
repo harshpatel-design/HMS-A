@@ -12,6 +12,29 @@ export const receivePayment = createAsyncThunk(
   }
 );
 
+export const getPatientLedgerById = createAsyncThunk(
+  'payment/getPatientLedgerById',
+  async (
+    { id, page = 1, limit = 10, startDate = null, endDate = null, caseType = null },
+    thunkAPI
+  ) => {
+    try {
+      console.log('Fetching ledger for:', id);
+      const data = await paymentService.getPatientLedgerById({
+        id,
+        page,
+        limit,
+        startDate,
+        endDate,
+        caseType,
+      });
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error?.response?.data || error.message);
+    }
+  }
+);
+
 export const getPatientPaymentHistory = createAsyncThunk(
   'payment/getPatientPaymentHistory',
   async (patientId, thunkAPI) => {
@@ -32,7 +55,8 @@ export const getPatientLedger = createAsyncThunk(
       startDate = null,
       endDate = null,
       search = null,
-      id = null
+      id = null,
+      caseType = null,
     },
     thunkAPI
   ) => {
@@ -44,7 +68,8 @@ export const getPatientLedger = createAsyncThunk(
         startDate,
         endDate,
         search,
-        id
+        id,
+        caseType,
       });
       return data;
     } catch (error) {
@@ -77,8 +102,19 @@ const paymentSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getPatientLedgerById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPatientLedgerById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ledger = action.payload;
+      })
+      .addCase(getPatientLedgerById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-      // 🔹 RECEIVE PAYMENT
       .addCase(receivePayment.pending, (state) => {
         state.loading = true;
         state.error = null;

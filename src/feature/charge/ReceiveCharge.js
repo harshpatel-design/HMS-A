@@ -2,7 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Card, Form, InputNumber, Select, Button, Input, Spin, message, Row, Col } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { receivePayment, getPatientLedger, clearLedger } from '../../slices/payment.slice';
+import {
+  receivePayment,
+  getPatientLedger,
+  getPatientLedgerById,
+  clearLedger,
+} from '../../slices/payment.slice';
 import { fetchPatientName } from '../../slices/patientSlice';
 import Breadcrumbs from '../comman/Breadcrumbs';
 
@@ -44,8 +49,8 @@ function ReceiveCharge({ setDrawerOpen }) {
   useEffect(() => {
     if (selectedPatientId) {
       dispatch(
-        getPatientLedger({
-          patientId: selectedPatientId,
+        getPatientLedgerById({
+          id: selectedPatientId,
           page: 1,
           limit: 10,
         })
@@ -71,8 +76,14 @@ function ReceiveCharge({ setDrawerOpen }) {
       await dispatch(receivePayment(payload)).unwrap();
       message.success('Payment received successfully');
 
-      form.resetFields();
-      setSelectedPatientId(null);
+      form.resetFields(['amount', 'paymentMode', 'note']);
+      dispatch(
+        getPatientLedgerById({
+          id: selectedPatientId,
+          page: 1,
+          limit: 10,
+        })
+      );
       setDrawerOpen?.(false);
     } catch (err) {
       message.error(err?.message || 'Failed to receive payment');

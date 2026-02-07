@@ -6,6 +6,8 @@ import {
   CreditCardOutlined,
   MedicineBoxOutlined,
   ScheduleOutlined,
+  UsergroupAddOutlined,
+  HourglassOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
@@ -70,7 +72,7 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
         },
         {
           key: '/patient',
-          icon: <UserOutlined />,
+          icon: <UsergroupAddOutlined />,
           label: 'Patient',
           children: [
             { key: '/patitent-onboarding', label: 'Patient' },
@@ -86,7 +88,7 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
         },
         {
           key: '/appointment',
-          icon: <ScheduleOutlined  />,
+          icon: <ScheduleOutlined />,
           label: 'Appointments',
           children: [{ key: '/appointments', label: 'Appointments' }],
         },
@@ -99,6 +101,12 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
             { key: '/receive-charge', label: 'Receive Charge' },
             { key: '/patient-ledger', label: 'Patient Ledger' },
           ],
+        },
+        {
+          key: '/wattingList ',
+          icon: <HourglassOutlined />,
+          label: 'Watting List',
+          children: [{ key: '/watting-list', label: 'Watting List' }],
         },
       ]}
     />

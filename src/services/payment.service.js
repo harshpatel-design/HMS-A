@@ -41,16 +41,43 @@ const getPatientLedger = ({
   startDate = null,
   endDate = null,
   id = null,
+  caseType= null,
 }) => {
   return axiosClient
     .get(`/api/patient-ledger`, {
-      params: { page, limit, search,id, ordering, startDate, endDate },
+      params: { page, limit, search,id, ordering, startDate, endDate,caseType },
+    })
+    .then((res) => res.data);
+};
+
+const getPatientLedgerById = ({
+  id,
+  page = 1,
+  limit = 10,
+  startDate = null,
+  endDate = null,
+  caseType = null,
+}) => {
+  if (!id) {
+    return Promise.reject({ message: "Patient ID is required" });
+  }
+
+  return axiosClient
+    .get(`/api/ledger/${id}`, {
+      params: {
+        page,
+        limit,
+        startDate,
+        endDate,
+        caseType,
+      },
     })
     .then((res) => res.data);
 };
 
 const paymentService = {
   receivePayment,
+  getPatientLedgerById,
   getPatientPaymentHistory,
   getPatientLedger,
 };

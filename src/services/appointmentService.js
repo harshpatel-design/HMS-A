@@ -1,5 +1,5 @@
-import axios from "axios";
-import config from "../Config";
+import axios from 'axios';
+import config from '../Config';
 
 const API_URL = config.API_URL;
 
@@ -9,7 +9,7 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -22,10 +22,10 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.error("Unauthorized – please login again");
+      console.error('Unauthorized – please login again');
     }
     if (error.response?.status === 403) {
-      console.error("Forbidden – insufficient permissions");
+      console.error('Forbidden – insufficient permissions');
     }
     return Promise.reject(error);
   }
@@ -34,13 +34,13 @@ axiosClient.interceptors.response.use(
 const getAppointments = async ({
   page = 1,
   limit = 10,
-  search = "",
-  ordering = "-appointmentDate",
+  search = '',
+  ordering = '-appointmentDate',
   startDate = null,
   endDate = null,
 } = {}) => {
   try {
-    const { data } = await axiosClient.get("/api/appointments", {
+    const { data } = await axiosClient.get('/api/appointments', {
       params: {
         page,
         limit,
@@ -53,7 +53,7 @@ const getAppointments = async ({
 
     return data;
   } catch (err) {
-    throw err.response?.data || { message: "Failed to fetch appointments" };
+    throw err.response?.data || { message: 'Failed to fetch appointments' };
   }
 };
 
@@ -62,28 +62,33 @@ const getAppointmentById = async (id) => {
     const { data } = await axiosClient.get(`/api/appointments/${id}`);
     return data;
   } catch (err) {
-    throw err.response?.data || { message: "Appointment not found" };
+    throw err.response?.data || { message: 'Appointment not found' };
   }
 };
 
 const createAppointment = async (payload) => {
   try {
-    const { data } = await axiosClient.post("/api/appointments", payload);
+    const { data } = await axiosClient.post('/api/appointments', payload);
     return data;
   } catch (err) {
-    throw err.response?.data || { message: "Create appointment failed" };
+    throw err.response?.data || { message: 'Create appointment failed' };
+  }
+};
+const checkAvailability = async (payload) => {
+  try {
+    const { data } = await axiosClient.post('/api/appointments/check-availability', payload);
+    return data;
+  } catch (err) {
+    throw err.response?.data || { message: 'Doctor is unavailable during the selected time' };
   }
 };
 
 const updateAppointment = async (id, payload) => {
   try {
-    const { data } = await axiosClient.patch(
-      `/api/appointments/${id}`,
-      payload
-    );
+    const { data } = await axiosClient.patch(`/api/appointments/${id}`, payload);
     return data;
   } catch (err) {
-    throw err.response?.data || { message: "Update appointment failed" };
+    throw err.response?.data || { message: 'Update appointment failed' };
   }
 };
 
@@ -92,18 +97,18 @@ const deleteAppointment = async (id) => {
     const { data } = await axiosClient.delete(`/api/appointments/${id}`);
     return data;
   } catch (err) {
-    throw err.response?.data || { message: "Cancel appointment failed" };
+    throw err.response?.data || { message: 'Cancel appointment failed' };
   }
 };
 
 const getDoctorAvailableSlots = async ({ doctorId, date }) => {
   try {
-    const { data } = await axiosClient.get("/api/appointments/slots", {
+    const { data } = await axiosClient.get('/api/appointments/slots', {
       params: { doctorId, date },
     });
     return data;
   } catch (err) {
-    throw err.response?.data || { message: "Failed to fetch available slots" };
+    throw err.response?.data || { message: 'Failed to fetch available slots' };
   }
 };
 
@@ -114,6 +119,7 @@ const appointmentService = {
   updateAppointment,
   deleteAppointment,
   getDoctorAvailableSlots,
+  checkAvailability,
 };
 
 export default appointmentService;

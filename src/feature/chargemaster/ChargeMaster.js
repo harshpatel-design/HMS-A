@@ -307,8 +307,6 @@ const ChargeMaster = () => {
       dispatch(fetchChargeMasters({ page, limit }));
       dispatch(resetChargeMasterState());
     } catch (err) {
-      console.log("errrr",err);
-      
       message.error(err || 'Something went wrong');
     }
   };
