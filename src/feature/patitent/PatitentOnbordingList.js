@@ -64,13 +64,8 @@ const PatientOnboardingList = () => {
   useEffect(() => {
     loadPatients();
     return () => dispatch(resetPatientState());
-  }, []);
+  }, [dispatch,]);
 
-  // useEffect((id) => {
-  //   if (isId) {
-  //     useDispatch(fetchChargeById(id))
-  //   }
-  // })
   const loadPatients = (pageValue = 1, searchValue = '') => {
     dispatch(
       fetchPatients({
@@ -218,7 +213,7 @@ const PatientOnboardingList = () => {
 
       <Button
         type="link"
-        style={{ padding: 0 }}
+        style={{ padding: 0, textAlign: 'left' }}
         onClick={() => setSelectedColumns(DEFAULT_PATIENT_COLUMNS)}
       >
         Reset to default

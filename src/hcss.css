@@ -1849,6 +1849,21 @@ section {
     margin-top: 10px;
 }
 
+.row-completed {
+    background-color: #d6eebd !important;
+
+}
+
+.row-called {
+    background-color: #e1eef7 !important;
+
+}
+
+.row-cancelled {
+    background-color: #f7e4e4 !important;
+
+}
+
 
 
 @media (max-width: 768px) {

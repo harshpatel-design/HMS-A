@@ -12,7 +12,7 @@ import GlobalMessageProvider from '../src/feature/comman/GlobalMessage'; //  ⬅
 
 message.config({
   top: 27,
-  duration: 2,
+  duration: 4,
   maxCount: 10,
 });
 

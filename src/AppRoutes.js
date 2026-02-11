@@ -47,6 +47,9 @@ import ReceiveCharge from './feature/charge/ReceiveCharge';
 import PatientPaymentHistoryPage from './feature/charge/PatientPaymentHistoryPage';
 import PatientLedger from './feature/charge/Patientledger';
 import DoctorWaitingListPage from './feature/waittingList/DoctorWaitingListPage';
+import DiagnosisList from './feature/daignosis/DiagnosisList';
+import AddEditDiagnosis from './feature/daignosis/AddEditDiagnosis';
+import AddDiagnosis from './feature/daignosis/AddDiagnosis';
 
 export function AppRoutes() {
   return (
@@ -111,6 +114,10 @@ export function AppRoutes() {
 
 
           <Route path="/watting-list" element={<DoctorWaitingListPage />} />
+          <Route path="/diagnosis" element={<DiagnosisList />} />
+          <Route path="/add-diagnosis/:id" element={<AddDiagnosis />} />
+          <Route path="/add-edit-diagnosis" element={<AddEditDiagnosis />} />
+          <Route path="/add-edit-diagnosis/:id" element={<AddEditDiagnosis />} />
 
 
         </Route>

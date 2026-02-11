@@ -18,6 +18,7 @@ import chargeReducer from './slices/chargeSlice';
 import ipdReducer from './slices/ipdAdmission.slice';
 import paymentReducer from './slices/payment.slice';
 import waitingListReducer from './slices/waitingListSlice';
+import diagnosisReducer from './slices/diagnosisSlice';
 
 const rootReducer = {
   auth: authReducer,
@@ -38,6 +39,7 @@ const rootReducer = {
   ipd: ipdReducer,
   payment: paymentReducer,
   waitingList: waitingListReducer,
+  diagnosis: diagnosisReducer,
 };
 
 const store = configureStore({

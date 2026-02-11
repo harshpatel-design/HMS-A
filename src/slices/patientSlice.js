@@ -26,9 +26,7 @@ export const fetchPatients = createAsyncThunk(
         endDate,
       });
     } catch (err) {
-      return rejectWithValue(
-        err?.message || 'Failed to fetch patients'
-      );
+      return rejectWithValue(err?.message || 'Failed to fetch patients');
     }
   }
 );
@@ -78,17 +76,16 @@ export const deletePatient = createAsyncThunk(
 );
 
 export const fetchPatientName = createAsyncThunk(
-  "patient/patientName",
-  async ({ search = "" } = {}, { rejectWithValue }) => {
+  'patient/patientName',
+  async ({ search = '' } = {}, { rejectWithValue }) => {
     try {
       const res = await patientService.getPatientNames({ search });
       return res;
     } catch (error) {
-      return rejectWithValue(
-        error?.response?.data?.message || "Failed to load patient name"
-      );
+      return rejectWithValue(error?.response?.data?.message || 'Failed to load patient name');
     }
-  })
+  }
+);
 
 const initialState = {
   patients: [],
@@ -98,7 +95,7 @@ const initialState = {
   totalPages: 1,
   page: 1,
   limit: 10,
-
+  selectedPatient: [],
   loading: false,
   error: null,
   success: false,
@@ -160,13 +157,13 @@ const patientSlice = createSlice({
       .addCase(fetchPatientById.fulfilled, (state, action) => {
         state.loading = false;
         state.patient = action.payload.patient;
+        state.selectedPatient = action.payload.patient;
       })
       .addCase(fetchPatientById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      /* ================= CREATE ================= */
       .addCase(createPatient.pending, (state) => {
         state.loading = true;
         state.error = null;

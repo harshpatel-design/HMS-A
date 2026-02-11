@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import waitingListService from '../services/waitingListService';
 
-/* =====================================================
-   ➕ ADD TO WAITING LIST
-===================================================== */
 export const addToWaitingList = createAsyncThunk(
   'waitingList/add',
   async (payload, { rejectWithValue }) => {
@@ -16,9 +13,6 @@ export const addToWaitingList = createAsyncThunk(
   }
 );
 
-/* =====================================================
-   ❌ DELETE FROM WAITING LIST
-===================================================== */
 export const deleteWaitingList = createAsyncThunk(
   'waitingList/delete',
   async (id, { rejectWithValue }) => {
@@ -31,9 +25,6 @@ export const deleteWaitingList = createAsyncThunk(
   }
 );
 
-/* =====================================================
-   🔄 UPDATE WAITING LIST
-===================================================== */
 export const updateWaitingList = createAsyncThunk(
   'waitingList/update',
   async ({ id, data }, { rejectWithValue }) => {
@@ -46,12 +37,12 @@ export const updateWaitingList = createAsyncThunk(
   }
 );
 
-/* =====================================================
-   📋 ALL WAITING LIST (ALL DOCTORS)
-===================================================== */
 export const fetchAllWaitingList = createAsyncThunk(
   'waitingList/fetchAll',
-  async ({ page = 1, limit = 10, type, search, sortBy, order } = {}, { rejectWithValue }) => {
+  async (
+    { page = 1, limit = 10, type, search, sortBy, order, status = '' } = {},
+    { rejectWithValue }
+  ) => {
     try {
       const res = await waitingListService.getAllWaitingList({
         page,
@@ -60,6 +51,7 @@ export const fetchAllWaitingList = createAsyncThunk(
         search,
         sortBy,
         order,
+        status,
       });
       return res;
     } catch (err) {
@@ -68,9 +60,6 @@ export const fetchAllWaitingList = createAsyncThunk(
   }
 );
 
-/* =====================================================
-   📋 DOCTOR-WISE WAITING LIST + APPOINTMENTS
-===================================================== */
 export const fetchDoctorWaitingList = createAsyncThunk(
   'waitingList/fetchDoctor',
   async (
@@ -96,9 +85,6 @@ export const fetchDoctorWaitingList = createAsyncThunk(
   }
 );
 
-/* =====================================================
-   INITIAL STATE
-===================================================== */
 const initialState = {
   waitingList: [],
   doctorQueue: [],
@@ -111,9 +97,6 @@ const initialState = {
   success: false,
 };
 
-/* =====================================================
-   SLICE
-===================================================== */
 const waitingListSlice = createSlice({
   name: 'waitingList',
   initialState,
@@ -125,8 +108,6 @@ const waitingListSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-
-      /* ---------- ADD ---------- */
       .addCase(addToWaitingList.pending, (state) => {
         state.loading = true;
       })
@@ -139,8 +120,6 @@ const waitingListSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ---------- DELETE ---------- */
       .addCase(deleteWaitingList.fulfilled, (state, action) => {
         state.success = true;
         state.waitingList = state.waitingList.filter((item) => item._id !== action.payload.id);
@@ -148,8 +127,6 @@ const waitingListSlice = createSlice({
       .addCase(deleteWaitingList.rejected, (state, action) => {
         state.error = action.payload;
       })
-
-      /* ---------- UPDATE ---------- */
       .addCase(updateWaitingList.fulfilled, (state, action) => {
         state.success = true;
         const index = state.waitingList.findIndex((i) => i._id === action.payload._id);
@@ -158,8 +135,6 @@ const waitingListSlice = createSlice({
       .addCase(updateWaitingList.rejected, (state, action) => {
         state.error = action.payload;
       })
-
-      /* ---------- ALL WAITING LIST ---------- */
       .addCase(fetchAllWaitingList.pending, (state) => {
         state.loading = true;
       })
@@ -175,8 +150,6 @@ const waitingListSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ---------- DOCTOR QUEUE ---------- */
       .addCase(fetchDoctorWaitingList.pending, (state) => {
         state.loading = true;
       })
