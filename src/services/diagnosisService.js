@@ -73,6 +73,7 @@ const getAllDiagnosis = async ({
   order = 'DESC',
   startDate = null,
   endDate = null,
+  patient = null,
 } = {}) => {
   const ordering = order === 'DESC' ? `-${orderBy}` : orderBy;
 
@@ -84,6 +85,7 @@ const getAllDiagnosis = async ({
       ordering,
       startDate,
       endDate,
+      patient,
     },
   });
   return res;

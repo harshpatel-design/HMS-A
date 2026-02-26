@@ -1,22 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Table,
-  Input,
-  Button,
-  Space,
-  Tag,
-  Tooltip,
-  Popconfirm,
-  message,
-  Dropdown,
-  Checkbox,
-  DatePicker,
-} from 'antd';
+import { Table, Input, Button, Space, Tag, Tooltip, Dropdown, Checkbox, DatePicker } from 'antd';
 
 import {
   PlusOutlined,
   EditOutlined,
-  DeleteOutlined,
   EyeOutlined,
   ReloadOutlined,
   FilterOutlined,
@@ -69,6 +56,11 @@ const DiagnosisList = () => {
         order: 'DESC',
       })
     );
+  };
+
+  const handleAll = (r) => {
+    const patientId = r.patient?._id;
+    navigate(`/view-diagnosis/${patientId}`);
   };
 
   const allColumns = [
@@ -141,6 +133,7 @@ const DiagnosisList = () => {
       width: 100,
       render: (_, r) => (
         <Space>
+          <Button type="link" icon={<EyeOutlined />} onClick={() => handleAll(r)} />
           <Button
             type="link"
             icon={<EditOutlined />}

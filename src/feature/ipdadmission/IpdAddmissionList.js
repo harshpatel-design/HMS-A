@@ -157,7 +157,8 @@ function IpdAddmissionList() {
       key: 'name',
       dataIndex: 'patient',
       width: 180,
-      render: (v) => ` ${v.firstName.toUpperCase()} ${v.lastName.toUpperCase()}`,
+      render: (patient) =>
+        `${patient?.firstName?.toUpperCase() || ''} ${patient?.lastName?.toUpperCase() || ''}`,
     },
     {
       title: 'gender',
@@ -243,7 +244,6 @@ function IpdAddmissionList() {
     dispatch(fetchActiveIpdByPatient(patientId))
       .unwrap()
       .then((res) => {
-
         form.setFieldsValue({
           admissionDate: res.admissionDate ? dayjs(res.admissionDate) : null,
           dischargeDate: res.dischargeDate ? dayjs(res.dischargeDate) : null,
@@ -266,8 +266,8 @@ function IpdAddmissionList() {
     const selectedCharges = Array.isArray(values.charges)
       ? values.charges
       : values.charges
-      ? [values.charges]
-      : [];
+        ? [values.charges]
+        : [];
 
     const chargesArray = selectedCharges.map((chargeId) => ({
       chargeMaster: chargeId,

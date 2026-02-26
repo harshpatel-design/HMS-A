@@ -407,12 +407,12 @@ const WardMaster = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="name" label="Ward Name" rules={[{ required: true }]}>
-                <Input />
+              <Form.Item name="name" label="Ward Name" rules={[{ required: true , message: 'Please enter ward name'}]}>
+                <Input placeholder='Ward Name (e.g. General Ward A)' />
               </Form.Item>
 
               <Form.Item name="code" label="Ward Code" rules={[{ required: true }]}>
-                <Input disabled={drawerMode === 'edit'} />
+                <Input placeholder='Ward Code (e.g. GW-A)' />
               </Form.Item>
 
               <Form.Item
@@ -441,7 +441,7 @@ const WardMaster = () => {
                 </Form.Item>
               )}
               <Form.Item name="notes" label="Notes">
-                <Input.TextArea rows={3} />
+                <Input.TextArea rows={3} placeholder="Enter notes (optional)"/>
               </Form.Item>
 
               <Space className="width-space">

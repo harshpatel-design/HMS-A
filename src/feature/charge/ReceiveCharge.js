@@ -25,8 +25,6 @@ function ReceiveCharge({ setDrawerOpen }) {
 
   const { patientName } = useSelector((state) => state.patient);
 
-  const receiveAmount = Form.useWatch('amount', form);
-
   useEffect(() => {
     dispatch(fetchPatientName({ page: 1, limit: 1000 }));
   }, [dispatch]);
@@ -51,8 +49,6 @@ function ReceiveCharge({ setDrawerOpen }) {
       dispatch(
         getPatientLedgerById({
           id: selectedPatientId,
-          page: 1,
-          limit: 10,
         })
       )
         .unwrap()
@@ -80,8 +76,6 @@ function ReceiveCharge({ setDrawerOpen }) {
       dispatch(
         getPatientLedgerById({
           id: selectedPatientId,
-          page: 1,
-          limit: 10,
         })
       );
       setDrawerOpen?.(false);
@@ -91,8 +85,25 @@ function ReceiveCharge({ setDrawerOpen }) {
   };
 
   const ledgerSummary = useMemo(() => {
-    return (
-      ledger?.data?.[0] || {
+    if (!ledger?.data?.length) {
+      return {
+        totalAmount: 0,
+        paidAmount: 0,
+        discountAmount: 0,
+        balanceAmount: 0,
+      };
+    }
+
+    console.log(ledger.data);
+
+    return ledger.data.reduce(
+      (acc, item) => {
+        acc.totalAmount += item.totalAmount || 0;
+        acc.paidAmount += item.paidAmount || 0;
+        acc.discountAmount += item.discountAmount || 0;
+        return acc;
+      },
+      {
         totalAmount: 0,
         paidAmount: 0,
         discountAmount: 0,
@@ -101,6 +112,12 @@ function ReceiveCharge({ setDrawerOpen }) {
     );
   }, [ledger]);
 
+
+  const cashType = [...new Set(ledger?.data?.map((item) => item.caseType))].join(', ') || '';
+  const cashNumber = ledger?.data[0]?.patient?.caseNumber || '';
+  console.log('ledger', cashNumber);
+
+  ledgerSummary.balanceAmount = ledgerSummary.totalAmount - ledgerSummary.paidAmount;
   return (
     <div className="page-wrapper">
       <Breadcrumbs
@@ -114,10 +131,10 @@ function ReceiveCharge({ setDrawerOpen }) {
       />
 
       <Spin spinning={loading}>
-        <Card title="Receive Payment" bordered={false}>
+        <Card title="Receive Payment" variant="borderless">
           <Form layout="vertical" form={form} onFinish={onFinish}>
             <Row gutter={16}>
-              <Col xs={24}>
+              <Col xs={24} md={8}>
                 <Form.Item
                   label="Patient"
                   name="patient"
@@ -141,10 +158,30 @@ function ReceiveCharge({ setDrawerOpen }) {
                   >
                     {patientName?.patients?.map((p) => (
                       <Option key={p._id} value={p._id}>
-                        {p.name || `${p.firstName} ${p.lastName}`}
+                        {p.name.toUpperCase() ||
+                          `${p.firstName?.toUpperCase()} ${p.lastName?.toUpperCase()}`}
                       </Option>
                     ))}
                   </Select>
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} md={8}>
+                <Form.Item label="Case Number">
+                  <Input
+                    value={cashNumber || 'N/A'}
+                    style={{ fontWeight: 600, color: 'black' }}
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item label="Case Type">
+                  <Input
+                    value={cashType.toUpperCase() || 'N/A'}
+                    style={{ fontWeight: 600, color: 'black' }}
+                    disabled
+                  />
                 </Form.Item>
               </Col>
 
@@ -214,6 +251,7 @@ function ReceiveCharge({ setDrawerOpen }) {
                   <InputNumber
                     min={1}
                     style={{ width: '100%' }}
+                    placeholder="Enter amount to receive"
                     disabled={ledgerSummary.balanceAmount === 0}
                   />
                 </Form.Item>
@@ -239,7 +277,11 @@ function ReceiveCharge({ setDrawerOpen }) {
 
               <Col xs={24}>
                 <Form.Item name="note" label="Note">
-                  <TextArea rows={3} disabled={ledgerSummary.balanceAmount === 0} />
+                  <TextArea
+                    rows={3}
+                    disabled={ledgerSummary.balanceAmount === 0}
+                    placeholder="Notes..."
+                  />
                 </Form.Item>
               </Col>
 

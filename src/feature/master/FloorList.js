@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Table,
   Button,
@@ -13,47 +13,36 @@ import {
   Select,
   Drawer,
   Dropdown,
-  Form
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  ReloadOutlined,
-  FilterOutlined
-} from "@ant-design/icons";
+  Form,
+} from 'antd';
+import { EditOutlined, DeleteOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
 import {
   deleteFloor,
   fetchFloors,
   setSort,
   resetSort,
   createFloor,
-  updateFloor
-} from "../../slices/floorSlice";
-import "../../index.css";
-import Breadcrumbs from "../comman/Breadcrumbs";
-import debounce from "lodash/debounce";
-import "../../index.css"
+  updateFloor,
+} from '../../slices/floorSlice';
+import '../../index.css';
+import Breadcrumbs from '../comman/Breadcrumbs';
+import debounce from 'lodash/debounce';
+import '../../index.css';
 
-const { Search } = Input
+const { Search } = Input;
 
 const FloorList = () => {
   const [form] = Form.useForm();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState("add");
+  const [drawerMode, setDrawerMode] = useState('add');
   const [editingRecord, setEditingRecord] = useState(null);
 
   const dispatch = useDispatch();
-  const {
-    floors,
-    loading,
-    page,
-    limit,
-    total,
-    orderBy,
-    order,
-  } = useSelector((state) => state.floor);
+  const { floors, loading, page, limit, total, orderBy, order } = useSelector(
+    (state) => state.floor
+  );
 
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     dispatch(fetchFloors({ page: 1, limit: 10 }));
@@ -81,13 +70,7 @@ const FloorList = () => {
     };
   }, [debouncedFetch]);
 
-  const defaultChecked = [
-    "name",
-    "code",
-    "floorNumber",
-    "isActive",
-    "notes",
-  ];
+  const defaultChecked = ['name', 'code', 'floorNumber', 'isActive', 'notes'];
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked || []);
 
   const loadData = (pageNum = 1, pageSize = limit, search = searchText, order, orderBy) => {
@@ -99,8 +82,7 @@ const FloorList = () => {
         limit: pageSize,
         search,
         orderBy,
-        order
-
+        order,
       })
     );
   };
@@ -112,13 +94,13 @@ const FloorList = () => {
         fetchFloors({
           page: pagination.current,
           limit: pagination.pageSize,
-          orderBy: "createdAt",
-          order: "DESC",
+          orderBy: 'createdAt',
+          order: 'DESC',
         })
       );
       return;
     }
-    const sortOrder = sorter.order === "ascend" ? "ASC" : "DESC";
+    const sortOrder = sorter.order === 'ascend' ? 'ASC' : 'DESC';
 
     dispatch(
       setSort({
@@ -139,25 +121,25 @@ const FloorList = () => {
   };
 
   const handleReset = () => {
-    setSearchText("");
+    setSearchText('');
     dispatch(fetchFloors({ page: 1, limit: 10 }));
   };
 
   const handleDelete = (record) => {
     Modal.confirm({
-      title: "Delete Floor?",
+      title: 'Delete Floor?',
       content: `Are you sure you want to delete "${record.name}"?`,
-      okText: "Yes, Delete",
-      okType: "danger",
-      cancelText: "No",
+      okText: 'Yes, Delete',
+      okType: 'danger',
+      cancelText: 'No',
       onOk: async () => {
         try {
           await dispatch(deleteFloor(record._id)).unwrap();
 
-          message.success("Floor deleted successfully");
+          message.success('Floor deleted successfully');
           dispatch(fetchFloors({ page, limit }));
         } catch (err) {
-          message.error(err?.message || "Failed to delete floor");
+          message.error(err?.message || 'Failed to delete floor');
         }
       },
     });
@@ -165,16 +147,11 @@ const FloorList = () => {
 
   const allColumns = [
     {
-      title: "Floor Name",
-      dataIndex: "name",
-      key: "name",
+      title: 'Floor Name',
+      dataIndex: 'name',
+      key: 'name',
       sorter: true,
-      sortOrder:
-        orderBy === "name"
-          ? order === "ASC"
-            ? "ascend"
-            : "descend"
-          : null,
+      sortOrder: orderBy === 'name' ? (order === 'ASC' ? 'ascend' : 'descend') : null,
       render: (text) => (
         <Tooltip title={text}>
           <strong>{text}</strong>
@@ -182,92 +159,70 @@ const FloorList = () => {
       ),
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
+      title: 'Code',
+      dataIndex: 'code',
+      key: 'code',
       sorter: true,
-      sortOrder:
-        orderBy === "code"
-          ? order === "ASC"
-            ? "ascend"
-            : "descend"
-          : null,
+      sortOrder: orderBy === 'code' ? (order === 'ASC' ? 'ascend' : 'descend') : null,
     },
     {
-      title: "Floor No",
-      dataIndex: "floorNumber",
-      key: "floorNumber",
+      title: 'Floor No',
+      dataIndex: 'floorNumber',
+      key: 'floorNumber',
       sorter: true,
-      sortOrder:
-        orderBy === "floorNumber"
-          ? order === "ASC"
-            ? "ascend"
-            : "descend"
-          : null,
+      sortOrder: orderBy === 'floorNumber' ? (order === 'ASC' ? 'ascend' : 'descend') : null,
     },
     {
-      title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
+      title: 'Status',
+      dataIndex: 'isActive',
+      key: 'isActive',
       sorter: true,
       render: (v) =>
         v === true ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>,
     },
     {
-      title: "Notes",
-      dataIndex: "notes",
-      key: "notes",
-      render: (v) => v || "—",
+      title: 'Notes',
+      dataIndex: 'notes',
+      key: 'notes',
+      render: (v) => v || '—',
     },
     {
-      title: "Created At",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       sorter: true,
-      render: (value) =>
-        value ? new Date(value).toLocaleString() : "—",
+      render: (value) => (value ? new Date(value).toLocaleString() : '—'),
     },
     {
-      title: "Created By",
-      dataIndex: "createdBy",
-      key: "createdBy",
-      render: (user) =>
-        user ? (
-          <Tooltip title={user.email}>
-            {user.name}
-          </Tooltip>
-        ) : "—",
+      title: 'Created By',
+      dataIndex: 'createdBy',
+      key: 'createdBy',
+      render: (user) => (user ? <Tooltip title={user.email}>{user.name}</Tooltip> : '—'),
     },
     {
-      title: "Updated At",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
+      title: 'Updated At',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       sorter: true,
-      render: (value) =>
-        value ? new Date(value).toLocaleString() : "—",
+      render: (value) => (value ? new Date(value).toLocaleString() : '—'),
     },
     {
-      title: "Updated By",
-      dataIndex: "updatedBy",
-      key: "updatedBy",
-      render: (user) =>
-        user ? (
-          <Tooltip title={user.email}>
-            {user.name}
-          </Tooltip>
-        ) : "—",
+      title: 'Updated By',
+      dataIndex: 'updatedBy',
+      key: 'updatedBy',
+      render: (user) => (user ? <Tooltip title={user.email}>{user.name}</Tooltip> : '—'),
     },
     {
-      title: "Actions",
-      key: "actions",
-      width:100,
+      title: 'Actions',
+      key: 'actions',
+      width: 100,
       render: (record) => (
         <Space>
           <Button
             type="text"
             icon={<EditOutlined />}
             onClick={() => {
-              setDrawerMode("edit");
+              setDrawerMode('edit');
               setEditingRecord(record);
               form.setFieldsValue(record);
               setDrawerOpen(true);
@@ -285,18 +240,15 @@ const FloorList = () => {
     },
   ];
 
-
   const filteredColumns = allColumns.filter(
-    (col) =>
-      selectedColumns.includes(col.key) || col.key === "actions"
+    (col) => selectedColumns.includes(col.key) || col.key === 'actions'
   );
-
 
   const columnMenu = (
     <div className="column-filter-menu">
       <div className="column-filter-grid">
         {allColumns
-          .filter((c) => c.key !== "actions")
+          .filter((c) => c.key !== 'actions')
           .map((col) => (
             <div key={col.key} className="column-filter-item">
               <Checkbox
@@ -305,9 +257,7 @@ const FloorList = () => {
                   if (e.target.checked) {
                     setSelectedColumns([...selectedColumns, col.key]);
                   } else {
-                    setSelectedColumns(
-                      selectedColumns.filter((c) => c !== col.key)
-                    );
+                    setSelectedColumns(selectedColumns.filter((c) => c !== col.key));
                   }
                 }}
               >
@@ -319,24 +269,17 @@ const FloorList = () => {
 
       <div className="column-filter-divider" />
 
-      <Button
-        type="link"
-        style={{ padding: 0 }}
-        onClick={() => setSelectedColumns(defaultChecked)}
-      >
+      <Button type="link" style={{ padding: 0 }} onClick={() => setSelectedColumns(defaultChecked)}>
         Reset to default
       </Button>
     </div>
   );
-
 
   return (
     <>
       <div className="page-wrapper">
         <Breadcrumbs
           title="Floor List"
-          showBack
-          backTo="/dashboard"
           items={[{ label: 'Floor List', href: '/floor-master' }, { label: 'Floor List' }]}
         />
 
@@ -345,7 +288,7 @@ const FloorList = () => {
             <Search
               placeholder="Search floor name or code"
               allowClear
-               className='searchbar-search'
+              className="searchbar-search"
               value={searchText}
               onChange={(e) => {
                 const value = e.target.value;
@@ -380,7 +323,7 @@ const FloorList = () => {
         <div className="table-scroll-container">
           <Table
             columns={filteredColumns}
-            scroll={{ x: 1000}}
+            scroll={{ x: 1000 }}
             dataSource={floors}
             loading={loading}
             rowKey="_id"
@@ -457,7 +400,9 @@ const FloorList = () => {
                 <Button type="primary" htmlType="submit" className="btn-full">
                   {drawerMode === 'add' ? 'Create' : 'Update'}
                 </Button>
-                <Button onClick={() => setDrawerOpen(false)} style={{display:"block"}}>Cancel</Button>
+                <Button onClick={() => setDrawerOpen(false)} style={{ display: 'block' }}>
+                  Cancel
+                </Button>
               </Space>
             </Form>
           </Drawer>

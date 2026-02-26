@@ -409,13 +409,14 @@ const ChargeMaster = () => {
   }, [dispatch, selectedFloor]);
 
   useEffect(() => {
-    if (selectedFloor && (selectedWard || selectedRoom)) {
+    if (selectedFloor && (selectedWard || selectedRoom )) {
       dispatch(
         fetchBeds({
           page: 1,
           limit: 1000,
           wardId: selectedWard,
           roomId: selectedRoom,
+          floorId: selectedFloor,
         })
       );
     }

@@ -58,25 +58,21 @@ const PatientOnboardingList = () => {
   const { patients, total, page, limit, loading } = useSelector((state) => state.patient);
 
   const [searchText, setSearchText] = useState('');
-  const [ordering, setOrdering] = useState('createdAt');
   const [selectedColumns, setSelectedColumns] = useState(DEFAULT_PATIENT_COLUMNS);
-
-  useEffect(() => {
-    loadPatients();
-    return () => dispatch(resetPatientState());
-  }, [dispatch,]);
 
   const loadPatients = (pageValue = 1, searchValue = '') => {
     dispatch(
       fetchPatients({
         page: pageValue,
-        limit: 10,
+        limit: limit || 10,
         search: searchValue,
-        orderBy: ordering,
-        order: 'DESC',
       })
     );
   };
+
+  useEffect(() => {
+    loadPatients(1, '');
+  }, [dispatch]);
 
   const handleDelete = (id) => {
     dispatch(deletePatient(id))
@@ -89,6 +85,13 @@ const PatientOnboardingList = () => {
   };
 
   const allColumns = [
+    {
+      title: 'Case No.',
+      key: 'caseNumber',
+      dataIndex: 'caseNumber',
+      width: 90,
+      render: (v) => v,
+    },
     {
       title: 'Full Name',
       key: 'name',
@@ -113,13 +116,7 @@ const PatientOnboardingList = () => {
       width: 100,
       render: (v) => v?.toUpperCase(),
     },
-    {
-      title: 'Case Number',
-      key: 'caseNumber',
-      dataIndex: 'caseNumber',
-      widht: 150,
-      render: (v) => v,
-    },
+
     {
       title: 'Case',
       key: 'caseType',
@@ -134,13 +131,22 @@ const PatientOnboardingList = () => {
     {
       title: 'Blood Group',
       key: 'bloodGroup',
-      dataIndex: 'bloodGroup',
+      render: (r) => r.bloodGroup || '—',
     },
     {
       title: 'Status',
       key: 'isActive',
       dataIndex: 'isActive',
-      render: (v) => (v ? <Tag color="green">ACTIVE</Tag> : <Tag color="red">INACTIVE</Tag>),
+      render: (v) =>
+        v ? (
+          <strong>
+            <Tag color="green">ACTIVE</Tag>
+          </strong>
+        ) : (
+          <strong>
+            <Tag color="red">INACTIVE</Tag>
+          </strong>
+        ),
     },
     {
       title: 'Created On',
@@ -151,29 +157,39 @@ const PatientOnboardingList = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 220,
+      width: 240,
       render: (_, r) => (
         <Space>
-          <Button
-            type="link"
-            icon={<CreditCardOutlined />}
-            onClick={() => navigate(`/receive-charge/${r._id}`)}
-          />
-          <Button
-            type="link"
-            icon={<HistoryOutlined />}
-            onClick={() => navigate(`/patient-payment-history/${r._id}`)}
-          />
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/add-edit-patitent/${r._id}`)}
-          />
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/view-patitent/${r._id}`)}
-          />
+          <Tooltip title="Receive Payment">
+            <Button
+              type="link"
+              icon={<CreditCardOutlined style={{ color: 'green' }} />}
+              onClick={() => navigate(`/receive-charge/${r._id}`)}
+            />
+          </Tooltip>
+          <Tooltip title="View Payment History">
+            <Button
+              type="link"
+              icon={<HistoryOutlined style={{ color: 'orange' }} />}
+              onClick={() => navigate(`/patient-payment-history/${r._id}`)}
+            />
+          </Tooltip>
+
+          <Tooltip title="Edit Patient">
+            <Button
+              type="link"
+              icon={<EditOutlined style={{ color: 'blue' }} />}
+              onClick={() => navigate(`/add-edit-patitent/${r._id}`)}
+            />
+          </Tooltip>
+          <Tooltip title="View Patient">
+            <Button
+              type="link"
+              icon={<EyeOutlined style={{ color: 'purple' }} />}
+              onClick={() => navigate(`/view-patitent/${r._id}`)}
+            />
+          </Tooltip>
+
           <Popconfirm title="Delete patient?" onConfirm={() => handleDelete(r._id)}>
             <Button danger type="link" icon={<DeleteOutlined />} />
           </Popconfirm>
@@ -222,34 +238,21 @@ const PatientOnboardingList = () => {
   );
 
   const handleTableChange = (pagination, filters, sorter) => {
-    if (!sorter.order) {
-      dispatch(resetSort());
-      dispatch(
-        fetchPatients({
-          page: pagination.current,
-          limit: pagination.pageSize,
-          orderBy: 'createdAt',
-          order: 'DESC',
-        })
-      );
-      return;
-    }
-    const sortOrder = sorter.order === 'ascend' ? 'ASC' : 'DESC';
+    const { current, pageSize } = pagination;
 
-    dispatch(
-      setSort({
-        orderBy: sorter.field,
-        order: sortOrder,
-      })
-    );
+    const ordering =
+      sorter?.order === 'ascend'
+        ? sorter.field
+        : sorter?.order === 'descend'
+          ? `-${sorter.field}`
+          : undefined;
 
     dispatch(
       fetchPatients({
-        page: pagination.current,
-        limit: pagination.pageSize,
+        page: current,
+        limit: pageSize,
         search: searchText,
-        orderBy: sorter.field,
-        order: sortOrder,
+        ordering,
       })
     );
   };
@@ -319,13 +322,13 @@ const PatientOnboardingList = () => {
             scroll={{ x: 1000 }}
             dataSource={patients}
             loading={loading}
+            onChange={handleTableChange}
             pagination={{
               current: page,
               pageSize: limit,
               total: total,
               showSizeChanger: true,
               pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
-              onChange: handleTableChange,
               showTotal: (totalRecord) => `Total ${totalRecord} items`,
               showQuickJumper: limit > 100 && limit < 500,
               locale: {

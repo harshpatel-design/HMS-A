@@ -1,150 +1,89 @@
 import React, { useEffect } from 'react';
-import { Card, Table, Spin, Empty, Row, Col, Space, DatePicker } from 'antd';
+import { Card, Table, Spin, Empty } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getPatientLedger } from '../slices/payment.slice';
-
-const { RangePicker } = DatePicker;
+import { fetchChargeById } from '../slices/chargeSlice';
+import Breadcrumbs from '../feature/comman/Breadcrumbs.jsx';
+import dayjs from 'dayjs';
 
 function PatientChargesLedger() {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const { ledger, loading } = useSelector((state) => state.payment);
-  const [page, setPage] = React.useState(1);
-  const [limit, setLimit] = React.useState(10);
-
+  const { charge, loading } = useSelector((state) => state.charge);
 
   useEffect(() => {
     if (id) {
-      dispatch(
-        getPatientLedger({
-          patientId: id,
-          page,
-          limit,
-        })
-      );
+      dispatch(fetchChargeById(id));
     }
-  }, [dispatch, id, page, limit]);
+  }, [dispatch, id]);
 
-  const handleTableChange = (page, pageSize) => {
-    setPage(page);
-    setLimit(pageSize);
-
-    dispatch(
-      getPatientLedger({
-        patientId: id,
-        page,
-        limit: pageSize,
-      })
-    );
-  };
-
-  const payments = ledger?.payments || [];
-  const summary = ledger?.summary;
+  const ledgerRows = charge?.charges || [];
 
   const columns = [
     {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
+      title: 'Charge Name',
+      key: 'chargeName',
+      render: (_, record) => {
+        if (!record?.charges?.length) return '—';
+        return record.charges.map((c) => c.name).join(', ');
+      },
     },
     {
-      title: 'Payment Mode',
-      dataIndex: 'paymentMode',
-      key: 'paymentMode',
-      render: (v) => v?.toUpperCase(),
+      title: 'Base Amount (₹)',
+      dataIndex: 'baseAmount',
+      key: 'baseAmount',
     },
     {
-      title: 'Transaction ID',
-      dataIndex: 'transactionId',
-      key: 'transactionId',
-      render: (v) => v || '—',
+      title: 'Discount (₹)',
+      dataIndex: 'discountAmount',
+      key: 'discountAmount',
+      render: (v) => v ?? 0,
     },
     {
-      title: 'Received By',
-      key: 'receivedBy',
-      render: (_, r) => r.receivedBy || '—',
+      title: 'Final Amount (₹)',
+      dataIndex: 'finalAmount',
+      key: 'finalAmount',
+      render: (v) => <b>₹ {v}</b>,
     },
     {
-      title: 'Received At',
-      dataIndex: 'receivedAt',
-      key: 'receivedAt',
-      render: (v) => new Date(v).toLocaleString('en-IN'),
-    },
-    {
-      title: 'Note',
-      dataIndex: 'note',
-      key: 'note',
-      render: (v) => v || '—',
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (v) => (v ? dayjs(v).format('DD-MM-YYYY') : '—'),
     },
   ];
 
+  const p = `${ledgerRows[0]?.patient.firstName} ${ledgerRows[0]?.patient.lastName}`;
+  const m = `${ledgerRows[0]?.patient.phone}`;
+
   return (
     <div className="page-wrapper">
-      <Card title="Patient Ledger & Payment History">
+      <Breadcrumbs
+        title="Patient Ledger List"
+        showBack
+        backTo="/patient-ledger"
+        items={[
+          { label: 'Patient Ledger', href: '/patient-ledger' },
+          { label: 'Patient Charges Ledger' },
+        ]}
+      />
+      <Card title={`View Patient Charges :  ${p} (${m})`}>
         <Spin spinning={loading}>
-          {summary && (
-            <Row gutter={16} style={{ marginBottom: 16 }}>
-              <Col xs={24} md={6}>
-                <Card size="small">Total: ₹ {summary.totalAmount}</Card>
-              </Col>
-              <Col xs={24} md={6}>
-                <Card size="small">Paid: ₹ {summary.paidAmount}</Card>
-              </Col>
-              <Col xs={24} md={6}>
-                <Card size="small">Discount: ₹ {summary.discount.amount}</Card>
-              </Col>
-              <Col xs={24} md={6}>
-                <Card size="small">Balance: ₹ {summary.balanceAmount}</Card>
-              </Col>
-            </Row>
-          )}
-          <div className="serachbar-bread">
-            <Space style={{ flexWrap: 'wrap' }}>
-              <RangePicker
-                format="YYYY-MM-DD"
-                onChange={(dates) => {
-                  dispatch(
-                    getPatientLedger({
-                      patientId: id,
-                      page: 1,
-                      limit,
-                      startDate: dates?.[0]?.format('YYYY-MM-DD'),
-                      endDate: dates?.[1]?.format('YYYY-MM-DD'),
-                    })
-                  );
-                  setPage(1);
-                }}
-              />
-            </Space>
-          </div>
-          <div className="table-scroll-container">
-            {payments.length ? (
+          {ledgerRows.length ? (
+            <div className="table-scroll-container">
               <Table
                 rowKey="_id"
                 columns={columns}
-                dataSource={payments}
+                dataSource={ledgerRows}
                 loading={loading}
-                scroll={{ x: 1000 }}
-                pagination={{
-                  current: page,
-                  pageSize: limit,
-                  total: payments.length,
-                  showSizeChanger: true,
-                  pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
-                  onChange: handleTableChange,
-                  showTotal: (totalRecord) => `Total ${totalRecord} items`,
-                  showQuickJumper: limit > 100 && limit < 500,
-                  locale: {
-                    items_per_page: 'Items / Page',
-                  },
-                }}
+                scroll={{ x: 800 }}
+                pagination={false}
               />
-            ) : (
-              <Empty description="No payment history found" />
-            )}
-          </div>
+            </div>
+          ) : (
+            <Empty description="No charges found" />
+          )}
         </Spin>
       </Card>
     </div>

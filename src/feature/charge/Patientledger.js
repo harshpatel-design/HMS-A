@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Spin, Empty, Space, Button, Input, DatePicker, Tooltip, Select } from 'antd';
-import { CreditCardOutlined, HistoryOutlined, MedicineBoxOutlined, ReloadOutlined } from '@ant-design/icons';
+import {
+  CreditCardOutlined,
+  EyeOutlined,
+  HistoryOutlined,
+  MedicineBoxOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPatientLedger } from '../../slices/payment.slice';
 import Breadcrumbs from '../comman/Breadcrumbs';
@@ -21,7 +27,6 @@ function PatientLedger() {
   const [dates, setDates] = useState(null);
   const [caseType, setCaseType] = useState(null);
 
-  /* ================= API CALL (SINGLE SOURCE) ================= */
   useEffect(() => {
     dispatch(
       getPatientLedger({
@@ -37,14 +42,12 @@ function PatientLedger() {
 
   const dataSource = ledger?.data || [];
 
-  /* ================= TABLE ================= */
   const columns = [
     {
       title: 'Patient',
-      dataIndex: 'patient',
       key: 'patient',
       width: 220,
-      render: (v) => v?.name || '—',
+      render: (v) => v?.patient?.name || '—',
     },
     {
       title: 'Total Amount',
@@ -69,19 +72,27 @@ function PatientLedger() {
     {
       title: 'Action',
       align: 'center',
+      width: 140,
       render: (_, r) => (
         <>
+          <Tooltip title="View Charge">
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/chargeby-patient/${r.patient._id}`)}
+            />
+          </Tooltip>
           <Tooltip title="View Payments">
             <Button
               type="link"
-              icon={<HistoryOutlined />}
+              icon={<HistoryOutlined style={{color :"orange"}} />}
               onClick={() => navigate(`/patient-payment-history/${r.patient._id}`)}
             />
           </Tooltip>
           <Tooltip title="Receive Payments">
             <Button
               type="link"
-              icon={<CreditCardOutlined />}
+              icon={<CreditCardOutlined style={{color :"green"}} />}
               onClick={() => navigate(`/receive-charge/${r.patient._id}`)}
             />
           </Tooltip>
@@ -90,7 +101,6 @@ function PatientLedger() {
     },
   ];
 
-  /* ================= UI ================= */
   return (
     <div className="page-wrapper">
       <Breadcrumbs
@@ -103,7 +113,6 @@ function PatientLedger() {
         ]}
       />
 
-      {/* ---------- FILTER BAR ---------- */}
       <div className="serachbar-bread" style={{ marginBottom: 16 }}>
         <Space>
           <Search
@@ -151,7 +160,6 @@ function PatientLedger() {
         </Space>
       </div>
 
-      {/* ---------- TABLE ---------- */}
       <Spin spinning={loading}>
         {dataSource.length ? (
           <div className="table-scroll-container">
@@ -175,7 +183,10 @@ function PatientLedger() {
             />
           </div>
         ) : (
-          <Empty description="No ledger data found"  style={{background:"white" ,borderRadius:20 , padding:40}}/>
+          <Empty
+            description="No ledger data found"
+            style={{ background: 'white', borderRadius: 20, padding: 40 }}
+          />
         )}
       </Spin>
     </div>

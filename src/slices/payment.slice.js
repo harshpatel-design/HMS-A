@@ -15,18 +15,12 @@ export const receivePayment = createAsyncThunk(
 export const getPatientLedgerById = createAsyncThunk(
   'payment/getPatientLedgerById',
   async (
-    { id, page = 1, limit = 10, startDate = null, endDate = null, caseType = null },
+    { id},
     thunkAPI
   ) => {
     try {
-      console.log('Fetching ledger for:', id);
       const data = await paymentService.getPatientLedgerById({
         id,
-        page,
-        limit,
-        startDate,
-        endDate,
-        caseType,
       });
       return data;
     } catch (error) {

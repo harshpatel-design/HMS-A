@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
-import { Card, Table, Spin, Empty } from 'antd';
+import { Table, Spin, Empty } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getPatientPaymentHistory } from '../../slices/payment.slice';
 import Breadcrumbs from '../comman/Breadcrumbs';
+import dayjs from 'dayjs';
 
 function PatientPaymentHistoryPage() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const dispatch = useDispatch();
   const { paymentHistory, loading } = useSelector((state) => state.payment);
@@ -42,7 +44,7 @@ function PatientPaymentHistoryPage() {
       title: 'Received At',
       dataIndex: 'receivedAt',
       key: 'receivedAt',
-      render: (v) => new Date(v).toLocaleString('en-IN'),
+      render: (v) => dayjs(v)?.format('DD-MM-YYYY') || '—',
     },
     {
       title: 'Note',
@@ -56,8 +58,6 @@ function PatientPaymentHistoryPage() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Patient History"
-        showBack={true}
-        backTo="/patient-ledger"
         items={[
           { label: 'Patient List', href: '/patitent-onboarding' },
           { label: 'Patient History' },

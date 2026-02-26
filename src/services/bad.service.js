@@ -63,13 +63,14 @@ const getBedById = (id) => {
 
 const createBed = (payload) => {
   if (!isAdmin()) {
-    throw new Error('Admin Only Access ❌');
+    throw new Error('Admin Only Access');
   }
 
   return axiosClient.post('api/create-bed', payload).then((res) => {
     return res.data;
   });
 };
+
 const updateBed = (id, payload) => {
   if (!isAdmin()) {
     return Promise.reject({ message: 'Admin Only Access ❌' });

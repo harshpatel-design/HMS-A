@@ -96,11 +96,21 @@ const DoctorWaitingListPage = () => {
       })
       .catch(() => message.error('Delete failed'));
   };
-
   const handleDaignosis = (r) => {
-    const id = r.patient?._id;
-    navigate(`/add-diagnosis/${id}`);
-    console.log('recoed', r);
+    const patientId = r.patient?._id;
+    const doctorId = r.doctor?._id;
+
+    console.log('handleDaignosis',  doctorId);
+    if (!patientId || !doctorId) {
+      console.error('Missing patient or doctor ID', r);
+      return;
+    }
+    navigate(`/add-diagnosis/${patientId}/${doctorId}`);
+    console.log('record', {
+      patientId,
+      doctorId,
+      r,
+    });
   };
 
   const statusMenu = (

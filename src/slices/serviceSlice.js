@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import serviceService from "../services/serviceService";
 
-/* =======================================================
-📌 GET ALL SERVICES
-======================================================= */
 export const fetchServices = createAsyncThunk(
   "service/fetchServices",
   async (
@@ -25,9 +22,6 @@ export const fetchServices = createAsyncThunk(
   }
 );
 
-/* =======================================================
-📌 GET SERVICE BY ID
-======================================================= */
 export const fetchServiceById = createAsyncThunk(
   "service/fetchServiceById",
   async (id, { rejectWithValue }) => {
@@ -39,10 +33,6 @@ export const fetchServiceById = createAsyncThunk(
     }
   }
 );
-
-/* =======================================================
-🟢 CREATE SERVICE
-======================================================= */
 export const createService = createAsyncThunk(
   "service/createService",
   async (payload, { rejectWithValue }) => {
@@ -51,16 +41,13 @@ export const createService = createAsyncThunk(
 
       if (res?.success === false) return rejectWithValue(res);
 
-      return res; // contains res.service
+      return res;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-/* =======================================================
-🟡 UPDATE SERVICE
-======================================================= */
 export const updateService = createAsyncThunk(
   "service/updateService",
   async ({ id, data }, { rejectWithValue }) => {
@@ -69,16 +56,13 @@ export const updateService = createAsyncThunk(
 
       if (res?.success === false) return rejectWithValue(res);
 
-      return res; // contains res.service
+      return res;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-/* =======================================================
-🔴 DELETE SERVICE
-======================================================= */
 export const deleteService = createAsyncThunk(
   "service/deleteService",
   async (id, { rejectWithValue }) => {
@@ -94,9 +78,6 @@ export const deleteService = createAsyncThunk(
   }
 );
 
-/* =======================================================
-INITIAL STATE
-======================================================= */
 const initialState = {
   services: [],
   service: null,
@@ -114,9 +95,6 @@ const initialState = {
   success: false,
 };
 
-/* =======================================================
-SLICE
-======================================================= */
 const serviceSlice = createSlice({
   name: "service",
   initialState,
@@ -129,7 +107,6 @@ const serviceSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      /* ================= FETCH ALL ================= */
       .addCase(fetchServices.pending, (state) => {
         state.loading = true;
       })
@@ -147,8 +124,6 @@ const serviceSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ================= FETCH BY ID ================= */
       .addCase(fetchServiceById.pending, (state) => {
         state.loading = true;
       })
@@ -160,8 +135,6 @@ const serviceSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ================= CREATE ================= */
       .addCase(createService.pending, (state) => {
         state.loading = true;
       })
@@ -177,8 +150,6 @@ const serviceSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ================= UPDATE ================= */
       .addCase(updateService.pending, (state) => {
         state.loading = true;
       })
@@ -198,8 +169,6 @@ const serviceSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ================= DELETE ================= */
       .addCase(deleteService.pending, (state) => {
         state.loading = true;
       })

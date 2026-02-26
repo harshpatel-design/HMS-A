@@ -1,38 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import diagnosisService from '../services/diagnosisService';
 
-export const createDiagnosis = createAsyncThunk(
-  'diagnosis/create',
-  async (payload, thunkAPI) => {
-    try {
-      return await diagnosisService.createDiagnosis(payload);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error?.message || error);
-    }
+export const createDiagnosis = createAsyncThunk('diagnosis/create', async (payload, thunkAPI) => {
+  try {
+    return await diagnosisService.createDiagnosis(payload);
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error?.message || error);
   }
-);
+});
 
-export const getAllDiagnosis = createAsyncThunk(
-  'diagnosis/getAll',
-  async (params, thunkAPI) => {
-    try {
-      return await diagnosisService.getAllDiagnosis(params);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error?.message || error);
-    }
-  }
-);
 
-export const getDiagnosisById = createAsyncThunk(
-  'diagnosis/getById',
-  async (id, thunkAPI) => {
-    try {
-      return await diagnosisService.getDiagnosisById(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error?.message || error);
-    }
+export const getAllDiagnosis = createAsyncThunk('diagnosis/getAll', async (params, thunkAPI) => {
+  try {
+    return await diagnosisService.getAllDiagnosis(params);
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error?.message || error);
   }
-);
+});
+
+export const getDiagnosisById = createAsyncThunk('diagnosis/getById', async (id, thunkAPI) => {
+  try {
+    return await diagnosisService.getDiagnosisById(id);
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error?.message || error);
+  }
+});
 
 export const updateDiagnosisById = createAsyncThunk(
   'diagnosis/update',
@@ -122,9 +114,7 @@ const diagnosisSlice = createSlice({
 
         const updated = action.payload?.data || action.payload;
 
-        state.list = state.list.map((item) =>
-          item._id === updated._id ? updated : item
-        );
+        state.list = state.list.map((item) => (item._id === updated._id ? updated : item));
 
         if (state.selectedDiagnosis?._id === updated._id) {
           state.selectedDiagnosis = updated;
@@ -137,9 +127,6 @@ const diagnosisSlice = createSlice({
   },
 });
 
-export const {
-  clearDiagnosisState,
-  clearSelectedDiagnosis,
-} = diagnosisSlice.actions;
+export const { clearDiagnosisState, clearSelectedDiagnosis } = diagnosisSlice.actions;
 
 export default diagnosisSlice.reducer;

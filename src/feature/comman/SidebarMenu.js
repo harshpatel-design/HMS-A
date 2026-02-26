@@ -8,6 +8,7 @@ import {
   ScheduleOutlined,
   UsergroupAddOutlined,
   HourglassOutlined,
+  ReadOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
@@ -107,6 +108,12 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
           icon: <HourglassOutlined />,
           label: 'Watting List',
           children: [{ key: '/watting-list', label: 'Watting List' }],
+        },
+        {
+          key: '/diagnosisList',
+          icon: <ReadOutlined  />,
+          label: 'Diagnosis',
+          children: [{ key: '/diagnosis', label: 'Diagnosis List' }],
         },
       ]}
     />

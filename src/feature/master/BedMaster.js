@@ -52,6 +52,8 @@ const BedMaster = () => {
   const { wards, loading: wardLoading } = useSelector((state) => state.ward);
   const { selectedBed } = useSelector((state) => state.bed);
 
+  const selectedFloor = Form.useWatch('floor', form);
+
   const [searchText, setSearchText] = useState('');
   useEffect(() => {
     dispatch(fetchBeds({ page: 1, limit: 10 }));
@@ -60,10 +62,23 @@ const BedMaster = () => {
   useEffect(() => {
     if (drawerOpen && floors.length === 0) {
       dispatch(fetchFloors({ page: 1, limit: 100 }));
-      dispatch(fetchRooms({ page: 1, limit: 100 }));
-      dispatch(fetchWards({ page: 1, limit: 100 }));
     }
   }, [drawerOpen, floors.length, rooms.length, wards.length, dispatch]);
+
+  useEffect(() => {
+    if (selectedFloor) {
+      dispatch(fetchRooms({ page: 1, limit: 100, floorId: selectedFloor }));
+      dispatch(fetchWards({ page: 1, limit: 100, floorId: selectedFloor }));
+    }
+  }, [selectedFloor, dispatch]);
+
+  useEffect(() => {
+    if (!selectedFloor) {
+      setSelectedRoom('');
+      setSelectedWard('');
+      form.setFieldsValue({ room: null, ward: null });
+    }
+  }, [selectedFloor, dispatch]);
 
   useEffect(() => {
     if (drawerMode === 'edit' && selectedBed) {
@@ -81,7 +96,7 @@ const BedMaster = () => {
       setSelectedRoom(selectedBed.room?._id || null);
       setSelectedWard(selectedBed.ward?._id || null);
     }
-  }, [selectedBed, drawerMode]);
+  }, [selectedBed, drawerMode, form]);
 
   const debouncedFetch = useMemo(
     () =>
@@ -346,10 +361,7 @@ const BedMaster = () => {
     } catch (err) {
       console.error('API Error:', err);
 
-      const errorMsg =
-        err?.message || // unwrap rejectWithValue payload
-        err?.payload?.message ||
-        'Something went wrong';
+      const errorMsg = err?.message || err?.payload?.message || 'Something went wrong';
 
       message.error(errorMsg);
     }
@@ -442,7 +454,7 @@ const BedMaster = () => {
             </Form.Item>
 
             <Form.Item name="floor" label="Floor" rules={[{ required: true }]}>
-              <Select placeholder="Select Floor" loading={floorLoading}>
+              <Select placeholder="Select Floor" allowClear loading={floorLoading}>
                 {floors.map((f) => (
                   <Select.Option key={f._id} value={f._id}>
                     {f.name} (Floor {f.floorNumber})
@@ -462,8 +474,8 @@ const BedMaster = () => {
             >
               <Select
                 placeholder="Select Room"
-                loading={roomLoading} //
-                disabled={!!selectedWard}
+                loading={roomLoading}
+                disabled={!!selectedWard || !selectedFloor}
                 allowClear
                 onChange={(value) => {
                   setSelectedRoom(value);
@@ -496,7 +508,7 @@ const BedMaster = () => {
               <Select
                 placeholder="Select Ward"
                 loading={wardLoading}
-                disabled={!!selectedRoom}
+                disabled={!!selectedRoom || !selectedFloor}
                 allowClear
                 onChange={(value) => {
                   setSelectedWard(value);

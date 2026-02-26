@@ -645,6 +645,7 @@ h6 {
     width: 100% !important;
     max-width: unset !important;
     margin-left: 0px;
+    transition: 0.3s;
 }
 
 .width-space {
@@ -682,6 +683,7 @@ h6 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
     background: #001a33f6 !important;
     transform: scale(1.01);
+    color: #fff !important;
 }
 
 .avatar {
@@ -1582,6 +1584,7 @@ section {
     margin: 2px;
 }
 
+
 .education-degree,
 .education-institute {
     color: var(--text-light) !important;
@@ -1863,6 +1866,83 @@ section {
     background-color: #f7e4e4 !important;
 
 }
+
+.select-inp.ant-select-disabled .ant-select-selector {
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.85);
+}
+
+/* ===== View Diagnosis Page ONLY ===== */
+
+.view-diagnosis-page .diagnosis-collapse {
+    margin-top: 16px;
+}
+
+.view-diagnosis-page .panel-header {
+    display: grid;
+    grid-template-columns: 10fr 1fr;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+}
+
+.view-diagnosis-page .panel-date {
+    font-size: 13px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.view-diagnosis-page .panel-title {
+    font-weight: 600;
+    color: #fff;
+}
+
+.view-diagnosis-page .panel-status {
+    text-transform: capitalize;
+    text-align: center;
+    font-weight: 700;
+}
+
+.view-diagnosis-page .diagnosis-detail-card {
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.view-diagnosis-page .info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.view-diagnosis-page .label {
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+.view-diagnosis-page .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #262626;
+}
+
+.view-diagnosis-page .info-block .text {
+    margin: 4px 0 0;
+    color: #434343;
+    line-height: 1.5;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .view-diagnosis-page .panel-header {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .view-diagnosis-page .panel-date {
+        font-size: 12px;
+    }
+}
+
 
 
 
