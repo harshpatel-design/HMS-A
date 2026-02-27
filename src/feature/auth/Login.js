@@ -1,14 +1,13 @@
-import { Col, Row, Form, Input, Button, Checkbox, Divider, message } from "antd"
-import "../../hcss.css";
-import leftImg from "../../images/sign.png";
-import RightLogo from "../../images/logo.png";
-import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../slices/authSlice";
+import { Col, Row, Form, Input, Button, Checkbox, Divider, message } from 'antd';
+import '../../hcss.css';
+import leftImg from '../../images/sign.png';
+import RightLogo from '../../images/logo.png';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../slices/authSlice';
 
 function Login() {
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
@@ -16,14 +15,14 @@ function Login() {
   const onFinish = async (values) => {
     const result = await dispatch(loginUser(values));
 
-    if (result.meta.requestStatus === "fulfilled") {
-      message.success("Login Successful 🎉");
-      navigate("/dashboard");
+    if (result.meta.requestStatus === 'fulfilled') {
+      message.success('Login Successful 🎉');
+      navigate('/dashboard');
     } else {
       const err = result.payload;
       console.log(err);
 
-      message.error(err?.message || "Invalid Email or Password");
+      message.error(err?.message || 'Invalid Email or Password');
     }
   };
 
@@ -63,10 +62,10 @@ function Login() {
                     Login
                   </Button>
 
-                  <Divider>OR</Divider>
+                  {/* <Divider>OR</Divider>
                   <p className="register-text">
                     Don't have an account? <Link to="/register">Register</Link>
-                  </p>
+                  </p> */}
                 </Form>
               </div>
             </Col>

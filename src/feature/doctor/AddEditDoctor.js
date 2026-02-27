@@ -78,6 +78,7 @@ export default function AddEditDoctor() {
         if (!doctor) return;
 
         const profile = doctor.profile || {};
+
         form.setFieldsValue({
           name: doctor.user?.name,
           email: doctor.user?.email,
@@ -85,8 +86,9 @@ export default function AddEditDoctor() {
           age: doctor.user?.age,
           gender: doctor.user?.gender,
 
-          bio: profile.bio,
-          specialization: profile.specialization,
+          bio: profile.bio || '',
+
+          specialization: profile.specialization?._id,
           department: profile.department,
           experience: profile.experience,
 
@@ -98,7 +100,11 @@ export default function AddEditDoctor() {
           address: profile.address,
 
           education: profile.education?.length
-            ? profile.education
+            ? profile.education.map((e) => ({
+                degree: e.degree,
+                institute: e.institute,
+                year: Number(e.year),
+              }))
             : [{ degree: '', institute: '', year: '' }],
 
           awards: Array.isArray(profile.awards)
@@ -107,7 +113,10 @@ export default function AddEditDoctor() {
                 date: a.date ? dayjs(a.date) : null,
               }))
             : [],
+
+          sessions: {},
         });
+
         if (doctor.user?.image) {
           setPreview(buildImageUrl(doctor.user.image));
           setOldImage(doctor.user.image);
@@ -339,7 +348,7 @@ export default function AddEditDoctor() {
                       name="name"
                       rules={[{ required: true, message: 'Doctor name is required' }]}
                     >
-                      <Input disabled={loading} />
+                      <Input disabled={loading} placeholder="Enter Dr.name" />
                     </Form.Item>
                   </Col>
 
@@ -347,9 +356,9 @@ export default function AddEditDoctor() {
                     <Form.Item
                       label="Email"
                       name="email"
-                      rules={[{ type: 'email', message: 'Enter a valid email' }]}
+                      rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}
                     >
-                      <Input disabled={loading} />
+                      <Input disabled={loading} placeholder="Enter your Email" />
                     </Form.Item>
                   </Col>
 
@@ -362,7 +371,11 @@ export default function AddEditDoctor() {
                         { len: 10, message: 'Phone must be 10 digits' },
                       ]}
                     >
-                      <Input maxLength={10} disabled={loading} />
+                      <Input
+                        maxLength={10}
+                        disabled={loading}
+                        placeholder="Enter your Phone Number"
+                      />
                     </Form.Item>
                   </Col>
 
@@ -407,7 +420,7 @@ export default function AddEditDoctor() {
                   </Col>
                   <Col xs={12} sm={12} md={8}>
                     <Form.Item label="Bio" name="bio">
-                      <Input maxLength={10} disabled={loading} />
+                      <Input maxLength={10} disabled={loading} placeholder="Enter your Bio" />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -647,7 +660,13 @@ export default function AddEditDoctor() {
                         },
                       ]}
                     >
-                      <InputNumber style={{ width: '100%' }} disabled={loading} min={0} max={50} />
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        placeholder="Enter your Experience"
+                        disabled={loading}
+                        min={0}
+                        max={50}
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -686,7 +705,7 @@ export default function AddEditDoctor() {
                       label="Institute"
                       rules={[{ required: true, message: 'Institute is required' }]}
                     >
-                      <Input disabled={loading} />
+                      <Input disabled={loading} placeholder="Enter Institute" />
                     </Form.Item>
                   </Col>
 
@@ -696,7 +715,11 @@ export default function AddEditDoctor() {
                       label="Year"
                       rules={[{ required: true, message: 'Year is required' }]}
                     >
-                      <InputNumber style={{ width: '100%' }} disabled={loading} />
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        placeholder="Enter Education Year  "
+                        disabled={loading}
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -745,7 +768,7 @@ export default function AddEditDoctor() {
                 htmlType="button"
                 disabled={loading}
                 onClick={() => navigate('/doctor-onbording')}
-                style={{marginRight:10 }}
+                style={{ marginRight: 10 }}
               >
                 Cancel
               </Button>

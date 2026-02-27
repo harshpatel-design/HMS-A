@@ -20,18 +20,18 @@ export default function DoctorOnbordingList() {
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    dispatch(fetchDoctors({ page: 1, limit: 12 }));
+    dispatch(fetchDoctors({ page: 1, limit: 10 }));
   }, [dispatch]);
 
   const handleDelete = async (doc) => {
     await dispatch(deleteDoctor(doc.id));
-    dispatch(fetchDoctors({ page, limit, search: searchText }));
+    dispatch(fetchDoctors({ page: 1, limit: 10, search: searchText }));
   };
 
   const debouncedSearch = useMemo(
     () =>
       debounce((value) => {
-        dispatch(fetchDoctors({ page: 1, limit, search: value }));
+        dispatch(fetchDoctors({ page: 1, limit: 10, search: value }));
       }, 500),
     [dispatch, limit]
   );
@@ -42,15 +42,15 @@ export default function DoctorOnbordingList() {
   }, [debouncedSearch]);
   const columns = [
     {
-      title: 'Image',
+      title: 'Profile Image',
       key: 'image',
-      width: 80,
+      width: 100,
       render: (_, doc) => {
         const imageUrl = doc?.image
           ? `${process.env.REACT_APP_API_URL}/uploads/users/${doc.image}`
           : `https://ui-avatars.com/api/?name=${doc.name}&background=random`;
 
-        return <Avatar src={imageUrl} size={48} />;
+        return <Avatar className="avtar-pic" src={imageUrl} />;
       },
     },
     {
@@ -70,13 +70,15 @@ export default function DoctorOnbordingList() {
     {
       title: 'Phone',
       key: 'phone',
-      dataIndex: 'phone',
       width: 130,
+      render: (v) => {
+        return v?.phone;
+      },
     },
     {
       title: 'Schedule',
       key: 'schedule',
-      width: 280,
+      width: 200,
       render: (_, doc) =>
         doc.schedule?.length ? (
           <div className="schedule-cell">
@@ -163,8 +165,6 @@ export default function DoctorOnbordingList() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Doctor List"
-        showBack
-        backTo="/doctor-onbording"
         items={[{ label: 'Doctors', href: '/doctor-onbording' }, { label: 'Doctor List' }]}
       />
 
@@ -191,18 +191,18 @@ export default function DoctorOnbordingList() {
 
       <div className="table-scroll-container">
         <Table
-          rowKey="doctorid"
+          rowKey={(record) => record.id}
           columns={columns}
-          dataSource={doctors}
+          dataSource={doctors || []}
           loading={loading}
-          scroll={{ x: 'max-content' }}
+          scroll={{ x: 1000 }}
+          onChange={handleTableChange}
           pagination={{
             current: page,
             pageSize: limit,
             total: total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
-            onChange: handleTableChange,
             showTotal: (totalRecord) => `Total ${totalRecord} items`,
             showQuickJumper: limit > 100 && limit < 500,
             locale: {
