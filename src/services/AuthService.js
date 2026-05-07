@@ -7,10 +7,9 @@ axiosClient.defaults.baseURL = API_URL;
 
 axiosClient.interceptors.request.use((req) => {
     if (
-        req.url.includes("reset-password") ||
-        req.url.includes("forgot-password")
+        req.url.includes("reset-password")
     ) {
-        return req; // skip token
+        return req;
     }
     const token = localStorage.getItem("auth_token");
     if (token) req.headers.Authorization = `Bearer ${token}`;
@@ -78,5 +77,7 @@ const authService = {
     uploadImage,
     forgotPassword,
     resetPassword,
+
 };
 export default authService;
+

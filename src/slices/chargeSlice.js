@@ -109,29 +109,22 @@ const chargeSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-
-      // 🔹 Fetch Charges
       .addCase(fetchCharges.pending, (state) => {
         state.loading = true;
       })
 
       .addCase(fetchCharges.fulfilled, (state, action) => {
         state.loading = false;
-
         state.charges = action.payload.charges || [];
         state.total = action.payload.total || 0;
         state.totalPages = action.payload.totalPages || 1;
-
-        state.page = action.meta.arg.page;
+        state.page = action.meta.arg.page || 1;
         state.limit = action.meta.arg.limit;
       })
-
       .addCase(fetchCharges.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔹 Fetch Charge By ID
       .addCase(fetchChargeById.pending, (state) => {
         state.loading = true;
       })

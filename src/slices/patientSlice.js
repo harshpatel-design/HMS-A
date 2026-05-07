@@ -127,7 +127,7 @@ const patientSlice = createSlice({
       })
       .addCase(fetchPatientName.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientName = action.payload; // 👈 SET HERE
+        state.patientName = action.payload; 
       })
       .addCase(fetchPatientName.rejected, (state, action) => {
         state.loading = false;

@@ -1,7 +1,6 @@
 import React from 'react'
 import DashboardCountNumber from '../../components/DashboradCountNumber'
 import AppointsmentDashbordList from '../../components/AppointsmentDashbordList'
-import { Col, Row } from 'antd'
 
 function Dashboard() {
   return (

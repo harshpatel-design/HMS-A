@@ -8,11 +8,10 @@ import './index.css';
 import './hcss.css';
 import { message, ConfigProvider } from 'antd';
 import { BrowserRouter } from 'react-router-dom';
-import GlobalMessageProvider from '../src/feature/comman/GlobalMessage'; //  ⬅ NEW
-
+import GlobalMessageProvider from '../src/feature/comman/GlobalMessage';
 message.config({
   top: 27,
-  duration: 4,
+  duration: 5,
   maxCount: 10,
 });
 
@@ -24,7 +23,6 @@ root.render(
       <ConfigProvider>
         <GlobalMessageProvider>
           {' '}
-          {/* ⬅ Toast now GLOBAL */}
           <App />
         </GlobalMessageProvider>
       </ConfigProvider>

@@ -5,7 +5,6 @@ import {
   Button,
   Space,
   Input,
-  Tag,
   message,
   Checkbox,
   Select,
@@ -93,7 +92,6 @@ const ChargeList = () => {
       setEditingRecord(record);
       setDrawerOpen(true);
 
-      // ✅ Fetch patient ledger (this is correct)
       const res = await dispatch(fetchChargeById(record.patient._id)).unwrap();
 
       if (!res?.charges?.length) {
@@ -101,7 +99,6 @@ const ChargeList = () => {
         return;
       }
 
-      // ✅ FIND the exact charge document user clicked
       const charge = res.charges.find((c) => c._id === record._id);
 
       if (!charge) {

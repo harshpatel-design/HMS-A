@@ -51,7 +51,6 @@ export default function AddEditDoctor() {
     'SUNDAY',
   ];
   const [selectedDays, setSelectedDays] = useState([]);
-  const [doctorData, setDoctorData] = useState(null);
   const [daySessions, setDaySessions] = useState({});
 
   const buildImageUrl = (img) => {
@@ -315,7 +314,7 @@ export default function AddEditDoctor() {
         >
           <Form layout="vertical" form={form} onFinish={onFinish}>
             <Collapse
-              {...(isEdit ? { activeKey: allPanelKeys } : { defaultActiveKey: ['basic'] })}
+              activeKey={allPanelKeys}
               accordion={false}
             >
               <Panel header="Basic Information" key="basic">

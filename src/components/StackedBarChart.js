@@ -1,15 +1,63 @@
 import React from "react";
 import Chart from "react-apexcharts";
 
-const StackedBarChart = () => {
+const StackedBarChart = ({
+  appointments = [],
+}) => {
+  const groupedData = {};
+
+  appointments.forEach((item) => {
+    const date = new Date(
+      item.createdAt
+    ).toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+    });
+
+    if (!groupedData[date]) {
+      groupedData[date] = {
+        scheduled: 0,
+        completed: 0,
+        cancelled: 0,
+        checkedin: 0,
+      };
+    }
+
+    switch (item.status) {
+      case "scheduled":
+        groupedData[date].scheduled += 1;
+        break;
+
+      case "completed":
+        groupedData[date].completed += 1;
+        break;
+
+      case "cancelled":
+        groupedData[date].cancelled += 1;
+        break;
+
+      case "checked-in":
+        groupedData[date].checkedin += 1;
+        break;
+
+      default:
+        break;
+    }
+  });
+
+  const categories =
+    Object.keys(groupedData);
+
   const options = {
     chart: {
       type: "bar",
       height: 350,
       stacked: true,
+
       toolbar: {
         show: true,
       },
+
       zoom: {
         enabled: true,
       },
@@ -32,11 +80,15 @@ const StackedBarChart = () => {
       bar: {
         horizontal: false,
         borderRadius: 10,
-        borderRadiusApplication: "end",
-        borderRadiusWhenStacked: "last",
+        borderRadiusApplication:
+          "end",
+        borderRadiusWhenStacked:
+          "last",
+
         dataLabels: {
           total: {
             enabled: true,
+
             style: {
               fontSize: "13px",
               fontWeight: 900,
@@ -47,15 +99,7 @@ const StackedBarChart = () => {
     },
 
     xaxis: {
-      type: "datetime",
-      categories: [
-        "01/01/2011 GMT",
-        "01/02/2011 GMT",
-        "01/03/2011 GMT",
-        "01/04/2011 GMT",
-        "01/05/2011 GMT",
-        "01/06/2011 GMT",
-      ],
+      categories,
     },
 
     legend: {
@@ -66,13 +110,51 @@ const StackedBarChart = () => {
     fill: {
       opacity: 1,
     },
+
+    dataLabels: {
+      enabled: true,
+    },
+
+    colors: [
+      "#008FFB",
+      "#00E396",
+      "#FEB019",
+      "#FF4560",
+    ],
   };
 
   const series = [
-    { name: "PRODUCT A", data: [44, 55, 41, 67, 22, 43] },
-    { name: "PRODUCT B", data: [13, 23, 20, 8, 13, 27] },
-    { name: "PRODUCT C", data: [11, 17, 15, 15, 21, 14] },
-    { name: "PRODUCT D", data: [21, 7, 25, 13, 22, 8] },
+    {
+      name: "Scheduled",
+      data: categories.map(
+        (date) =>
+          groupedData[date].scheduled
+      ),
+    },
+
+    {
+      name: "Completed",
+      data: categories.map(
+        (date) =>
+          groupedData[date].completed
+      ),
+    },
+
+    {
+      name: "Checked In",
+      data: categories.map(
+        (date) =>
+          groupedData[date].checkedin
+      ),
+    },
+
+    {
+      name: "Cancelled",
+      data: categories.map(
+        (date) =>
+          groupedData[date].cancelled
+      ),
+    },
   ];
 
   return (

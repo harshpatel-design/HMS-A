@@ -11,7 +11,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.29.1",
-    "apexcharts": "^5.3.6",
+    "apexcharts": "^3.45.2",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "dotenv": "^17.2.3",
@@ -19,12 +19,13 @@
     "i18next-browser-languagedetector": "^8.2.0",
     "multer": "^2.0.2",
     "react": "^18.3.1",
-    "react-apexcharts": "^1.9.0",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^13.5.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.6",
     "react-scripts": "5.0.1",
+    "recharts": "^3.8.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

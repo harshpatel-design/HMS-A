@@ -6,6 +6,7 @@ import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../slices/authSlice';
+import logo from '../../images/logo.png';
 
 function Login() {
   const dispatch = useDispatch();
@@ -31,43 +32,59 @@ function Login() {
       <div className="page-wrapper">
         <Row className="loging-wapper">
           <div className="login-page">
-            <Col xs={0} md={12} className="login-left">
+            <Col xs={24} md={24} lg={12} className="login-left">
               <img src={leftImg} alt="login" />
             </Col>
 
-            <Col xs={24} md={12} className="login-right">
-              <div className="login-box">
-                <Form layout="vertical" className="form-container" onFinish={onFinish}>
-                  <h3 className="login-title">Login</h3>
-                  <Form.Item
-                    name="email"
-                    label="Email Address"
-                    rules={[{ required: true, message: 'Email is required' }]}
-                  >
-                    <Input placeholder="Enter Email" />
-                  </Form.Item>
+            <Col xs={24} md={24} lg={12} className="login-right">
+              <Row className="login-content">
+                <Col className="login-logo">
+                  <img src={logo} alt="logo" />
+                </Col>
 
-                  <Form.Item
-                    name="password"
-                    label="Password"
-                    rules={[{ required: true, message: 'Password is required' }]}
-                  >
-                    <Input.Password
-                      placeholder="Enter Password"
-                      iconRender={(v) => (v ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
-                    />
-                  </Form.Item>
+                <Col className="login-box">
+                
+                  <Form layout="vertical" className="form-container" onFinish={onFinish}>
+                    <h3 className="login-title">Sign in</h3>
+                    <p className="login-title-p">
+                      Please enter below details to access the dashboard
+                    </p>
+                    <Form.Item
+                      name="email"
+                      label="Email Address"
+                      rules={[{ required: true, message: 'Email is required' }]}
+                    >
+                      <Input placeholder="Enter Email" />
+                    </Form.Item>
 
-                  <Button type="primary" block htmlType="submit" loading={loading}>
-                    Login
-                  </Button>
+                    <Form.Item
+                      name="password"
+                      label="Password"
+                      rules={[{ required: true, message: 'Password is required' }]}
+                    >
+                      <Input.Password
+                        placeholder="Enter Password"
+                        iconRender={(v) => (v ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
+                      />
+                    </Form.Item>
 
-                  {/* <Divider>OR</Divider>
-                  <p className="register-text">
-                    Don't have an account? <Link to="/register">Register</Link>
-                  </p> */}
-                </Form>
-              </div>
+                    <Button
+                      type="primary"
+                      className="login-btn"
+                      block
+                      htmlType="submit"
+                      loading={loading}
+                    >
+                      Login
+                    </Button>
+
+                    <Divider className="login-divider">OR</Divider>
+                    <p className="register-text">
+                      Forgot your password? <Link to="/forget-password">Forget Password</Link>
+                    </p>
+                  </Form>
+                </Col>
+              </Row>
             </Col>
           </div>
         </Row>

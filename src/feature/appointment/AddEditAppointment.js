@@ -57,13 +57,15 @@ export default function AddEditAppointment() {
 
     const payload = {
       doctorId: selectedDoctor,
-      appointmentDate: appointmentDate.format('YYYY-MM-DD'),
+      appointmentDate: appointmentDate.startOf('day').toISOString(),
       timeSlot: {
         start: startTime.format('HH:mm'),
         end: endTime.format('HH:mm'),
       },
       ...(isEdit && { excludeId: id }),
     };
+
+    console.log('payloaddddddddd', payload);
 
     try {
       const res = await appointmentService.checkAvailability(payload);
@@ -172,9 +174,10 @@ export default function AddEditAppointment() {
   };
 
   const onFinish = async (values) => {
+    console.log('value', values);
+
     try {
       setLoading(true);
-
       const payload = {
         patient: values.patient,
         doctor: values.doctor,
@@ -225,7 +228,7 @@ export default function AddEditAppointment() {
         <div className="form-wrapper">
           <Form layout="vertical" form={form} onFinish={onFinish}>
             <Collapse
-              defaultActiveKey={['basic']}
+              defaultActiveKey={['basic', 'schedule', 'case', 'notes']}
               accordion={false}
               items={[
                 {
@@ -346,7 +349,7 @@ export default function AddEditAppointment() {
 
                       <Col md={6} xs={24}>
                         <Form.Item label="Status" name="status" rules={[{ required: true }]}>
-                          <Select allowClear placeholder="Select Status"  >
+                          <Select allowClear placeholder="Select Status">
                             <Select.Option value="scheduled">Scheduled</Select.Option>
                             <Select.Option value="checked-in">Checked-in</Select.Option>
                             <Select.Option value="completed">Completed</Select.Option>

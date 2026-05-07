@@ -10,7 +10,6 @@ const axiosClient = axios.create({
   },
 });
 
-// Auth Token Interceptor
 axiosClient.interceptors.request.use((req) => {
   const token = localStorage.getItem('auth_token');
   if (token) {
@@ -29,6 +28,7 @@ const createCharge = (payload) => {
 
   return axiosClient.post('/api/create-charges', payload).then((res) => res.data);
 };
+
 
 const getCharges = ({
   page = 1,

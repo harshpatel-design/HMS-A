@@ -35,11 +35,13 @@ export default function DoctorOnbordingList() {
       }, 500),
     [dispatch, limit]
   );
+
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
     };
   }, [debouncedSearch]);
+  
   const columns = [
     {
       title: 'Profile Image',

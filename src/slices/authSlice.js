@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authService from "../services/AuthService";
 
-/* =========================================================
-   🔥 LOGIN THUNK
-========================================================= */
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async ({ email, password }, { rejectWithValue }) => {
@@ -17,7 +14,7 @@ export const loginUser = createAsyncThunk(
                 });
             }
 
-            return response; // Contains token + user
+            return response;
         } catch (error) {
             return rejectWithValue(
                 error?.response?.data || { message: "Login failed", success: false }
@@ -26,18 +23,12 @@ export const loginUser = createAsyncThunk(
     }
 );
 
-/* =========================================================
-   🔥 LOGOUT THUNK (CALL API + CLEAR STORAGE)
-========================================================= */
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
-    await authService.logout();     // <-- calls backend + removes local storage
+    await authService.logout();    
     return true;
 });
 
 
-/* =========================================================
-   🔥 GET LOGGED IN USER
-========================================================= */
 export const fetchUserProfile = createAsyncThunk(
     "auth/fetchMe",
     async (_, { rejectWithValue }) => {
@@ -49,9 +40,6 @@ export const fetchUserProfile = createAsyncThunk(
     }
 );
 
-/* =========================================================
-   🔥 UPLOAD PROFILE IMAGE
-========================================================= */
 export const uploadUserImage = createAsyncThunk(
     "auth/uploadImage",
     async (formData, { rejectWithValue }) => {
@@ -65,9 +53,6 @@ export const uploadUserImage = createAsyncThunk(
     }
 );
 
-/* =========================================================
-   INITIAL STATE
-========================================================= */
 const initialState = {
     user: JSON.parse(localStorage.getItem("user")) || null,
     token: localStorage.getItem("auth_token") || null,
@@ -77,9 +62,6 @@ const initialState = {
     authMessage: null,
 };
 
-/* =========================================================
-   AUTH SLICE
-========================================================= */
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -92,8 +74,6 @@ const authSlice = createSlice({
 
     extraReducers: (builder) => {
         builder
-
-            /* -------- LOGIN -------- */
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -113,7 +93,6 @@ const authSlice = createSlice({
                 state.error = action.payload?.message;
             })
 
-            /* -------- LOGOUT -------- */
             .addCase(logoutUser.fulfilled, (state) => {
                 state.user = null;
                 state.token = null;
@@ -121,7 +100,6 @@ const authSlice = createSlice({
                 state.authMessage = null;
                 state.error = null;
             })
-            /* -------- FETCH PROFILE -------- */
             .addCase(fetchUserProfile.pending, (state) => {
                 state.loading = true;
             })
@@ -132,14 +110,12 @@ const authSlice = createSlice({
             .addCase(fetchUserProfile.rejected, (state) => {
                 state.loading = false;
             })
-
-            /* -------- UPLOAD IMAGE -------- */
             .addCase(uploadUserImage.pending, (state) => {
                 state.loading = true;
             })
             .addCase(uploadUserImage.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;   // update image instantly
+                state.user = action.payload; 
             })
             .addCase(uploadUserImage.rejected, (state, action) => {
                 state.loading = false;

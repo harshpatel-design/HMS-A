@@ -18,11 +18,9 @@ import PatientView from './feature/patitent/PatientView';
 import AppointmentList from './feature/appointment/AppointmentList';
 import AddEditAppointment from './feature/appointment/AddEditAppointment';
 
-// ⭐ SERVICE PAGES
 import ServiceList from './feature/service/ServiceList';
 import AddEditService from './feature/service/AddEditService';
 
-// Layouts
 import MainLayout from './feature/comman/MainLayout';
 import Public from './feature/comman/Public';
 import PrivateRoute from './feature/comman/PrivateRoute';
@@ -56,7 +54,6 @@ import MedicineList from './feature/master/MedicineList';
 export function AppRoutes() {
   return (
     <Routes>
-      {/* 🔐 Protected Routes (Login required) */}
       <Route element={<PrivateRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
@@ -128,15 +125,13 @@ export function AppRoutes() {
         </Route>
       </Route>
 
-      {/* 🔓 Public Routes */}
       <Route element={<Public />}>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/forget-password" element={<ForgotPassword />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Route>
 
-      {/* Fallback */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

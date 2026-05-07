@@ -15,7 +15,6 @@ h6 {
     border-radius: 5px;
 }
 
-
 .ant-form-item-explain-error {
     text-align: left !important;
     font-size: 12px !important;
@@ -66,7 +65,6 @@ h6 {
     color: var(--white-text) !important;
 }
 
-/* Outer border for the whole table */
 .ant-table-wrapper .ant-table {
     border-radius: 8px;
 }
@@ -99,7 +97,6 @@ h6 {
     -webkit-overflow-scrolling: touch;
     box-sizing: border-box;
     height: 100%;
-    /* max-height: calc(100vh - 180px); */
 
 }
 
@@ -144,15 +141,10 @@ h6 {
     margin: 13px 0px 4px !important;
 }
 
-.ant-table-wrapper .ant-table-thead>tr>th:last-child {
-    border-right: none;
-}
-
 .ant-pagination-options .ant-select-arrow {
     top: 19px !important;
 }
 
-/* Body cell borders */
 .ant-table-wrapper .ant-table-tbody>tr>td {
     border-right: 1px solid #d9d9d9;
     border-bottom: 1px solid #d9d9d9;
@@ -167,7 +159,6 @@ h6 {
 }
 
 
-/* Remove bottom border on last row */
 .ant-table-wrapper .ant-table-tbody>tr:last-child>td {
     border-bottom: none;
 }
@@ -190,7 +181,7 @@ h6 {
 
 .ant-select-dropdown .ant-select-item-option {
     scrollbar-width: thin;
-    /* Firefox */
+    
 }
 
 .ant-drawer .ant-drawer-close {
@@ -202,7 +193,6 @@ h6 {
     color: var(--text-dark) !important;
 }
 
-/* Chrome / Edge / Safari */
 .ant-select-dropdown .ant-select-item-option::-webkit-scrollbar {
     width: 2px;
 }
@@ -275,7 +265,6 @@ h6 {
     flex-direction: column;
 }
 
-/* When sidebar collapsed */
 .content.collapsed+.pagination-fixed {
     width: calc(100% - 75px);
 }
@@ -291,9 +280,8 @@ h6 {
 
 .ant-table-wrapper .ant-table-thead>tr>th,
 .ant-table-wrapper .ant-table-tbody>tr>td {
-    padding: 4px 12px !important;
+    padding: 16px 12px !important;
     border-bottom: 1px solid #d9d9d9 !important;
-    /* border-left: 1px solid #d9d9d9 !important; */
 }
 
 .ant-table-wrapper .ant-table-tbody>tr>td:first-child {
@@ -306,7 +294,7 @@ h6 {
 
 .ant-table-wrapper .ant-table-thead>tr>th {
     border: none !important;
-    padding: 10px 12px !important;
+    padding: 16px 12px !important;
 
 }
 
@@ -328,11 +316,6 @@ h6 {
     --shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* .ant-btn-variant-solid {
-    background: var(--primary-dark) !important;
-} */
-
-/* 🔥 Custom Logout Modal */
 .custom-logout-modal .ant-modal-content {
     border-radius: 18px !important;
     padding: 30px 25px !important;
@@ -340,17 +323,14 @@ h6 {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
-/* Remove default spacing */
 .custom-logout-modal .ant-modal-confirm-body {
     padding: 0 !important;
 }
 
-/* Center Alignment */
 .logout-modal-content {
     text-align: center;
 }
 
-/* Title */
 .logout-modal-content h2 {
     font-size: 22px;
     font-weight: 600;
@@ -358,14 +338,12 @@ h6 {
     color: #222;
 }
 
-/* Subtext */
 .logout-modal-content p {
     font-size: 16px;
     color: #666;
     margin-bottom: 20px;
 }
 
-/* Buttons */
 .custom-logout-modal .ant-btn-primary {
     background: #ff4d4f !important;
     border-color: #ff4d4f !important;
@@ -382,7 +360,6 @@ h6 {
     font-weight: 500;
 }
 
-/* Center footer */
 
 .b-titele {
     margin: 0;
@@ -412,26 +389,49 @@ h6 {
 }
 
 .ant-picker {
-
     width: 240px !important;
 }
 
-/* form  */
-/* ===========================
-   GLOBAL FORM WRAPPER
-=========================== */
 .form-container {
     width: 100%;
     background: #ffffff;
-    padding: 32px 38px;
+    padding: 40px;
+    border: 1px solid #E7E8EB;
     border-radius: 14px;
-    box-shadow: 0 2px 10px 2px rgba(0, 0, 0, 0.1);
     text-align: center;
     animation: fadeUp .4s ease-in-out;
 
 }
 
-/* Fade animation */
+.login-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+}
+
+.login-content .login-logo {
+    width: 130px;
+    height: 30px;
+   object-fit: cover;
+}
+
+
+.login-title-p {
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 21px;
+text-align: center;
+color: #6C7688;
+opacity: 0.7;
+
+
+}
+
 @keyframes fadeUp {
     from {
         opacity: 0;
@@ -444,9 +444,6 @@ h6 {
     }
 }
 
-/* ===========================
-   LOGO + TITLE TEXT
-=========================== */
 .form-logo {
     width: 150px;
     margin-bottom: 10px;
@@ -465,9 +462,6 @@ h6 {
     margin-bottom: 20px;
 }
 
-/* ===========================
-   INPUT FIELDS
-=========================== */
 .ant-form-item-label>label {
     font-weight: 600;
     font-size: 13px;
@@ -485,9 +479,6 @@ h6 {
     margin-bottom: 12px !important;
 }
 
-/* ===========================
-   BUTTON
-=========================== */
 .form-btn {
     height: 42px;
     font-weight: 600;
@@ -495,9 +486,6 @@ h6 {
     border-radius: 8px;
 }
 
-/* ===========================
-   REMEMBER + FORGOT
-=========================== */
 .form-row {
     display: flex;
     justify-content: space-between;
@@ -511,9 +499,6 @@ h6 {
     color: #3554d4;
 }
 
-/* ===========================
-   SOCIAL AUTH
-=========================== */
 .social-icons {
     display: flex;
     justify-content: center;
@@ -537,9 +522,6 @@ h6 {
     transform: scale(1.09);
 }
 
-/* ===========================
-   REGISTER TEXT
-=========================== */
 .register-line {
     margin-top: 14px;
     font-size: 13px;
@@ -551,7 +533,6 @@ h6 {
 }
 
 
-/* HEADER */
 .head {
     height: 60px;
     display: flex;
@@ -612,15 +593,12 @@ h6 {
     color: red !important
 }
 
-/* RIGHT PART */
 .head-right {
     display: flex;
     align-items: center;
     gap: 15px;
     animation: fadeIn 0.8s ease-in-out;
 }
-
-/* Profile Button */
 
 .btn,
 .btn-full {
@@ -634,7 +612,7 @@ h6 {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
     font-weight: 600;
     max-width: 190px !important;
-    /* width: 100%; */
+  
     height: 32px !important;
     cursor: pointer;
     transition: 0.1s;
@@ -710,7 +688,6 @@ h6 {
     opacity: 1;
 }
 
-/* Logout Icon */
 .logout-icon {
     font-size: 22px;
     cursor: pointer;
@@ -787,11 +764,10 @@ h6 {
     transition: all 0.3ss;
 }
 
-/* loging page */
 
 .login-page {
-    height: 70vh !important;
-    width: 80%;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -806,13 +782,11 @@ h6 {
     background: #b4b7de4D;
     width: 100%;
     height: 100%;
-    border-bottom-left-radius: 10px;
-    border-top-left-radius: 10px;
     animation: slideFromLeft 1s ease forwards;
 }
 
 .login-left img {
-    width: 100%;
+    width: 80%;
     object-fit: cover;
 }
 
@@ -823,8 +797,7 @@ h6 {
     background: #ffffff;
     width: 100%;
     height: 100%;
-    border-bottom-right-radius: 10px;
-    border-top-right-radius: 10px;
+    box-shadow: unset;
     animation: slideFromRight 1s ease forwards;
 }
 
@@ -858,6 +831,7 @@ h6 {
     background: #fff;
     border-radius: 12px;
     animation: fadeIn 1.2s ease forwards;
+    width: 70%;
 }
 
 .login-logo {
@@ -874,9 +848,9 @@ h6 {
 .login-title {
     font-size: 24px;
     font-weight: 500;
-    margin-bottom: 10px !important;
-    color: var(--primary-dark);
-
+    color: #0A1B39;
+    margin-bottom: 0px !important;
+    font-weight: 600;
 }
 
 label {
@@ -887,6 +861,13 @@ label {
     color: #444;
 }
 
+.login-btn {
+    background: #2E37A4 !important;
+    height: 40px;
+}
+.login-divider {
+    margin: 30px auto !important;
+}
 
 
 .password-field {
@@ -915,6 +896,7 @@ label {
     align-items: center;
     border-radius: 10px;
     height: 100vh;
+       
 }
 
 .forgot-link {
@@ -1297,6 +1279,7 @@ label {
     align-items: center;
     padding: 8px;
     background: #fff;
+    min-height: 60px;
     margin-top: 10px;
     border-radius: 5px;
 }
@@ -1319,27 +1302,25 @@ label {
     cursor: pointer;
 }
 
-
-
-
-/* components*/
-
 .count-card {
     padding: 20px;
-    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 30px;
-    transition: 0.3s ease-in-out;
+    transition: 0.2s ease-in-out;
     cursor: pointer;
     background: #fff !important;
+    margin: 2px;
+    border: none;
 }
 
 .count-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2),
+                0 0 5px 2px rgba(0, 0, 0, 0.2),
+                0 0 14px 3px rgba(0, 0, 0, 0.1);
 }
 
 .counter-effect {
@@ -1520,7 +1501,6 @@ section {
     font-size: 11px !important;
 }
 
-/* Session time */
 .session-time {
     color: #555;
     font-size: 10px;
@@ -1646,23 +1626,26 @@ section {
 }
 
 
-/* Schedule column */
 .schedule-cell {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 8px;
 }
 
 .avtar-pic {
-    width: 100%;
-    height: 100%;
+    width: 100px;
+    height: 100px;
+    margin: 0px auto;
+    text-align: center;
     object-fit: cover;
     border-radius: 50%;
+    transform: translate(-50%);
+    left: 50%;
 }
 
 .schedule-day-row {
     display: flex;
-    align-items: center !important;
+    flex-direction: column;
     gap: 8px;
     flex-wrap: wrap;
 }
@@ -1881,7 +1864,6 @@ section {
     color: rgba(0, 0, 0, 0.85);
 }
 
-/* ===== View Diagnosis Page ONLY ===== */
 
 .view-diagnosis-page .diagnosis-collapse {
     margin-top: 16px;
@@ -1939,7 +1921,12 @@ section {
     line-height: 1.5;
 }
 
-/* Mobile */
+.sess-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 @media (max-width: 768px) {
 
     .view-diagnosis-page .panel-header {
@@ -2003,30 +1990,52 @@ section {
 
     .login-page {
         flex-direction: column;
+        width: 100% !important;
         height: unset !important;
+        align-items: center;
+        justify-content: center;
+        box-shadow: unset;
+    }
+    .login-box {
+        width: 90%;
     }
 
     .login-left {
         padding: 30px;
+        width: 100% !important;
+        height: 100% !important;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .login-left img {
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        width: 100%;
+        object-fit: cover;
+    }
+    .login-content {
+        gap: 20px;
     }
 
     .login-right {
         width: 100% !important;
-        padding: 30px 0px 20px;
+        padding: 30px 0px 30px;
     }
 
     .form-container {
         width: 100%;
-        background: #ffffff;
-        padding: 12px 24px;
-
         border-radius: 14px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         text-align: center;
+        padding: 20px;
         animation: fadeUp .4s ease-in-out;
 
     }
 
+    .login-title-p {
+        margin-top: 5px;
+        font-size: 12px;
+    }
     .head {
         width: 100%;
         padding: 5px 10px;
@@ -2054,7 +2063,6 @@ section {
         z-index: 1000;
     }
 
-    /* Hide desktop toggle arrow on mobile */
     .sidebar-toggle-right {
         display: none;
     }
@@ -2154,7 +2162,7 @@ section {
     }
 
     .page-wrapper {
-        margin-top: 10px;
+        width: 100%;
     }
 
     .breadcrumbs-title {
