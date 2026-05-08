@@ -1,11 +1,12 @@
 import { Avatar, Card, Col, Row, Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import '../hcss.css';
 import StackedBarChart from './StackedBarChart';
 
 import { UserOutlined } from '@ant-design/icons';
 import AppointmentsWidget from './AppointmentsWidget';
 import { fetchAppointments } from '../../src/slices/appointmentSlice';
+import { fetchDoctors } from '../../src/slices/doctorSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const { Option } = Select;
@@ -18,8 +19,15 @@ function AppointsmentDashbordList() {
     total: apponitmenLength,
     loading,
   } = useSelector((state) => state.appointment);
+  const { doctors, loading: doctorLoading } = useSelector((state) => state.doctor);
 
-  console.log('appointments', appointments);
+  useEffect(() => {
+    dispatch(fetchDoctors({ page: 1, limit: 100 }));
+  }, [dispatch]);
+
+  const topDoctors = [...doctors]
+    .sort((a, b) => b.appointmentBookingCount - a.appointmentBookingCount)
+    .slice(0, 4);
 
   const cancelledApp = appointments.filter((e) => {
     return e.status === 'cancelled';
@@ -37,26 +45,7 @@ function AppointsmentDashbordList() {
     { label: 'This Month', value: 'month' },
     { label: 'This Year', value: 'year' },
   ];
-  const doctors = [
-    {
-      name: 'Dr. Mick Thompson',
-      specialty: 'Cardiologist',
-      bookings: 258,
-      image: '',
-    },
-    {
-      name: 'Dr. Emily Carter',
-      specialty: 'Pediatrician',
-      bookings: 125,
-      image: '',
-    },
-    {
-      name: 'Dr. David Lee',
-      specialty: 'Gynecologist',
-      bookings: 115,
-      image: null,
-    },
-  ];
+
   const getDateRange = (filterType) => {
     const now = new Date();
 
@@ -136,10 +125,10 @@ function AppointsmentDashbordList() {
   return (
     <>
       <div className="appointment-dashboard">
-        <Row gutter={[24, 24]}>
-          <Col sm={24} md={15} style={{ background: '#fff' }}>
-            <Row style={{ padding: '8px 0px' }}>
-              <Col span={24}>
+        <Row gutter={[24, 24]} style={{ borderRadius: '12px' }}>
+          <Col sm={24} md={15} style={{ background: '#fff', borderRadius: 8 }}>
+            <Row style={{ padding: '8px 0px', borderRadius: 5 }}>
+              <Col span={24} style={{ borderRadius: 5 }}>
                 <div className="app-heading">
                   <h1 className="dashbord-heading">Appointment Statistic</h1>
                   <Select value={filter} onChange={setFilter}>
@@ -193,13 +182,15 @@ function AppointsmentDashbordList() {
                 <Row gutter={[16, 10]}>
                   <Col span={24}>
                     <Row gutter={16} className="doctor-grid-dashbord">
-                      {doctors.map((doc, index) => (
-                        <Col xs={24} sm={12} md={12} lg={8} key={index}>
+                      {topDoctors?.map((doc, index) => (
+                        <Col xs={24} sm={12} md={12} lg={6} key={index}>
                           <Card className="doctor-card">
                             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                              {doc.image ? (
+                              {doctorLoading ? (
+                                'Loading...'
+                              ) : doc.image ? (
                                 <img
-                                  src={doc.image}
+                                  src={`http://localhost:5000/uploads/users/${doc.image}`}
                                   alt={doc.name}
                                   style={{
                                     width: 48,
@@ -211,13 +202,22 @@ function AppointsmentDashbordList() {
                               ) : (
                                 <Avatar size={48} icon={<UserOutlined />} />
                               )}
-                              <div>
-                                <div style={{ fontWeight: 600 }}>{doc.name}</div>
-                                <div style={{ fontSize: 12, color: '#888' }}>{doc.specialty}</div>
-                                <div style={{ marginTop: 4, fontSize: 12 }}>
-                                  <b>{doc.bookings}</b> Bookings
-                                </div>
-                              </div>
+                              <Row gutter={8}>
+                                <Col md={24}>
+                                  <div style={{ fontWeight: 600 }}>
+                                    {doctorLoading ? 'Loading...' : doc.name}
+                                  </div>
+                                  <div style={{ fontSize: 12, color: '#888' }}>
+                                    {doctorLoading ? 'Loading...' : doc.specialization}
+                                  </div>
+                                </Col>
+                                <Col style={{ marginTop: 4, fontSize: 12 }}>
+                                  <b>
+                                    {doctorLoading ? 'Loading...' : doc.appointmentBookingCount}
+                                  </b>{' '}
+                                  Bookings
+                                </Col>
+                              </Row>
                             </div>
                           </Card>
                         </Col>

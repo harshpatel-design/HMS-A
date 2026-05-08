@@ -1,102 +1,111 @@
-import React, { useState } from "react";
-import { Card, Calendar, Select, List, Avatar, Button } from "antd";
-import { LeftOutlined, RightOutlined, CalendarOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
-import "../hcss.css";
+import React, { useState, useEffect } from 'react';
+import { Card, Calendar, Select, List } from 'antd';
+import { LeftOutlined, RightOutlined, CalendarOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import '../hcss.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchPatientVisits } from '../slices/patientVisitSlice';
+import { Typography } from 'antd';
+import { Link } from 'react-router-dom';
+
+const { Link: TextLink } = Typography;
 
 const AppointmentsWidget = () => {
-    const [value, setValue] = useState(dayjs());
+  const dispatch = useDispatch();
+  const [value, setValue] = useState(dayjs());
+  const [caseType, setCaseType] = useState('');
 
-    const appointments = [
-        {
-            title: "General Visit",
-            time: "Wed, 05 Apr 2025, 06:30 PM",
-            avatars: ["/doc1.png", "/doc2.png"],
-        },
-        {
-            title: "General Visit",
-            time: "Wed, 05 Apr 2025, 04:10 PM",
-            avatars: ["/doc1.png"],
-        },
-        {
-            title: "General Visit",
-            time: "Wed, 05 Apr 2025, 10:00 AM",
-            avatars: ["/doc2.png"],
-        },
-        {
-            title: "General Visit",
-            time: "Wed, 05 Apr 2025, 10:00 AM",
-            avatars: ["/doc2.png"],
-        },
-    ];
+  const { visits } = useSelector((state) => state.patientVisit);
+  useEffect(() => {
+    const params = {
+      page: 1,
+      limit: 10,
+      caseType,
+    };
 
-    return (
-      <div className="app-widgest full-height">
-        <Card
-          title="Appointments"
-          className="full-height"
-          extra={
-            <Select size="small" defaultValue="all">
-              <Select.Option value="all">All Type</Select.Option>
-              <Select.Option value="visit">Visit</Select.Option>
-            </Select>
-          }
-          bodyStyle={{ padding: 16 }}
-        >
-          <Calendar
-            fullscreen={false}
-            value={value}
-            onSelect={(val) => setValue(val)}
-            headerRender={({ value, onChange }) => (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: 8,
-                  alignItems: 'center',
-                }}
-              >
-                <LeftOutlined onClick={() => onChange(value.clone().subtract(1, 'month'))} />
-                <strong>{value.format('MMMM YYYY')}</strong>
-                <RightOutlined onClick={() => onChange(value.clone().add(1, 'month'))} />
-              </div>
-            )}
-          />
+    if (value) {
+      params.startDate = dayjs(value).format('YYYY-MM-DD');
+      params.endDate = dayjs(value).format('YYYY-MM-DD');
+    }
 
-          <List
-            style={{ marginTop: 12 }}
-            dataSource={appointments}
-            renderItem={(item) => (
-              <List.Item
-                style={{
-                  background: '#f5f7fb',
-                  borderRadius: 8,
-                  marginBottom: 8,
-                  padding: '10px 12px',
-                }}
-              >
-                <List.Item.Meta
-                  title={<strong>{item.title}</strong>}
-                  description={
-                    <>
-                      <CalendarOutlined /> {item.time}
-                    </>
-                  }
-                />
-                <Avatar.Group maxCount={2}>
-                  {item.avatars.map((img, i) => (
-                    <Avatar key={i} src={img} />
-                  ))}
-                </Avatar.Group>
-              </List.Item>
-            )}
-          />
-          <Button type="link" block>
-            View All Appointments
-          </Button>
-        </Card>
-      </div>
-    );
+    dispatch(fetchPatientVisits(params));
+  }, [dispatch, caseType, value]);
+
+  return (
+    <div className="app-widgest full-height">
+      <Card
+        title="Patient Visits"
+        className="full-height dashbordVisitCard"
+        extra={
+          <Select size="small" defaultValue="" onChange={(value) => setCaseType(value)}>
+            <Select.Option value="">All Type</Select.Option>
+            <Select.Option value="opd">OPD</Select.Option>
+            <Select.Option value="ipd">IPD</Select.Option>
+          </Select>
+        }
+        bodyStyle={{ padding: 16 }}
+      >
+        <Calendar
+          fullscreen={false}
+          value={value}
+          onSelect={(val) => setValue(val)}
+          headerRender={({ value, onChange }) => (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: 10,
+                alignItems: 'center',
+              }}
+            >
+              <LeftOutlined onClick={() => onChange(value.clone().subtract(1, 'month'))} />
+              <strong>{value.format('MMMM YYYY')}</strong>
+              <RightOutlined onClick={() => onChange(value.clone().add(1, 'month'))} />
+            </div>
+          )}
+        />
+
+        <List
+          style={{ marginTop: 12 }}
+          dataSource={visits?.slice(0, 5) || []}
+          renderItem={(item) => (
+            <List.Item
+              style={{
+                background: '#f5f7fb',
+                borderRadius: 8,
+                marginBottom: 8,
+                padding: '10px 12px',
+              }}
+              className="text-capitalize"
+            >
+              <List.Item.Meta
+                title={
+                  <strong>
+                    {item?.caseType === 'opd'
+                      ? 'General OPD'
+                      : item?.caseType === 'ipd'
+                        ? 'IPD Visit'
+                        : 'Unknown'}
+                  </strong>
+                }
+                description={
+                  <>
+                    <CalendarOutlined />{' '}
+                    {item?.visitDate ? dayjs(item.visitDate).format('DD-MMM-YYYY') : 'No date'}
+                  </>
+                }
+              />
+              <div>{item?.doctor?.specialization?.name || 'N/A'}</div>
+            </List.Item>
+          )}
+        />
+
+        <TextLink style={{ display: 'block', textAlign: 'center', marginTop: 12 }}>
+          <Link to="/patient-visit">View All Visits</Link>
+        </TextLink>
+      </Card>
+    </div>
+  );
 };
 
 export default AppointmentsWidget;

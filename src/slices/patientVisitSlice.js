@@ -24,8 +24,8 @@ export const fetchPatientVisits = createAsyncThunk(
         search,
         caseType,
         caseStatus,
-        startDate, // ✅ forward
-        endDate,   // ✅ forward
+        startDate,
+        endDate,
       });
     } catch (err) {
       return rejectWithValue(

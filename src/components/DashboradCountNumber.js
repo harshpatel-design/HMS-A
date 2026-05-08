@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Row, Col } from 'antd';
 import doctoricon from '../images/Icon Container.png';
 import doctorpolygon from '../images/doctor polygon.png';
-import doctorchart from '../images/doctor  chart.png';
 import patienticon from '../images/patient icon.png';
 import patientpolygon from '../images/patient Polygon.png';
 import appointmenticon from '../images/Appointment icon.png';

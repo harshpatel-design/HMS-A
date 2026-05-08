@@ -215,9 +215,9 @@ const DoctorWaitingListPage = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
+      width: 130,
       render: (_, r) => (
-        <Space>
+        <Space style={{ justifyContent: 'center' }}>
           <Tooltip title="Create Diagnosis">
             <Button
               type="link"
@@ -337,9 +337,10 @@ const DoctorWaitingListPage = () => {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Doctor Waiting List"
-        showBack
-        backTo="/dashboard"
-        items={[{ label: 'Waiting List' }]}
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Doctor Waiting List' },
+        ]}
       />
       <div className="serachbar-bread">
         <Space style={{ flexWrap: 'wrap' }}>

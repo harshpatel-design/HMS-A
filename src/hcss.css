@@ -751,6 +751,7 @@ opacity: 0.7;
     margin-top: 60px !important;
     padding-left: 15px !important;
     transition: margin-left 0.3s ease;
+    height: fit-content;
 }
 
 .content-scroll {
@@ -1927,6 +1928,101 @@ section {
     gap: 10px;
 }
 
+.dashbordVisitCard .ant-card-head-title {
+    height: 40px  !important;
+    line-height: 40px !important;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.ant-spin-container {
+    background: var(--bg-light);
+}
+.doctor-list-card {
+  border-radius: 12px;
+}
+
+.doctor-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.doctor-card {
+  border-radius: 12px;
+}
+
+.doctor-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-left: 8px;
+}
+
+.doctor-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.doctor-specialization {
+  margin: 4px 0 0;
+  color: #8c8c8c;
+}
+
+.doctor-schedule-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.schedule-card {
+  background: #fafafa;
+  border-radius: 10px;
+}
+
+.schedule-header {
+  margin-bottom: 12px;
+}
+
+.session-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.session-name {
+  margin: 0;
+  font-weight: 500;
+}
+
+.session-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.SeduleModel .ant-modal-content {
+    padding: 0px;
+}
+
+.SeduleModel .ant-card-head {
+    height: 60px;
+    line-height: 60px;
+    font-size: 22px;
+}
+
 @media (max-width: 768px) {
 
     .view-diagnosis-page .panel-header {
@@ -1938,6 +2034,7 @@ section {
         font-size: 12px;
     }
 }
+
 
 
 

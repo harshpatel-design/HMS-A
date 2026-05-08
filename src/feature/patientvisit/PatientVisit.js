@@ -46,10 +46,10 @@ const DEFAULT_PATIENT_COLUMNS = [
   'doctor',
   'specialization',
   'caseType',
+  'visitDate',
   'city',
   'phone',
   'status',
-  'nextFollowUpDate',
 ];
 
 const PatientVisit = () => {
@@ -234,7 +234,10 @@ const PatientVisit = () => {
           <Select
             size="small"
             value={status}
-            style={{ width: '100%', textAlign: 'center' }}
+            style={{
+              width: '100%',
+              textAlign: 'center',
+            }}
             onChange={async (value) => {
               try {
                 await dispatch(
@@ -251,9 +254,15 @@ const PatientVisit = () => {
               }
             }}
           >
-            <Option value="active">Active</Option>
-            <Option value="completed">Completed</Option>
-            <Option value="cancelled">Cancelled</Option>
+            <Option value="active" style={{ color: '#1890ff' }}>
+              Active
+            </Option>
+            <Option value="completed" style={{ color: '#52c41a' }}>
+              Completed
+            </Option>
+            <Option value="cancelled" style={{ color: '#ff4d4f' }}>
+              Cancelled
+            </Option>
           </Select>
         </>
       ),
@@ -390,7 +399,10 @@ const PatientVisit = () => {
   return (
     <>
       <div className="page-wrapper">
-        <Breadcrumbs title="Patient Visits" items={[{ label: 'Patient Visits' }]} />
+        <Breadcrumbs
+          title="Patient Visits"
+          items={[{ label: 'Patient Visit', href: '/patient-visit' }, { label: 'Patient Visit' }]}
+        />
 
         <div className="serachbar-bread">
           <Space style={{ flexWrap: 'wrap' }}>
