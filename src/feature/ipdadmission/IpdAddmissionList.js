@@ -1,7 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Drawer, Input, Select, Space, Table, Form, DatePicker, message, Tag } from 'antd';
-import { PlusOutlined, HomeOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Drawer,
+  Input,
+  Select,
+  Space,
+  Table,
+  Form,
+  DatePicker,
+  message,
+  Tag,
+  Modal,
+} from 'antd';
+import {
+  PlusOutlined,
+  HomeOutlined,
+  EditOutlined,
+  ExportOutlined,
+} from '@ant-design/icons';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
 
@@ -12,6 +29,7 @@ import {
   createIpdAdmission,
   fetchAllIpdAdmissions,
   fetchIpdAdmissionById,
+  dischargeIpdPatient,
 } from '../../slices/ipdAdmission.slice';
 import { fetchFloors } from '../../slices/floorSlice';
 import { fetchWards } from '../../slices/wardSlice';
@@ -155,6 +173,64 @@ function IpdAddmissionList() {
     [chargeMasters]
   );
 
+  const handleDischarge = (record) => {
+     const pid = record.patient._id;
+    
+    let dischargeDate = dayjs();
+
+    Modal.confirm({
+      title: 'Discharge Patient',
+      className: 'discharge-modal',
+      content: (
+        <div className="discharge-modal-content">
+          <p className="discharge-modal-text">Please select discharge date</p>
+
+          <DatePicker
+            className="discharge-date-picker"
+            defaultValue={dayjs()}
+            format="DD-MM-YYYY"
+            onChange={(date) => {
+              dischargeDate = date;
+            }}
+            disabledDate={(current) => current && current < dayjs().startOf('day')}
+          />
+        </div>
+
+        
+      ),
+
+      okText: 'Discharge',
+      cancelText: 'Cancel',
+      okButtonProps: {
+        danger: true,
+      },
+      onOk: async () => {
+        try {
+  
+          await dispatch(
+            dischargeIpdPatient({
+              id: record._id,
+              dischargeDate: dischargeDate.toDate(),
+              bed: record.bed,
+              patient : pid
+            })
+          ).unwrap();
+
+          message.success('Patient discharged successfully');
+
+          dispatch(
+            fetchAllIpdAdmissions({
+              page,
+              limit,
+              search: searchText,
+            })
+          );
+        } catch (err) {
+          message.error(err?.message || 'Failed to discharge patient');
+        }
+      },
+    });
+  };
   const columns = [
     {
       title: 'Case No.',
@@ -255,14 +331,20 @@ function IpdAddmissionList() {
     {
       title: 'Action',
       key: 'action',
-      width: 50,
+      width: 100,
       render: (_, record) => (
         <Space className="action">
           <Button
-            type="button"
+            type="link"
             icon={<EditOutlined />}
             style={{ color: '#1677ff' }}
             onClick={() => handleEdit(record)}
+          ></Button>
+          <Button
+            type="link"
+            icon={<ExportOutlined />}
+            style={{ color: 'red' }}
+            onClick={() => handleDischarge(record)}
           ></Button>
         </Space>
       ),

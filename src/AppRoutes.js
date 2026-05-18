@@ -59,7 +59,7 @@ const ViewDiagnosis = lazy(() => import('./feature/daignosis/ViewDiagnosis'));
 
 const Loader = () => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
+    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', zIndex: 9999 }}>
       <Spin size="large" />
     </div>
   );

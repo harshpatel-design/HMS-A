@@ -35,8 +35,6 @@ const DiagnosisList = () => {
 
   const { list, total, page, limit, loading } = useSelector((state) => state.diagnosis);
 
-  console.log(list);
-
   const [searchText, setSearchText] = useState('');
   const [ordering, setOrdering] = useState('createdAt');
   const [selectedColumns, setSelectedColumns] = useState(DEFAULT_DIAGNOSIS_COLUMNS);
@@ -44,7 +42,7 @@ const DiagnosisList = () => {
   useEffect(() => {
     loadDiagnosis();
     return () => dispatch(clearDiagnosisState());
-  }, []);
+  }, [dispatch]);
 
   const loadDiagnosis = (pageValue = 1, searchValue = '') => {
     dispatch(

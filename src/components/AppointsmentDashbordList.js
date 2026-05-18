@@ -1,12 +1,11 @@
 import { Avatar, Card, Col, Row, Select } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../hcss.css';
 import StackedBarChart from './StackedBarChart';
 
 import { UserOutlined } from '@ant-design/icons';
 import AppointmentsWidget from './AppointmentsWidget';
 import { fetchAppointments } from '../../src/slices/appointmentSlice';
-import { fetchDoctors } from '../../src/slices/doctorSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const { Option } = Select;
@@ -21,9 +20,6 @@ function AppointsmentDashbordList() {
   } = useSelector((state) => state.appointment);
   const { doctors, loading: doctorLoading } = useSelector((state) => state.doctor);
 
-  useEffect(() => {
-    dispatch(fetchDoctors({ page: 1, limit: 100 }));
-  }, [dispatch]);
 
   const topDoctors = [...doctors]
     .sort((a, b) => b.appointmentBookingCount - a.appointmentBookingCount)
@@ -48,12 +44,8 @@ function AppointsmentDashbordList() {
 
   const getDateRange = (filterType) => {
     const now = new Date();
-
     let startDate;
-
     let endDate = new Date();
-
-    // full current day include
     endDate.setHours(23, 59, 59, 999);
 
     switch (filterType) {
@@ -61,19 +53,12 @@ function AppointsmentDashbordList() {
         startDate = new Date();
 
         startDate.setDate(now.getDate() - 6);
-
-        // start of day
         startDate.setHours(0, 0, 0, 0);
-
         break;
-
       case 'week':
         startDate = new Date();
-
         const day = now.getDay();
-
         const diff = day === 0 ? 6 : day - 1;
-
         startDate.setDate(now.getDate() - diff);
 
         startDate.setHours(0, 0, 0, 0);
@@ -89,7 +74,6 @@ function AppointsmentDashbordList() {
 
       case 'year':
         startDate = new Date(now.getFullYear(), 0, 1);
-
         startDate.setHours(0, 0, 0, 0);
 
         break;

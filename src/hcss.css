@@ -2119,6 +2119,60 @@ section {
 .dashCal .ant-picker-body th {
     font-weight: 500 !important;
 }
+
+
+
+.discharge-modal .ant-modal-content {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+}
+
+.discharge-modal .ant-modal-content .ant-modal-confirm-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-between;
+}
+
+.discharge-modal .ant-modal-content .ant-picker {
+    width: 100% !important;
+}
+
+.discharge-modal .ant-modal-confirm-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+
+.discharge-modal-content {
+  margin-top: 0px;
+}
+
+.discharge-modal  .ant-modal-confirm-body {
+      border-bottom: 1px solid #8c8c8caf;
+      padding-bottom: 16px;
+}
+.discharge-modal-text {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+}
+
+.discharge-date-picker {
+  width: 100%;
+}
+
+
+.discharge-modal .ant-btn-dangerous {
+  background: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+.discharge-modal .ant-btn-dangerous:hover {
+  background: #ff7875 !important;
+  border-color: #ff7875 !important;
+}
 @media (max-width: 768px) {
 
     .view-diagnosis-page .panel-header {

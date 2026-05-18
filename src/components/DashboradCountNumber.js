@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Row, Col } from 'antd';
+import { Row, Col, Spin } from 'antd';
 import doctoricon from '../images/Icon Container.png';
 import doctorpolygon from '../images/doctor polygon.png';
 import patienticon from '../images/patient icon.png';
@@ -8,146 +8,62 @@ import appointmenticon from '../images/Appointment icon.png';
 import apppolygon from '../images/appointment polygon.png';
 import revicon from '../images/rev icon.png';
 import revpolygon from '../images/rev polygon.png';
-import { fetchDoctorsName } from '../slices/doctorSlice';
-import { fetchAppointments } from '../slices/appointmentSlice';
-import { fetchCharges } from '../slices/chargeSlice';
-import { fetchPatientName } from '../slices/patientSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import ApexChart from './MiniBarChart';
+import { getDashBoardCount } from '../slices/countSlice';
 
 function DashboardCountNumber() {
   const dispatch = useDispatch();
 
-  const { doctorNames, loading } = useSelector((state) => state.doctor);
-  const { appointments } = useSelector((state) => state.appointment);
-  const { charges } = useSelector((state) => state.charge);
-  const { patientName } = useSelector((state) => state.patient);
+  const { counts, loading } = useSelector((state) => state.count);
 
-  const patientCount = patientName?.count || 0;
-  const now = new Date();
+  const patientCount = counts?.counts?.patientCount || 0;
+  const doctorCount = counts?.counts?.doctorCount || 0;
+  const appointmentCount = counts?.counts?.appointments?.total || 0;
+  const totalRevenue = counts?.counts?.totalRevenue || 0;
 
-  const startDate = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() - 6,
-    0,
-    0,
-    0,
-    0
-  ).toISOString();
+  const doctorChartData = counts?.counts?.charts?.doctors || [];
+  const patientChartData = counts?.counts?.charts?.patients || [];
+  const appointmentChartData = counts?.counts?.charts?.appointments || [];
 
-  const endDate = new Date().toISOString();
 
-  useEffect(() => {
-    dispatch(fetchDoctorsName());
-    dispatch(fetchAppointments());
-    dispatch(fetchPatientName());
-  }, [dispatch]);
+  const revenueChartData = counts?.counts?.charts?.revenue || [];
 
-  useEffect(() => {
-    dispatch(
-      fetchCharges({
-        page: 1,
-        limit: 100,
-        startDate,
-        endDate,
-      })
+  const getLast7DaysPercentage = (chartData = []) => {
+    if (!chartData.length) {
+      return 0;
+    }
+    const total = chartData.reduce((sum, item) => sum + Number(item?.count || item?.total || 0), 0);
+    const lastValue = Number(
+      chartData[chartData.length - 1]?.count || chartData[chartData.length - 1]?.total || 0
     );
+    if (total === 0) return 0;
+    return Math.round((lastValue / total) * 100);
+  };
+
+  const doctorPercentage = getLast7DaysPercentage(doctorChartData);
+  const patientPercentage = getLast7DaysPercentage(patientChartData);
+  const appointmentPercentage = getLast7DaysPercentage(appointmentChartData);
+  const revenuePercentage = getLast7DaysPercentage(revenueChartData);
+
+
+  useEffect(() => {
+    dispatch(getDashBoardCount());
   }, [dispatch]);
-
-  const getLast7DaysPercentage = (data = [], field = null) => {
-    const last7Days = [...Array(7)].map((_, i) => {
-      const d = new Date();
-
-      d.setDate(d.getDate() - (6 - i));
-
-      return d.toISOString().split('T')[0];
-    });
-
-    const last7DaysData = data.filter((item) => {
-      if (!item?.createdAt) return false;
-
-      const date = new Date(item.createdAt);
-
-      if (isNaN(date.getTime())) return false;
-
-      const createdDate = date.toISOString().split('T')[0];
-
-      return last7Days.includes(createdDate);
-    });
-
-    const totalValue = field
-      ? data.reduce((sum, item) => sum + (Number(item[field]) || 0), 0)
-      : data.length;
-
-    const last7DaysValue = field
-      ? last7DaysData.reduce((sum, item) => sum + (Number(item[field]) || 0), 0)
-      : last7DaysData.length;
-
-    const percentage = totalValue > 0 ? (last7DaysValue / totalValue) * 100 : 0;
-
-    return {
-      totalValue,
-      last7DaysValue,
-      percentage: percentage.toFixed(0),
-    };
-  };
-
-  const getLast7DaysChartData = (data = [], field = null) => {
-    const last7Days = [...Array(7)].map((_, i) => {
-      const d = new Date();
-
-      d.setDate(d.getDate() - (6 - i));
-
-      return d.toISOString().split('T')[0];
-    });
-
-    return last7Days.map((date) => {
-      const filteredData = data.filter((item) => {
-        if (!item?.createdAt) return false;
-
-        const itemDate = new Date(item.createdAt);
-
-        if (isNaN(itemDate.getTime())) return false;
-
-        const createdDate = itemDate.toISOString().split('T')[0];
-
-        return createdDate === date;
-      });
-
-      const originalValue = field
-        ? filteredData.reduce((sum, item) => sum + (Number(item[field]) || 0), 0)
-        : filteredData.length;
-
-      return {
-        value: originalValue === 0 ? 1 : originalValue,
-        originalValue,
-      };
-    });
-  };
-  const doctorStats = getLast7DaysPercentage(doctorNames);
-  const patientStats = getLast7DaysPercentage(patientName?.patients || []);
-  const appointmentStats = getLast7DaysPercentage(appointments);
-  const revenueStats = getLast7DaysPercentage(charges, 'finalAmount');
-
-  const doctorChartData = getLast7DaysChartData(doctorNames);
-  const patientChartData = getLast7DaysChartData(patientName?.patients || []);
-  const appointmentChartData = getLast7DaysChartData(appointments);
-  const revenueChartData = getLast7DaysChartData(charges, 'finalAmount');
 
   return (
     <div className="dash-count">
-      <Row gutter={[16,16]}>
-        <Col xs={12} sm={12} xl={6} style={{borderRadius:"16px", overflow:"hidden"}}>
+      <Row gutter={[16, 16]}>
+        <Col xs={12} sm={12} xl={6} style={{ borderRadius: '16px', overflow: 'hidden' }}>
           <div className="count-card">
-            <div className="counter-effect" style={{borderRadius:"16px"}}>
+            <div className="counter-effect" style={{ borderRadius: '16px' }}>
               <img src={doctorpolygon} alt="polygone" />
             </div>
             <div className="count-header">
               <img src={doctoricon} alt="Doctor" className="count-icon" />
 
               <div className="count-growth">
-                <span className="growth-percent">+{doctorStats.percentage}%</span>
+                <span className="growth-percent">+{doctorPercentage}%</span>
                 <span className="growth-days">In 7 days</span>
               </div>
             </div>
@@ -156,10 +72,10 @@ function DashboardCountNumber() {
               <div className="count-body-number">
                 <h3 className="count-item">Doctors</h3>
                 <h2 className="count-number">
-                  {loading ? 'Loading...' : doctorNames?.length || 0}
+                  {loading ? <Spin style={{ marginLeft: '10px' }} size="small" /> : doctorCount}
                 </h2>
               </div>
-              <ApexChart data={doctorChartData} />
+              <ApexChart data={doctorChartData} label="Doctor" />
             </div>
           </div>
         </Col>
@@ -173,7 +89,7 @@ function DashboardCountNumber() {
               <img src={appointmenticon} alt="Doctor" className="count-icon" />
 
               <div className="count-growth">
-                <span className="growth-percent">+{appointmentStats.percentage}%</span>
+                <span className="growth-percent">+{appointmentPercentage}%</span>
                 <span className="growth-days">In 7 days</span>
               </div>
             </div>
@@ -182,10 +98,16 @@ function DashboardCountNumber() {
               <div className="count-body-number">
                 <h3 className="count-item">Appointments</h3>
                 <h2 className="count-number">
-                  {loading ? 'Loading...' : appointments?.length || 0}
+                  {loading ? (
+                    <Spin style={{ marginLeft: '10px' }} size="small" />
+                  ) : appointmentCount ? (
+                    appointmentCount
+                  ) : (
+                    0
+                  )}
                 </h2>
               </div>
-              <ApexChart data={appointmentChartData} color="#06B6D4" />
+              <ApexChart data={appointmentChartData} color="#06B6D4" label="Appointments" />
             </div>
           </div>
         </Col>
@@ -198,7 +120,7 @@ function DashboardCountNumber() {
               <img src={revicon} alt="Doctor" className="count-icon" />
 
               <div className="count-growth">
-                <span className="growth-percent">+{revenueStats.percentage}%</span>
+                <span className="growth-percent">+{revenuePercentage}%</span>
                 <span className="growth-days">In 7 days</span>
               </div>
             </div>
@@ -207,14 +129,16 @@ function DashboardCountNumber() {
               <div className="count-body-number">
                 <h3 className="count-item">Revenue</h3>
                 <h2 className="count-number">
-                  {loading
-                    ? 'Loading...'
-                    : charges
-                        ?.reduce((sum, charge) => sum + charge.finalAmount, 0)
-                        .toLocaleString() || 0}
+                  {loading ? (
+                    <Spin style={{ marginLeft: '10px' }} size="small" />
+                  ) : totalRevenue ? (
+                    totalRevenue
+                  ) : (
+                    0
+                  )}
                 </h2>
               </div>
-              <ApexChart data={revenueChartData} color="#059669" />
+              <ApexChart data={revenueChartData} color="#059669" label="Revenue" />
             </div>
           </div>
         </Col>
@@ -227,7 +151,7 @@ function DashboardCountNumber() {
               <img src={patienticon} alt="patients" className="count-icon" />
 
               <div className="count-growth">
-                <span className="growth-percent">+{patientStats.percentage}%</span>
+                <span className="growth-percent">+{patientPercentage}%</span>
                 <span className="growth-days">In 7 days</span>
               </div>
             </div>
@@ -235,9 +159,17 @@ function DashboardCountNumber() {
             <div className="count-body">
               <div className="count-body-number">
                 <h3 className="count-item">Patients</h3>
-                <h2 className="count-number">{loading ? 'Loading...' : patientCount || 0}</h2>
+                <h2 className="count-number">
+                  {loading ? (
+                    <Spin style={{ marginLeft: '10px' }} size="small" />
+                  ) : patientCount ? (
+                    patientCount
+                  ) : (
+                    0
+                  )}
+                </h2>
               </div>
-              <ApexChart data={patientChartData} color="#EA580C" />
+              <ApexChart data={patientChartData} color="#EA580C" label="Patients" />
             </div>
           </div>
         </Col>

@@ -1,12 +1,44 @@
 import React from 'react';
+
 import ReactApexChart from 'react-apexcharts';
 
-function MiniBarChart({ data = [], color = '#4338CA' }) {
-  const series = [
-    {
-      data: data.map((item) => item.originalValue),
-    },
-  ];
+function MiniBarChart({
+  data = [],
+  data1 = [],
+  data2 = [],
+  color = '#4338CA',
+  label = 'Chart',
+  label1 = 'Revenue',
+  label2 = 'Appointments',
+}) {
+  const chartData =
+    Array.isArray(data) && data.length
+      ? data.map((item) =>
+          Number(item?.originalValue ?? item?.count ?? item?.total ?? item?.value ?? 0)
+        )
+      : [0, 0, 0, 0, 0, 0, 0];
+
+  const series =
+    data1.length || data2.length
+      ? [
+          {
+            name: label1 || 'Revenue',
+            data: data1,
+          },
+
+          {
+            name: label2 || 'Appointments',
+
+            data: data2,
+          },
+        ]
+      : [
+          {
+            name: label || 'Chart',
+
+            data: chartData,
+          },
+        ];
 
   const options = {
     chart: {
@@ -27,6 +59,7 @@ function MiniBarChart({ data = [], color = '#4338CA' }) {
 
     stroke: {
       curve: 'smooth',
+
       width: 3,
     },
 
@@ -35,8 +68,11 @@ function MiniBarChart({ data = [], color = '#4338CA' }) {
 
       gradient: {
         shadeIntensity: 1,
+
         opacityFrom: 0.4,
+
         opacityTo: 0.05,
+
         stops: [0, 100],
       },
     },
@@ -48,7 +84,7 @@ function MiniBarChart({ data = [], color = '#4338CA' }) {
     },
 
     tooltip: {
-      enabled: false,
+      enabled: true,
     },
 
     grid: {
@@ -76,7 +112,7 @@ function MiniBarChart({ data = [], color = '#4338CA' }) {
     },
   };
 
-  return <ReactApexChart options={options} series={series} type="area" maxWidth={120} height={70} />;
+  return <ReactApexChart options={options} series={series} type="area" width={120} height={70} />;
 }
 
 export default MiniBarChart;

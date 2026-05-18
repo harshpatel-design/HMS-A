@@ -7,7 +7,7 @@ axiosClient.defaults.baseURL = API_URL;
 
 axiosClient.interceptors.request.use(
   (req) => {
-    // Public routes
+   
     if (
       req.url?.includes('login') ||
       req.url?.includes('forgot-password') ||

@@ -94,8 +94,6 @@ export default function ViewDiagnosis() {
     ),
   }));
 
-  console.log('list', list);
-
   return (
     <div className="page-wrapper">
       <Breadcrumbs

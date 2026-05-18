@@ -93,9 +93,6 @@ function ReceiveCharge({ setDrawerOpen }) {
         balanceAmount: 0,
       };
     }
-
-    console.log(ledger.data);
-
     return ledger.data.reduce(
       (acc, item) => {
         acc.totalAmount += item.totalAmount || 0;
@@ -114,9 +111,7 @@ function ReceiveCharge({ setDrawerOpen }) {
 
 
   const cashType = [...new Set(ledger?.data?.map((item) => item.caseType))].join(', ') || '';
-  const cashNumber = ledger?.data[0]?.patient?.caseNumber || '';
-  console.log('ledger', cashNumber);
-
+  const cashNumber = ledger?.data[0]?.patient?.caseNumber || ''; 
   ledgerSummary.balanceAmount = ledgerSummary.totalAmount - ledgerSummary.paidAmount;
   return (
     <div className="page-wrapper">

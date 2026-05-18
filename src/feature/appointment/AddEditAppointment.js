@@ -65,8 +65,6 @@ export default function AddEditAppointment() {
       ...(isEdit && { excludeId: id }),
     };
 
-    console.log('payloaddddddddd', payload);
-
     try {
       const res = await appointmentService.checkAvailability(payload);
 
@@ -174,8 +172,6 @@ export default function AddEditAppointment() {
   };
 
   const onFinish = async (values) => {
-    console.log('value', values);
-
     try {
       setLoading(true);
       const payload = {

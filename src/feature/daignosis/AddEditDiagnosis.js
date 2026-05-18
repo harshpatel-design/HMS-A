@@ -44,7 +44,6 @@ export default function AddEditDiagnosis() {
 
   useEffect(() => {
     if (isEdit) {
-      console.log(id);
 
       dispatch(getDiagnosisById(id));
     }

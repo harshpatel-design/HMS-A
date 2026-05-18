@@ -265,8 +265,7 @@ export default function AddEditDoctor() {
       const result = isEdit
         ? await dispatch(updateDoctor({ id, data: formData })).unwrap()
         : await dispatch(createDoctor(formData)).unwrap();
-
-      console.log(result);
+        
       message.success(isEdit ? 'Doctor updated successfully!' : 'Doctor created successfully!');
       navigate('/doctor-onbording');
     } catch (error) {

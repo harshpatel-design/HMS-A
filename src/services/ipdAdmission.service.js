@@ -10,7 +10,6 @@ const axiosClient = axios.create({
   },
 });
 
-// 🔐 Auth Token Interceptor
 axiosClient.interceptors.request.use((req) => {
   const token = localStorage.getItem('auth_token');
   if (token) {
@@ -74,13 +73,13 @@ const addIpdCharge = (ipdAdmissionId, payload) => {
     .then((res) => res.data);
 };
 
-const dischargeIpdPatient = (ipdAdmissionId, payload = {}) => {
+const dischargeIpdPatient = (ipdAdmissionId, { dischargeDate, bed, patient }) => {
   if (!isAdmin()) {
     throw new Error('Admin Only Access ❌');
   }
 
   return axiosClient
-    .patch(`/api/ipd-admissions/${ipdAdmissionId}/discharge`, payload)
+    .patch(`/api/ipd-admissions/${ipdAdmissionId}/discharge`, { dischargeDate, bedId: bed._id, patientId: patient._id })
     .then((res) => res.data);
 };
 
