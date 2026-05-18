@@ -154,8 +154,7 @@ export default function RecipientOnboarding() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Recipient List"
-        showBack
-        backTo="/dashboard"
+        showBack = {true}
         items={[
           { label: 'Recipient List', href: '/recipient-onboarding' },
           { label: 'Recipient List' },

@@ -202,12 +202,7 @@ const DiagnosisList = () => {
   };
   return (
     <div className="page-wrapper">
-      <Breadcrumbs
-        title="Diagnosis List"
-        showBack
-        backTo="/dashboard"
-        items={[{ label: 'Diagnosis List' }]}
-      />
+      <Breadcrumbs title="Diagnosis List" showBack={true} items={[{ label: 'Diagnosis List' }]} />
 
       <div className="serachbar-bread">
         <Space style={{ flexWrap: 'wrap' }}>

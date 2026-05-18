@@ -223,8 +223,7 @@ export default function AddEditPatient() {
       <div className="page-wrapper">
         <Breadcrumbs
           title="Patient List"
-          showBack
-          backTo="/dashboard"
+          showBack = {true}
           items={[
             { label: 'Patient List', href: '/patitent-onboarding' },
             { label: 'Add-Edit Patient List' },

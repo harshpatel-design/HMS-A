@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 import {
   Table,
   Button,
@@ -14,13 +15,8 @@ import {
   Dropdown,
   Form,
   InputNumber,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  ReloadOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
+} from 'antd';
+import { EditOutlined, DeleteOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
 
 import {
   fetchLabTests,
@@ -29,44 +25,42 @@ import {
   updateLabTest,
   deleteLabTest,
   resetLabTestState,
-} from "../../slices/labTestSlice";
+} from '../../slices/labTestSlice';
 
-import Breadcrumbs from "../comman/Breadcrumbs";
-import debounce from "lodash/debounce";
-import "../../index.css";
+import Breadcrumbs from '../comman/Breadcrumbs';
+import debounce from 'lodash/debounce';
+import '../../index.css';
 
 const { Search } = Input;
 
 const CATEGORIES = [
-  "PATHOLOGY",
-  "RADIOLOGY",
-  "MICROBIOLOGY",
-  "BIOCHEMISTRY",
-  "HEMATOLOGY",
-  "IMMUNOLOGY",
+  'PATHOLOGY',
+  'RADIOLOGY',
+  'MICROBIOLOGY',
+  'BIOCHEMISTRY',
+  'HEMATOLOGY',
+  'IMMUNOLOGY',
 ];
 
 const LabTest = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
-  const { labTests, loading, page, limit, total } = useSelector(
-    (state) => state.labTest
-  );
+  const { labTests, loading, page, limit, total } = useSelector((state) => state.labTest);
 
   const { selectedLabTest } = useSelector((state) => state.labTest);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState("add");
+  const [drawerMode, setDrawerMode] = useState('add');
   const [editingRecord, setEditingRecord] = useState(null);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     dispatch(fetchLabTests({ page: 1, limit: 20 }));
   }, [dispatch]);
 
   useEffect(() => {
-    if (drawerMode === "edit" && selectedLabTest) {
+    if (drawerMode === 'edit' && selectedLabTest) {
       form.setFieldsValue({
         name: selectedLabTest.name,
         code: selectedLabTest.code,
@@ -96,7 +90,7 @@ const LabTest = () => {
   useEffect(() => () => debouncedFetch.cancel(), [debouncedFetch]);
 
   const handleReset = () => {
-    setSearchText("");
+    setSearchText('');
     dispatch(fetchLabTests({ page: 1, limit: 10 }));
   };
 
@@ -105,8 +99,7 @@ const LabTest = () => {
       dispatch(fetchLabTests({ page: pagination.current, limit }));
       return;
     }
-    const ordering =
-      sorter.order === "ascend" ? sorter.field : `-${sorter.field}`;
+    const ordering = sorter.order === 'ascend' ? sorter.field : `-${sorter.field}`;
 
     dispatch(
       fetchLabTests({
@@ -119,7 +112,7 @@ const LabTest = () => {
   };
 
   const handleEdit = (record) => {
-    setDrawerMode("edit");
+    setDrawerMode('edit');
     setEditingRecord(record);
     setDrawerOpen(true);
     dispatch(fetchLabTestById(record._id));
@@ -127,83 +120,104 @@ const LabTest = () => {
 
   const handleDelete = (record) => {
     Modal.confirm({
-      title: "Delete Lab Test?",
+      title: 'Delete Lab Test?',
       content: `Delete "${record.name}"?`,
-      okType: "danger",
+      okType: 'danger',
       onOk: async () => {
         try {
           await dispatch(deleteLabTest(record._id)).unwrap();
-          message.success("Lab test deleted");
+          message.success('Lab test deleted');
           dispatch(fetchLabTests({ page, limit }));
         } catch (err) {
-          message.error(err?.message || "Delete failed");
+          message.error(err?.message || 'Delete failed');
         }
       },
     });
   };
 
   const defaultChecked = [
-    "name",
-    "code",
-    "category",
-    "unit",
-    "normalRange",
-    "sampleType",
-    "turnaroundTime",
-    "isActive",
+    'name',
+    'code',
+    'category',
+    'unit',
+    'normalRange',
+    'sampleType',
+    'turnaroundTime',
+    'isActive',
   ];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
 
   const allColumns = [
-    { title: "Name", dataIndex: "name", key: "name", sorter: true },
-    { title: "Code", dataIndex: "code", key: "code", sorter: true },
+    { title: 'Name', dataIndex: 'name', key: 'name', sorter: true },
+    { title: 'Code', dataIndex: 'code', key: 'code', sorter: true, width: 140 },
     {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-      render: (v) => <Tag color="blue">{v}</Tag>,
-    },
-    { title: "Unit", dataIndex: "unit", key: "unit", render: (v) => v || "—" },
-    {
-      title: "Normal Range",
-      dataIndex: "normalRange",
-      key: "normalRange",
-      render: (v) => v || "—",
+      title: 'Category',
+      dataIndex: 'category',
+      key: 'category',
+      width: 150,
+      render: (v) => (
+        <Tag color="blue" className="w-100">
+          {v}
+        </Tag>
+      ),
     },
     {
-      title: "Sample",
-      dataIndex: "sampleType",
-      key: "sampleType",
+      title: 'Unit',
+      dataIndex: 'unit',
+      width: 100,
+      key: 'unit',
+      render: (v) => <Space className="action">{v ? v : '—'}</Space>,
     },
     {
-      title: "TAT (hrs)",
-      dataIndex: "turnaroundTime",
-      key: "turnaroundTime",
+      title: 'Normal Range',
+      dataIndex: 'normalRange',
+      key: 'normalRange',
+      width: 150,
+      render: (v) => v || '—',
     },
     {
-      title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
+      title: 'Sample',
+      dataIndex: 'sampleType',
+      key: 'sampleType',
+      width: 150,
+      render: (v) => v || '—',
+    },
+    {
+      title: 'TAT (hrs)',
+      dataIndex: 'turnaroundTime',
+      key: 'turnaroundTime',
+      width: 100,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'isActive',
+      key: 'isActive',
       render: (v) =>
-        v ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>,
+        v ? (
+          <Tag color="green" className="w-100">
+            Active
+          </Tag>
+        ) : (
+          <Tag color="red" className="w-100">
+            Inactive
+          </Tag>
+        ),
     },
     {
-      title: "Created At",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (v) => new Date(v).toLocaleString(),
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 110,
+      render: (v) => dayjs(v).format('DD-MM-YYYY'),
     },
     {
-      title: "Actions",
-      key: "actions",
+      title: 'Actions',
+      key: 'actions',
+      width: 100,
       render: (record) => (
-        <Space>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          />
+        <Space className="action">
+          <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Button
             type="text"
             danger
@@ -216,29 +230,27 @@ const LabTest = () => {
   ];
 
   const filteredColumns = allColumns.filter(
-    (c) => selectedColumns.includes(c.key) || c.key === "actions"
+    (c) => selectedColumns.includes(c.key) || c.key === 'actions'
   );
 
   const onFinish = async (values) => {
     try {
       let res;
-      if (drawerMode === "add") {
+      if (drawerMode === 'add') {
         res = await dispatch(createLabTest(values)).unwrap();
-        message.success(res?.message || "Lab test created");
+        message.success(res?.message || 'Lab test created');
       } else {
-        res = await dispatch(
-          updateLabTest({ id: editingRecord._id, payload: values })
-        ).unwrap();
-        message.success(res?.message || "Lab test updated");
+        res = await dispatch(updateLabTest({ id: editingRecord._id, payload: values })).unwrap();
+        message.success(res?.message || 'Lab test updated');
       }
 
       form.resetFields();
       setDrawerOpen(false);
-      setDrawerMode("add");
+      setDrawerMode('add');
       dispatch(fetchLabTests({ page, limit }));
       dispatch(resetLabTestState());
     } catch (err) {
-      message.error(err?.message || "Something went wrong");
+      message.error(err?.message || 'Something went wrong');
     }
   };
 
@@ -265,7 +277,7 @@ const LabTest = () => {
     <div className="column-filter-menu">
       <div className="column-filter-grid">
         {allColumns
-          .filter((c) => c.key !== "actions")
+          .filter((c) => c.key !== 'actions')
           .map((col) => (
             <div key={col.key} className="column-filter-item">
               <Checkbox
@@ -274,9 +286,7 @@ const LabTest = () => {
                   if (e.target.checked) {
                     setSelectedColumns([...selectedColumns, col.key]);
                   } else {
-                    setSelectedColumns(
-                      selectedColumns.filter((c) => c !== col.key)
-                    );
+                    setSelectedColumns(selectedColumns.filter((c) => c !== col.key));
                   }
                 }}
               >
@@ -288,11 +298,7 @@ const LabTest = () => {
 
       <div className="column-filter-divider" />
 
-      <Button
-        type="link"
-        style={{ padding: 0 }}
-        onClick={() => setSelectedColumns(defaultChecked)}
-      >
+      <Button type="link" style={{ padding: 0 }} onClick={() => setSelectedColumns(defaultChecked)}>
         Reset to default
       </Button>
     </div>
@@ -300,128 +306,126 @@ const LabTest = () => {
 
   return (
     <>
-     <div className="page-wrapper">
-      <Breadcrumbs
+      <div className="page-wrapper">
+        <Breadcrumbs
           title="lab List"
-          showBack
-          backTo="/dashboard"
+          showBack={true}
           items={[{ label: 'lab List', href: '/lab-master' }, { label: 'lab List' }]}
         />
 
-      <div className="serachbar-bread">
-        <Space>
-          <Search
-            placeholder="Search lab test"
-            allowClear
-             className='searchbar-search'
-            value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
-              debouncedFetch(e.target.value);
+        <div className="serachbar-bread">
+          <Space>
+            <Search
+              placeholder="Search lab test"
+              allowClear
+              className="searchbar-search"
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                debouncedFetch(e.target.value);
+              }}
+            />
+            <Button icon={<ReloadOutlined />} onClick={handleReset} />
+            <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
+              <Button icon={<FilterOutlined />} />
+            </Dropdown>
+
+            <Button
+              type="primary"
+              className="btn"
+              onClick={() => {
+                setDrawerMode('add');
+                form.resetFields();
+                setDrawerOpen(true);
+              }}
+            >
+              Add Lab Test
+            </Button>
+          </Space>
+        </div>
+
+        <div className="table-scroll-container">
+          <Table
+            rowKey="_id"
+            columns={filteredColumns}
+            // className="my-custom-table"
+            dataSource={labTests}
+            scroll={{ x: 1000 }}
+            loading={loading}
+            onChange={handleTableChange}
+            pagination={{
+              current: page,
+              pageSize: limit,
+              total: total,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageSizeChange,
+              showTotal: (total) => `Total ${total} items`,
+              showQuickJumper: limit > 100 && limit < 500,
+              locale: {
+                items_per_page: 'Items / Page',
+              },
             }}
-           
           />
-          <Button icon={<ReloadOutlined />} onClick={handleReset} />
-          <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
-            <Button icon={<FilterOutlined />} />
-          </Dropdown>
+        </div>
+        <Drawer
+          title={drawerMode === 'add' ? 'Add Lab Test' : 'Edit Lab Test'}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+        >
+          <Form layout="vertical" form={form} onFinish={onFinish}>
+            <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
 
-          <Button
-            type="primary"
-            className="btn"
-            onClick={() => {
-              setDrawerMode('add');
-              form.resetFields();
-              setDrawerOpen(true);
-            }}
-          >
-            Add Lab Test
-          </Button>
-        </Space>
-      </div>
+            <Form.Item name="code" label="Code" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
 
-      <div className="table-scroll-container">
-        <Table
-          rowKey="_id"
-          columns={filteredColumns}
-          // className="my-custom-table"
-          dataSource={labTests}
-          scroll={{ x: 1000}}
-          loading={loading}
-          onChange={handleTableChange}
-          pagination={{
-            current: page,
-            pageSize: limit,
-            total: total,
-            showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50', '100', '500', '1000'],
-            onChange: handlePageChange,
-            onShowSizeChange: handlePageSizeChange,
-            showTotal: (total) => `Total ${total} items`,
-            showQuickJumper: limit > 100 && limit < 500,
-            locale: {
-              items_per_page: 'Items / Page',
-            },
-          }}
-        />
-      </div>
-      <Drawer
-        title={drawerMode === 'add' ? 'Add Lab Test' : 'Edit Lab Test'}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      >
-        <Form layout="vertical" form={form} onFinish={onFinish}>
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="code" label="Code" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
-            <Select>
-              {CATEGORIES.map((c) => (
-                <Select.Option key={c} value={c}>
-                  {c}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="unit" label="Unit">
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="normalRange" label="Normal Range">
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="sampleType" label="Sample Type">
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="turnaroundTime" label="TAT (Hours)">
-            <InputNumber min={1} style={{ width: '100%' }} />
-          </Form.Item>
-
-          {drawerMode === 'edit' && (
-            <Form.Item name="isActive" label="Status">
+            <Form.Item name="category" label="Category" rules={[{ required: true }]}>
               <Select>
-                <Select.Option value={true}>Active</Select.Option>
-                <Select.Option value={false}>Inactive</Select.Option>
+                {CATEGORIES.map((c) => (
+                  <Select.Option key={c} value={c}>
+                    {c}
+                  </Select.Option>
+                ))}
               </Select>
             </Form.Item>
-          )}
 
-          <Space className="width-space">
-          <Button type="primary" htmlType="submit" className="btn-full">
-            {drawerMode === 'add' ? 'Create' : 'Update'}
-          </Button>
-           <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
-          </Space>
-        </Form>
-      </Drawer>
+            <Form.Item name="unit" label="Unit">
+              <Input />
+            </Form.Item>
+
+            <Form.Item name="normalRange" label="Normal Range">
+              <Input />
+            </Form.Item>
+
+            <Form.Item name="sampleType" label="Sample Type">
+              <Input />
+            </Form.Item>
+
+            <Form.Item name="turnaroundTime" label="TAT (Hours)">
+              <InputNumber min={1} style={{ width: '100%' }} />
+            </Form.Item>
+
+            {drawerMode === 'edit' && (
+              <Form.Item name="isActive" label="Status">
+                <Select>
+                  <Select.Option value={true}>Active</Select.Option>
+                  <Select.Option value={false}>Inactive</Select.Option>
+                </Select>
+              </Form.Item>
+            )}
+
+            <Space className="width-space">
+              <Button type="primary" htmlType="submit" className="btn-full">
+                {drawerMode === 'add' ? 'Create' : 'Update'}
+              </Button>
+              <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            </Space>
+          </Form>
+        </Drawer>
       </div>
     </>
   );

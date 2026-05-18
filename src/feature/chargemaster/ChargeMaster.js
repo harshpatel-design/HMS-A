@@ -163,24 +163,34 @@ const ChargeMaster = () => {
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
 
   const allColumns = [
-    { title: 'Name', dataIndex: 'name', key: 'name', sorter: true },
+    { title: 'Charge Name', dataIndex: 'name', key: 'name', sorter: true },
+    {
+      title: 'Bed Name',
+      key: 'bed',
+      render: (_, record) => {
+        return record?.bed?.bedNumber || '-';
+      },
+    },
     { title: 'Code', dataIndex: 'code', key: 'code', sorter: true },
     {
       title: 'Charge Category',
       dataIndex: 'chargeCategory',
       key: 'chargeCategory',
+      width: 150,
       render: (v) => v && v.charAt(0).toUpperCase() + v.slice(1),
     },
     {
       title: 'Case Type',
       dataIndex: 'caseType',
       key: 'caseType',
+      width: 150,
       render: (v) => v && v.charAt(0).toUpperCase() + v.slice(1),
     },
     {
       title: 'Case Status',
       dataIndex: 'caseStatus',
       key: 'caseStatus',
+      width: 150,
       render: (v) => v && v.charAt(0).toUpperCase() + v.slice(1),
     },
     {
@@ -204,13 +214,7 @@ const ChargeMaster = () => {
         return record?.room?.name || '-';
       },
     },
-    {
-      title: 'Bed',
-      key: 'bed',
-      render: (_, record) => {
-        return record?.bed?.bedNumber || '-';
-      },
-    },
+
     {
       title: 'Amount',
       dataIndex: 'amount',
@@ -227,7 +231,8 @@ const ChargeMaster = () => {
       title: 'GST %',
       dataIndex: 'gstRate',
       key: 'gstRate',
-      render: (v) => `${v}%`,
+      width: 80,
+      render: (v) => <Space className="action">{v ? `${v}%` : '-'}</Space>,
     },
     {
       title: 'Tax Inclusive',
@@ -258,11 +263,13 @@ const ChargeMaster = () => {
       key: 'isActive',
       render: (v) =>
         v ? (
-          <Tag color="green" style={{ width: '100%', textAlign: 'center' }}>
+          <Tag color="green" className="w-100">
             Active
           </Tag>
         ) : (
-          <Tag color="red">Inactive</Tag>
+          <Tag color="red" className="w-100">
+            Inactive
+          </Tag>
         ),
     },
     {
@@ -271,7 +278,7 @@ const ChargeMaster = () => {
       width: '100px',
       render: (record) => {
         return (
-          <Space>
+          <Space className="action">
             <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
             <Button
               type="text"
@@ -409,7 +416,7 @@ const ChargeMaster = () => {
   }, [dispatch, selectedFloor]);
 
   useEffect(() => {
-    if (selectedFloor && (selectedWard || selectedRoom )) {
+    if (selectedFloor && (selectedWard || selectedRoom)) {
       dispatch(
         fetchBeds({
           page: 1,

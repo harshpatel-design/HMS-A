@@ -45,7 +45,7 @@ export const uploadUserImage = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
         try {
             const updatedUser = await authService.uploadImage(formData);
-            localStorage.setItem("user", JSON.stringify(updatedUser)); // sync on update
+            localStorage.setItem("user", JSON.stringify(updatedUser));
             return updatedUser;
         } catch (err) {
             return rejectWithValue("Image upload failed");

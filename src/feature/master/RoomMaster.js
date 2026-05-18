@@ -203,8 +203,9 @@ const RoomMaster = () => {
     {
       title: 'Actions',
       key: 'actions',
+      width: 100,
       render: (record) => (
-        <Space>
+        <Space className="action">
           <Button
             type="text"
             icon={<EditOutlined />}
@@ -230,8 +231,7 @@ const RoomMaster = () => {
       <div className="page-wrapper">
         <Breadcrumbs
           title="Room List"
-          showBack
-          backTo="/dashboard"
+          showBack={true}
           items={[{ label: 'Room List', href: '/room-master' }, { label: 'Room List' }]}
         />
 

@@ -183,9 +183,9 @@ function AppointsmentDashbordList() {
                   <Col span={24}>
                     <Row gutter={16} className="doctor-grid-dashbord">
                       {topDoctors?.map((doc, index) => (
-                        <Col xs={24} sm={12} md={12} lg={6} key={index}>
+                        <Col xs={24} sm={12} md={12} lg={8} xl={8} xxl={6} key={index}>
                           <Card className="doctor-card">
-                            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }} className='doctorAppContent'>
                               {doctorLoading ? (
                                 'Loading...'
                               ) : doc.image ? (

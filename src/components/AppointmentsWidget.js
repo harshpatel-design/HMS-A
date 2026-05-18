@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Calendar, Select, List } from 'antd';
+import { Card, Calendar, Select, List, Typography, Spin } from 'antd';
 import { LeftOutlined, RightOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import '../hcss.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPatientVisits } from '../slices/patientVisitSlice';
-import { Typography } from 'antd';
 import { Link } from 'react-router-dom';
 
 const { Link: TextLink } = Typography;
 
 const AppointmentsWidget = () => {
   const dispatch = useDispatch();
+
   const [value, setValue] = useState(dayjs());
   const [caseType, setCaseType] = useState('');
 
-  const { visits } = useSelector((state) => state.patientVisit);
+  const { visits, loading } = useSelector((state) => state.patientVisit);
+
   useEffect(() => {
     const params = {
       page: 1,
@@ -48,6 +49,7 @@ const AppointmentsWidget = () => {
         <Calendar
           fullscreen={false}
           value={value}
+          className='dashCal'
           onSelect={(val) => setValue(val)}
           headerRender={({ value, onChange }) => (
             <div
@@ -59,48 +61,71 @@ const AppointmentsWidget = () => {
               }}
             >
               <LeftOutlined onClick={() => onChange(value.clone().subtract(1, 'month'))} />
+
               <strong>{value.format('MMMM YYYY')}</strong>
+
               <RightOutlined onClick={() => onChange(value.clone().add(1, 'month'))} />
             </div>
           )}
         />
 
-        <List
-          style={{ marginTop: 12 }}
-          dataSource={visits?.slice(0, 5) || []}
-          renderItem={(item) => (
-            <List.Item
-              style={{
-                background: '#f5f7fb',
-                borderRadius: 8,
-                marginBottom: 8,
-                padding: '10px 12px',
-              }}
-              className="text-capitalize"
-            >
-              <List.Item.Meta
-                title={
-                  <strong>
-                    {item?.caseType === 'opd'
-                      ? 'General OPD'
-                      : item?.caseType === 'ipd'
-                        ? 'IPD Visit'
-                        : 'Unknown'}
-                  </strong>
-                }
-                description={
-                  <>
-                    <CalendarOutlined />{' '}
-                    {item?.visitDate ? dayjs(item.visitDate).format('DD-MMM-YYYY') : 'No date'}
-                  </>
-                }
-              />
-              <div>{item?.doctor?.specialization?.name || 'N/A'}</div>
-            </List.Item>
-          )}
-        />
+        {loading ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '200px',
+              width: '100%',
+            }}
+          >
+            <Spin size="small" />
+          </div>
+        ) : (
+          <List
+            style={{ marginTop: 12, borderRadius: '10px', padding: '10px 0px' }}
+            dataSource={visits?.slice(0, 5) || []}
+            className="dashBordWCon"
+            renderItem={(item) => (
+              <List.Item
+              classNames="abcd2"
+                style={{
+                  borderRadius: '10px',
+                  marginBottom: 8,
+                  padding: '10px 12px',
+                }}
+                className="dashappLi"
+              >
+                <List.Item.Meta
+                  title={
+                    <strong>
+                      {item?.caseType === 'opd'
+                        ? 'General OPD'
+                        : item?.caseType === 'ipd'
+                          ? 'IPD Visit'
+                          : item?.caseType}
+                    </strong>
+                  }
+                  description={
+                    <>
+                      <CalendarOutlined />{' '}
+                      {item?.visitDate ? dayjs(item.visitDate).format('DD-MMM-YYYY') : 'No date'}
+                    </>
+                  }
+                />
 
-        <TextLink style={{ display: 'block', textAlign: 'center', marginTop: 12 }}>
+                <div>{item?.doctor?.specialization?.name || 'N/A'}</div>
+              </List.Item>
+            )}
+          />
+        )}
+        <TextLink
+          style={{
+            display: 'block',
+            textAlign: 'center',
+            marginTop: 12,
+          }}
+        >
           <Link to="/patient-visit">View All Visits</Link>
         </TextLink>
       </Card>

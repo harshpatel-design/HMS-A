@@ -100,8 +100,7 @@ export default function ViewDiagnosis() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Diagnosis History"
-        showBack
-        backTo="/diagnosis"
+        showBack={true}
         items={[{ label: 'Diagnosis List', href: '/diagnosis' }, { label: 'Patient History' }]}
       />
 

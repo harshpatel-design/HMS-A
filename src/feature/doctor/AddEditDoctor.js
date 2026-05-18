@@ -301,7 +301,7 @@ export default function AddEditDoctor() {
         <Breadcrumbs
           title={isEdit ? 'Edit Docotr' : 'Add New Doctor'}
           showBack={true}
-          backTo="/doctor-onbording"
+         
           items={[
             { label: 'Doctors', href: '/doctor-onbording' },
             { label: isEdit ? 'Edit Doctor' : 'Add New Doctor' },

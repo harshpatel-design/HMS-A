@@ -44,13 +44,14 @@ const AppointmentList = () => {
     'type',
     'status',
     'phone',
+    'caseNumber',
   ];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
 
   useEffect(() => {
     loadData(1, ordering);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadData = (pageNum, orderingValue = ordering) => {
@@ -154,9 +155,19 @@ const AppointmentList = () => {
   };
   const allColumns = [
     {
+      title: 'Case No.',
+      key: 'caseNumber',
+      dataIndex: ['patient', 'caseNumber'],
+      width: 100,
+      render: (v) => (
+        <Space className="action" style={{ fontWeight: 600 }}>
+          {v || '—'}
+        </Space>
+      ),
+    },
+    {
       key: 'patientName',
       title: 'Patient',
-      width: 150,
       render: (r) => {
         const name = `${r.patient?.firstName || ''} ${r.patient?.lastName || ''}`;
         return (
@@ -180,7 +191,6 @@ const AppointmentList = () => {
     {
       key: 'doctorId',
       title: 'Dr. Name',
-      width: 150,
       render: (r) => {
         const docName = r.doctor?.user?.name || 'N/A';
         return (
@@ -217,33 +227,35 @@ const AppointmentList = () => {
       title: 'Status',
       render: (record) => {
         const currentStatus = record.status;
-
         return (
-          <Select
-            size="small"
-            value={currentStatus}
-            style={{ width: 140 }}
-            onChange={(value) => {
-              Modal.confirm({
-                title: 'Change Appointment Status?',
-                content: `Change status to "${value}"?`,
-                okText: 'Yes',
-                cancelText: 'No',
-                onOk: () => handleStatusChange(record._id, value),
-              });
-            }}
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <Select.Option key={opt.value} value={opt.value}>
-                <Tag
-                  color={statusColors[opt.value]}
-                  style={{ marginRight: 0, width: '100%', border: 'none', fontWeight: 600 }}
-                >
-                  {opt.label}
-                </Tag>
-              </Select.Option>
-            ))}
-          </Select>
+          <Space className="w-100">
+            <Select
+              className="w-100"
+              size="big"
+              value={currentStatus}
+              style={{ width: 140 }}
+              onChange={(value) => {
+                Modal.confirm({
+                  title: 'Change Appointment Status?',
+                  content: `Change status to "${value}"?`,
+                  okText: 'Yes',
+                  cancelText: 'No',
+                  onOk: () => handleStatusChange(record._id, value),
+                });
+              }}
+            >
+              {STATUS_OPTIONS.map((opt) => (
+                <Select.Option key={opt.value} value={opt.value}>
+                  <Tag
+                    color={statusColors[opt.value]}
+                    style={{ marginRight: 0, width: '100%', border: 'none', fontWeight: 600 }}
+                  >
+                    {opt.label}
+                  </Tag>
+                </Select.Option>
+              ))}
+            </Select>
+          </Space>
         );
       },
     },
@@ -251,8 +263,22 @@ const AppointmentList = () => {
     {
       key: 'notes',
       title: 'Notes',
-      minWidth: 150,
+      width: 120,
       dataIndex: 'notes',
+      render: (v) => (
+        <Tooltip title={v}>
+          <div
+            style={{
+              width: 120,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {v || '—'}
+          </div>
+        </Tooltip>
+      ),
     },
     {
       key: 'phone',
@@ -263,21 +289,25 @@ const AppointmentList = () => {
     {
       key: 'createdAt',
       title: 'Created Time',
-      width: 110,
-      render: (r) => (r.createdAt ? dayjs(r.createdAt).format('hh:mm A') : '—'),
+      width: 125,
+      render: (r) => (
+        <Space className="action">{r.createdAt ? dayjs(r.createdAt).format('hh:mm A') : '—'}</Space>
+      ),
     },
     {
       key: 'updatedAt',
       title: 'Updated Time',
-      width: 110,
-      render: (r) => (r.updatedAt ? dayjs(r.updatedAt).format('hh:mm A') : '—'),
+      width: 125,
+      render: (r) => (
+        <Space className="action">{r.updatedAt ? dayjs(r.updatedAt).format('hh:mm A') : '—'}</Space>
+      ),
     },
     {
       key: 'actions',
       title: 'Actions',
-      width: 105,
+      width: 110,
       render: (record) => (
-        <Space size="middle">
+        <Space size="middle" className="action">
           <Link to={`/edit-appointment/${record._id}`}>
             <Button type="text" icon={<EditOutlined />} />
           </Link>
@@ -347,8 +377,7 @@ const AppointmentList = () => {
         <Breadcrumbs
           title="Appointments List"
           showBack={true}
-          backTo="/appointments"
-          items={[{ label: 'Appointments', href: '/appointments' }, { label: 'Appointments List' }]}
+          items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Appointments List' }]}
         />
 
         <div className="serachbar-bread">

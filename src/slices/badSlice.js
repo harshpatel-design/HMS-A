@@ -115,7 +115,6 @@ const bedSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      /* ===== FETCH BEDS ===== */
       .addCase(fetchBeds.pending, (state) => {
         state.loading = true;
       })

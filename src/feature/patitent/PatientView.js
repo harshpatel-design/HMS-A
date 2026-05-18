@@ -30,7 +30,6 @@ export default function PatientView() {
             <Breadcrumbs
                 title="View Patient"
                 showBack={true}
-                backTo="/patitent-onboarding"
                 items={[
                     { label: "Patient List", href: "/patitent-onboarding" },
                     { label: "View Patient" }

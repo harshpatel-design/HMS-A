@@ -16,7 +16,6 @@ function Dashboard() {
   }, [dispatch]);
 
   const { doctors, loading } = useSelector((state) => state.doctor);
-  console.log('doc', doctors);
 
   return (
     <>

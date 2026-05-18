@@ -12,6 +12,7 @@ export const fetchCharges = createAsyncThunk(
       search,
       startDate,
       endDate,
+      
     } = {},
     { rejectWithValue }
   ) => {

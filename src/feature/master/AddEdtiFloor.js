@@ -1,23 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  InputNumber,
-  Row,
-  Col,
-  Card,
-  Button,
-  Spin,
-  message,
-} from "antd";
-import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Breadcrumbs from "../comman/Breadcrumbs";
-import {
-  fetchFloorById,
-  createFloor,
-  updateFloor,
-} from "../../slices/floorSlice";
+import React, { useEffect, useState } from 'react';
+import { Form, Input, InputNumber, Row, Col, Card, Button, Spin, message } from 'antd';
+import { useDispatch } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Breadcrumbs from '../comman/Breadcrumbs';
+import { fetchFloorById, createFloor, updateFloor } from '../../slices/floorSlice';
 
 const AddEditFloor = () => {
   const [form] = Form.useForm();
@@ -44,7 +30,7 @@ const AddEditFloor = () => {
           notes: floor.notes,
         });
       })
-      .catch(() => message.error("Failed to load floor"))
+      .catch(() => message.error('Failed to load floor'))
       .finally(() => setLoading(false));
   }, [id, isEdit, dispatch, form]);
 
@@ -63,13 +49,11 @@ const AddEditFloor = () => {
         await dispatch(createFloor(payload)).unwrap();
       }
 
-      message.success(
-        isEdit ? "Floor updated successfully!" : "Floor created successfully!"
-      );
+      message.success(isEdit ? 'Floor updated successfully!' : 'Floor created successfully!');
 
-      navigate("/floor-master");
+      navigate('/floor-master');
     } catch (error) {
-      message.error(error?.message || "Something went wrong");
+      message.error(error?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -80,12 +64,11 @@ const AddEditFloor = () => {
       {loading && <Spin fullscreen tip="Loading..." />}
 
       <Breadcrumbs
-        title={isEdit ? "Edit Floor" : "Add New Floor"}
-        showBack
-        backTo="/floor-master"
+        title={isEdit ? 'Edit Floor' : 'Add New Floor'}
+        showBack={true}
         items={[
-          { label: "Floor List", href: "/floor-master" },
-          { label: isEdit ? "Edit Floor" : "Add Floor" },
+          { label: 'Floor List', href: '/floor-master' },
+          { label: isEdit ? 'Edit Floor' : 'Add Floor' },
         ]}
       />
 
@@ -97,7 +80,7 @@ const AddEditFloor = () => {
                 <Form.Item
                   label="Floor Name"
                   name="name"
-                  rules={[{ required: true, message: "Floor name is required" }]}
+                  rules={[{ required: true, message: 'Floor name is required' }]}
                 >
                   <Input disabled={loading} />
                 </Form.Item>
@@ -108,18 +91,16 @@ const AddEditFloor = () => {
                   label="Floor Code"
                   name="code"
                   rules={[
-                    { required: true, message: "Floor code is required" },
+                    { required: true, message: 'Floor code is required' },
                     {
                       pattern: /^[A-Z0-9-]+$/,
-                      message: "Only A-Z, 0-9 and - allowed",
+                      message: 'Only A-Z, 0-9 and - allowed',
                     },
                   ]}
                 >
                   <Input
                     disabled={loading}
-                    onChange={(e) =>
-                      form.setFieldValue("code", e.target.value.toUpperCase())
-                    }
+                    onChange={(e) => form.setFieldValue('code', e.target.value.toUpperCase())}
                   />
                 </Form.Item>
               </Col>
@@ -128,15 +109,9 @@ const AddEditFloor = () => {
                 <Form.Item
                   label="Floor Number"
                   name="floorNumber"
-                  rules={[
-                    { required: true, message: "Floor number is required" },
-                  ]}
+                  rules={[{ required: true, message: 'Floor number is required' }]}
                 >
-                  <InputNumber
-                    min={0}
-                    style={{ width: "100%" }}
-                    disabled={loading}
-                  />
+                  <InputNumber min={0} style={{ width: '100%' }} disabled={loading} />
                 </Form.Item>
               </Col>
 
@@ -147,14 +122,18 @@ const AddEditFloor = () => {
               </Col>
             </Row>
           </Card>
-          <div style={{ textAlign: "right", display:"flex", alignItems: "center", justifyContent: "flex-end", marginTop: 16, marginLeft :16}}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              className="btn"
-            >
-              {isEdit ? "Update Floor" : "Create Floor"}
+          <div
+            style={{
+              textAlign: 'right',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginTop: 16,
+              marginLeft: 16,
+            }}
+          >
+            <Button type="primary" htmlType="submit" loading={loading} className="btn">
+              {isEdit ? 'Update Floor' : 'Create Floor'}
             </Button>
           </div>
         </Form>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Table,
   Input,
@@ -20,13 +20,15 @@ import {
   CheckCircleOutlined,
   MedicineBoxOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
+
 import Breadcrumbs from '../comman/Breadcrumbs';
 
 import doctorService from '../../services/doctorService';
+
 import {
   fetchDoctorWaitingList,
   fetchAllWaitingList,
@@ -36,6 +38,7 @@ import {
 const { Search } = Input;
 
 const DEFAULT_COLUMNS = ['patient', 'type', 'status', 'priority', 'createdAt', 'doctor'];
+
 const STATUS_FILTERS = [
   { label: 'Waiting', value: 'waiting' },
   { label: 'Called', value: 'called' },
@@ -62,8 +65,16 @@ const DoctorWaitingListPage = () => {
   }, []);
 
   useEffect(() => {
-    !selectedDoctor &&
-      dispatch(fetchAllWaitingList({ page: 1, limit: 10, search: '', status: '' }));
+    if (!selectedDoctor) {
+      dispatch(
+        fetchAllWaitingList({
+          page: 1,
+          limit: 10,
+          search: '',
+          status: '',
+        })
+      );
+    }
   }, [dispatch, selectedDoctor]);
 
   const loadDoctors = async () => {
@@ -74,6 +85,7 @@ const DoctorWaitingListPage = () => {
       message.error('Failed to load doctors');
     }
   };
+
   const loadWaitingList = (doctorId, pageValue = 1, searchValue = '') => {
     if (!doctorId) return;
 
@@ -88,36 +100,45 @@ const DoctorWaitingListPage = () => {
   };
 
   const handleDelete = (id) => {
-    dispatch(updateWaitingList({ id, data: { status: 'cancelled' } }))
+    dispatch(
+      updateWaitingList({
+        id,
+        data: { status: 'cancelled' },
+      })
+    )
       .unwrap()
       .then(() => {
         message.success('Removed from waiting list');
-        dispatch(fetchAllWaitingList({ page: 1, limit, search: '', status: '' }));
+
+        dispatch(
+          fetchAllWaitingList({
+            page: 1,
+            limit,
+            search: '',
+            status: '',
+          })
+        );
       })
       .catch(() => message.error('Delete failed'));
   };
-  const handleDaignosis = (r) => {
-    const patientId = r.patient?._id;
-    const doctorId = r.doctor?._id;
 
-    console.log('handleDaignosis',  doctorId);
+  const handleDiagnosis = (record) => {
+    const patientId = record.patient?._id;
+    const doctorId = record.doctor?._id;
+
     if (!patientId || !doctorId) {
-      console.error('Missing patient or doctor ID', r);
+      message.error('Missing patient or doctor');
       return;
     }
+
     navigate(`/add-diagnosis/${patientId}/${doctorId}`);
-    console.log('record', {
-      patientId,
-      doctorId,
-      r,
-    });
   };
 
-  const statusMenu = (
-    <div className="column-filter-menu">
-      <div className="column-filter-grid">
-        {STATUS_FILTERS.map((s) => (
-          <>
+  const statusMenu = useMemo(
+    () => (
+      <div className="column-filter-menu">
+        <div className="column-filter-grid">
+          {STATUS_FILTERS.map((s) => (
             <Checkbox
               key={s.value}
               checked={statusFilter.includes(s.value)}
@@ -140,197 +161,216 @@ const DoctorWaitingListPage = () => {
             >
               {s.label}
             </Checkbox>
-          </>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="column-filter-divider" />
+        <div className="column-filter-divider" />
 
-      <div>
         <Button
           type="link"
           size="small"
           onClick={() => {
             setStatusFilter([]);
-            dispatch(fetchAllWaitingList({ page: 1, limit, search: searchText, status: '' }));
+
+            dispatch(
+              fetchAllWaitingList({
+                page: 1,
+                limit,
+                search: searchText,
+                status: '',
+              })
+            );
           }}
         >
           Clear Filter
         </Button>
       </div>
-    </div>
+    ),
+    [dispatch, limit, searchText, statusFilter]
   );
 
-  const allColumns = [
-    {
-      title: 'Patient',
-      key: 'patient',
-      width: 160,
-      render: (_, r) => (
-        <Tooltip title={`${r.patient?.firstName} ${r.patient?.lastName}`}>
-          <strong>
-            {r.patient?.firstName} {r.patient?.lastName}
-          </strong>
-        </Tooltip>
-      ),
-    },
-    {
-      title: 'Doctor',
-      key: 'doctor',
-      width: 160,
-      render: (_, r) => (
-        <Tooltip title={r.doctor?.user?.name}>
-          <strong>{r.doctor?.user?.name}</strong>
-        </Tooltip>
-      ),
-    },
+  const allColumns = useMemo(
+    () => [
+      {
+        title: 'Added On',
+        key: 'createdAt',
+        dataIndex: 'createdAt',
+        width: 120,
+        render: (v) => (
+          <Space className="action" style={{ fontWeight: 600 }}>
+            {dayjs(v).format('DD MMM YYYY')}
+          </Space>
+        ),
+      },
 
-    {
-      title: 'Type',
-      key: 'type',
-      width: 100,
-      render: (_, r) => (r.patient?.type || 'opd').toUpperCase(),
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      width: 100,
-      render: (_, r) => r.status.toUpperCase(),
-    },
-
-    {
-      title: 'Priority',
-      key: 'priority',
-      dataIndex: 'priority',
-      width: 100,
-    },
-
-    {
-      title: 'Added On',
-      key: 'createdAt',
-      dataIndex: 'createdAt',
-      width: 100,
-      render: (v) => dayjs(v).format('DD MMM YYYY'),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      width: 130,
-      render: (_, r) => (
-        <Space style={{ justifyContent: 'center' }}>
-          <Tooltip title="Create Diagnosis">
-            <Button
-              type="link"
-              icon={<MedicineBoxOutlined style={{ color: '#faad14' }} />}
-              onClick={() => handleDaignosis(r)}
-            />
+      {
+        title: 'Patient',
+        key: 'patient',
+        render: (_, r) => (
+          <Tooltip title={`${r.patient?.firstName} ${r.patient?.lastName}`}>
+            <strong>
+              {r.patient?.firstName} {r.patient?.lastName}
+            </strong>
           </Tooltip>
-          <Tooltip title="Mark consultation completed">
-            <Button
-              type="link"
-              icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-              onClick={() => {
-                if (r.status === 'waiting') {
-                  message.warning('Call patient before marking as completed');
-                  return;
-                }
-                if (r.status === 'completed') {
-                  message.info('Already marked as completed');
-                  return;
-                }
-                if (r.status === 'cancelled') {
-                  message.warning('Cannot complete a cancelled entry');
-                  return;
-                }
-                if (r.status === 'called') {
+        ),
+      },
+
+      {
+        title: 'Doctor',
+        key: 'doctor',
+        render: (_, r) => <Tooltip title={r.doctor?.user?.name}>{r.doctor?.user?.name}</Tooltip>,
+      },
+
+      {
+        title: 'Type',
+        key: 'type',
+        width: 100,
+        render: (_, r) => (r.patient?.type || 'opd').toUpperCase(),
+      },
+
+      {
+        title: 'Status',
+        key: 'status',
+        width: 120,
+        render: (_, r) => r?.status?.toUpperCase(),
+      },
+
+      {
+        title: 'Priority',
+        key: 'priority',
+        dataIndex: 'priority',
+        width: 100,
+        render: (v) => <Space className="action">{v ? v : '—'}</Space>,
+      },
+
+      {
+        title: 'Actions',
+        key: 'actions',
+        width: 200,
+
+        render: (_, r) => (
+          <Space className="action">
+            <Tooltip title="Create Diagnosis">
+              <Button
+                type="text"
+                icon={<MedicineBoxOutlined style={{ color: '#faad14' }} />}
+                onClick={() => handleDiagnosis(r)}
+              />
+            </Tooltip>
+
+            <Tooltip title="Mark consultation completed">
+              <Button
+                type="text"
+                icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                onClick={() => {
+                  if (r.status === 'waiting') {
+                    message.warning('Call patient before marking as completed');
+                    return;
+                  }
+
+                  if (r.status === 'completed') {
+                    message.info('Already marked as completed');
+                    return;
+                  }
+
+                  if (r.status === 'cancelled') {
+                    message.warning('Cannot complete a cancelled entry');
+                    return;
+                  }
+
                   dispatch(
                     updateWaitingList({
                       id: r._id,
                       data: { status: 'completed' },
                     })
                   );
-                  dispatch(fetchAllWaitingList({ page: 1, limit, search: '', status: '' }));
+
                   message.success('Consultation completed');
-                }
-              }}
-            />
-          </Tooltip>
+                }}
+              />
+            </Tooltip>
 
-          <Tooltip title="Call patient to chamber">
-            <Button
-              type="link"
-              icon={<SoundOutlined />}
-              onClick={() => {
-                if (r.status === 'called') {
-                  message.info('Already called');
-                  return;
-                } else if (r.status === 'completed') {
-                  message.warning('Cannot call a completed entry');
-                  return;
-                } else if (r.status === 'cancelled') {
-                  message.warning('Cannot call a cancelled entry');
-                  return;
-                }
-                dispatch(
-                  updateWaitingList({
-                    id: r._id,
-                    data: { status: 'called' },
-                  })
-                );
-                dispatch(fetchAllWaitingList({ page: 1, limit, search: '', status: '' }));
-                message.success(
-                  `Patient ${r.patient?.firstName} ${r.patient?.lastName} called to chamber`
-                );
-              }}
-            />
-          </Tooltip>
+            <Tooltip title="Call patient to chamber">
+              <Button
+                type="text"
+                icon={<SoundOutlined />}
+                onClick={() => {
+                  if (r.status === 'called') {
+                    message.info('Already called');
+                    return;
+                  }
 
-          <Popconfirm title="Remove from waiting list?" onConfirm={() => handleDelete(r._id)}>
-            <Button danger type="link" icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+                  if (r.status === 'completed') {
+                    message.warning('Cannot call completed entry');
+                    return;
+                  }
 
-  const filteredColumns = allColumns.filter(
-    (c) => selectedColumns.includes(c.key) || c.key === 'actions'
+                  if (r.status === 'cancelled') {
+                    message.warning('Cannot call cancelled entry');
+                    return;
+                  }
+
+                  dispatch(
+                    updateWaitingList({
+                      id: r._id,
+                      data: { status: 'called' },
+                    })
+                  );
+
+                  message.success(`Patient ${r.patient?.firstName} ${r.patient?.lastName} called`);
+                }}
+              />
+            </Tooltip>
+
+            <Popconfirm title="Remove from waiting list?" onConfirm={() => handleDelete(r._id)}>
+              <Button danger type="text" icon={<DeleteOutlined />} />
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ],
+    [navigate]
   );
 
-  const columnMenu = (
-    <div className="column-filter-menu">
-      <div className="column-filter-grid">
-        {allColumns
-          .filter((c) => c.key !== 'actions')
-          .map((col) => (
-            <Checkbox
-              key={col.key}
-              checked={selectedColumns.includes(col.key)}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setSelectedColumns([...selectedColumns, col.key]);
-                } else {
-                  setSelectedColumns(selectedColumns.filter((c) => c !== col.key));
-                }
-              }}
-            >
-              {col.title}
-            </Checkbox>
-          ))}
-      </div>
+  const filteredColumns = useMemo(() => {
+    return allColumns.filter((c) => selectedColumns.includes(c.key) || c.key === 'actions');
+  }, [allColumns, selectedColumns]);
 
-      <div className="column-filter-divider" />
+  const columnMenu = useMemo(
+    () => (
+      <div className="column-filter-menu">
+        <div className="column-filter-grid">
+          {allColumns
+            .filter((c) => c.key !== 'actions')
+            .map((col) => (
+              <Checkbox
+                key={col.key}
+                checked={selectedColumns.includes(col.key)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedColumns([...selectedColumns, col.key]);
+                  } else {
+                    setSelectedColumns(selectedColumns.filter((c) => c !== col.key));
+                  }
+                }}
+              >
+                {col.title}
+              </Checkbox>
+            ))}
+        </div>
 
-      <div>
+        <div className="column-filter-divider" />
+
         <Button
           type="link"
           style={{ padding: 0 }}
           onClick={() => setSelectedColumns(DEFAULT_COLUMNS)}
         >
-          Reset of Defaults
+          Reset to Defaults
         </Button>
       </div>
-    </div>
+    ),
+    [allColumns, selectedColumns]
   );
 
   return (
@@ -338,10 +378,16 @@ const DoctorWaitingListPage = () => {
       <Breadcrumbs
         title="Doctor Waiting List"
         items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Doctor Waiting List' },
+          {
+            label: 'Dashboard',
+            href: '/dashboard',
+          },
+          {
+            label: 'Doctor Waiting List',
+          },
         ]}
       />
+
       <div className="serachbar-bread">
         <Space style={{ flexWrap: 'wrap' }}>
           <Search
@@ -353,10 +399,17 @@ const DoctorWaitingListPage = () => {
               if (selectedDoctor) {
                 loadWaitingList(selectedDoctor, 1, value);
               } else {
-                dispatch(fetchAllWaitingList({ page: 1, limit, search: value }));
+                dispatch(
+                  fetchAllWaitingList({
+                    page: 1,
+                    limit,
+                    search: value,
+                  })
+                );
               }
             }}
           />
+
           <Button
             icon={<ReloadOutlined />}
             onClick={() => {
@@ -365,12 +418,18 @@ const DoctorWaitingListPage = () => {
               if (selectedDoctor) {
                 loadWaitingList(selectedDoctor, 1, '');
               } else {
-                dispatch(fetchAllWaitingList({ page: 1, limit, search: '' }));
+                dispatch(
+                  fetchAllWaitingList({
+                    page: 1,
+                    limit,
+                    search: '',
+                  })
+                );
               }
             }}
           />
 
-          <Dropdown dropdownRender={() => columnMenu} trigger={['click']}>
+          <Dropdown popupRender={() => columnMenu} trigger={['click']}>
             <Button icon={<FilterOutlined />} />
           </Dropdown>
 
@@ -387,10 +446,14 @@ const DoctorWaitingListPage = () => {
             onChange={(val) => {
               setSelectedDoctor(val);
               setSearchText('');
-              if (val) loadWaitingList(val, 1, '');
+
+              if (val) {
+                loadWaitingList(val, 1, '');
+              }
             }}
           />
-          <Dropdown dropdownRender={() => statusMenu} trigger={['click']}>
+
+          <Dropdown popupRender={() => statusMenu} trigger={['click']}>
             <Button icon={<FilterOutlined />} />
           </Dropdown>
         </Space>
@@ -401,12 +464,18 @@ const DoctorWaitingListPage = () => {
           rowKey="_id"
           loading={loading}
           columns={filteredColumns}
-          scroll={{ x: 1000 }}
           dataSource={selectedDoctor ? doctorQueue : waitingList}
+          scroll={{
+            x: 1000,
+            y: 500,
+          }}
           rowClassName={(record) => {
             if (record.status === 'completed') return 'row-completed';
+
             if (record.status === 'called') return 'row-called';
+
             if (record.status === 'cancelled') return 'row-cancelled';
+
             return '';
           }}
           pagination={{
@@ -414,11 +483,18 @@ const DoctorWaitingListPage = () => {
             pageSize: limit,
             total,
             showSizeChanger: true,
+
             onChange: (p, pageSize) => {
               if (selectedDoctor) {
                 loadWaitingList(selectedDoctor, p, searchText);
               } else {
-                dispatch(fetchAllWaitingList({ page: p, limit: pageSize, search: searchText }));
+                dispatch(
+                  fetchAllWaitingList({
+                    page: p,
+                    limit: pageSize,
+                    search: searchText,
+                  })
+                );
               }
             },
           }}
@@ -428,4 +504,4 @@ const DoctorWaitingListPage = () => {
   );
 };
 
-export default DoctorWaitingListPage;
+export default React.memo(DoctorWaitingListPage);

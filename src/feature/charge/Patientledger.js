@@ -105,8 +105,7 @@ function PatientLedger() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Patient Ledger List"
-        showBack
-        backTo="/dashboard"
+        showBack={true}
         items={[
           { label: 'Patient List', href: '/patitent-onboarding' },
           { label: 'Patient Ledger' },

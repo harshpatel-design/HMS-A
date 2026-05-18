@@ -41,7 +41,7 @@ export default function DoctorOnbordingList() {
       debouncedSearch.cancel();
     };
   }, [debouncedSearch]);
-  
+
   const columns = [
     {
       title: 'Profile Image',
@@ -67,7 +67,7 @@ export default function DoctorOnbordingList() {
       key: 'specialization',
       dataIndex: 'specialization',
       width: 160,
-      render: (v) => <Tag color="blue">{v}</Tag>,
+      render: (v) => <Tag color="blue" className='w-100'>{v}</Tag>,
     },
     {
       title: 'Phone',
@@ -80,7 +80,6 @@ export default function DoctorOnbordingList() {
     {
       title: 'Schedule',
       key: 'schedule',
-      width: 200,
       render: (_, doc) =>
         doc.schedule?.length ? (
           <div className="schedule-cell">
@@ -108,9 +107,9 @@ export default function DoctorOnbordingList() {
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
+      width: 140,
       render: (_, doc) => (
-        <Space>
+        <Space className="action">
           <Button
             type="text"
             icon={<EyeOutlined />}

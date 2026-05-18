@@ -133,8 +133,8 @@ export default function AddEditRecipient() {
 
       <Breadcrumbs
         title={isEdit ? 'Edit Recipient' : 'Add New Recipient'}
-        showBack
-        backTo="/recipient-onboarding"
+        showBack = {true}
+      
         items={[
           { label: 'Recipients', href: '/recipient-onboarding' },
           { label: isEdit ? 'Edit Recipient' : 'Add New Recipient' },

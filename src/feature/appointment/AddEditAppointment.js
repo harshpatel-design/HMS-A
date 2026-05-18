@@ -217,8 +217,7 @@ export default function AddEditAppointment() {
 
         <Breadcrumbs
           title={isEdit ? 'Edit Appointment' : 'Add Appointment'}
-          showBack
-          backTo="/appointments"
+          showBack={true}
           items={[
             { label: 'Appointments', href: '/appointments' },
             { label: isEdit ? 'Edit Appointment' : 'Add Appointment' },

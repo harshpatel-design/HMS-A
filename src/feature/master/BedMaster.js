@@ -201,12 +201,6 @@ const BedMaster = () => {
       sorter: true,
     },
     {
-      title: 'Type',
-      dataIndex: 'bedType',
-      key: 'bedType',
-      sorter: true,
-    },
-    {
       title: 'Floor',
       dataIndex: ['floor', 'name'],
       key: 'floor',
@@ -225,18 +219,45 @@ const BedMaster = () => {
       render: (v) => v || '—',
     },
     {
+      title: 'Type',
+      dataIndex: 'bedType',
+      key: 'bedType',
+      width: 120,
+      sorter: true,
+    },
+    {
       title: 'Occupied',
       dataIndex: 'isOccupied',
       key: 'isOccupied',
       sorter: true,
-      render: (v) => (v ? <Tag color="red">Occupied</Tag> : <Tag color="green">Vacant</Tag>),
+      width: 120,
+      render: (v) =>
+        v ? (
+          <Tag color="red" className="w-100">
+            Occupied
+          </Tag>
+        ) : (
+          <Tag color="green" className="w-100">
+            Vacant
+          </Tag>
+        ),
     },
     {
       title: 'Status',
       dataIndex: 'isActive',
       key: 'isActive',
+      width: 120,
       sorter: true,
-      render: (v) => (v ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>),
+      render: (v) =>
+        v ? (
+          <Tag color="blue" className="w-100">
+            Active
+          </Tag>
+        ) : (
+          <Tag color="red" className="w-100">
+            Inactive
+          </Tag>
+        ),
     },
     {
       title: 'Notes',
@@ -271,8 +292,9 @@ const BedMaster = () => {
     {
       title: 'Actions',
       key: 'actions',
+      width: 100,
       render: (record) => (
-        <Space>
+        <Space className="action">
           <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Button
             type="text"
@@ -372,8 +394,7 @@ const BedMaster = () => {
       <div className="page-wrapper">
         <Breadcrumbs
           title="Bad List"
-          showBack
-          backTo="/dashboard"
+          showBack={true}
           items={[{ label: 'Bad List', href: '/bad-master' }, { label: 'Bad List' }]}
         />
 

@@ -61,8 +61,7 @@ function PatientChargesLedger() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Patient Ledger List"
-        showBack
-        backTo="/patient-ledger"
+        showBack={true}
         items={[
           { label: 'Patient Ledger', href: '/patient-ledger' },
           { label: 'Patient Charges Ledger' },

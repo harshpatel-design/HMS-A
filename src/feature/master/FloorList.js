@@ -217,7 +217,7 @@ const FloorList = () => {
       key: 'actions',
       width: 100,
       render: (record) => (
-        <Space>
+        <Space className='action'>
           <Button
             type="text"
             icon={<EditOutlined />}

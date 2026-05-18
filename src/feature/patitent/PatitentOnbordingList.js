@@ -30,13 +30,7 @@ import Breadcrumbs from '../comman/Breadcrumbs';
 import { Link, useNavigate } from 'react-router-dom';
 import '../../hcss.css';
 
-import {
-  fetchPatients,
-  deletePatient,
-  resetPatientState,
-  setSort,
-  resetSort,
-} from '../../slices/patientSlice';
+import { fetchPatients, deletePatient } from '../../slices/patientSlice';
 
 const DEFAULT_PATIENT_COLUMNS = [
   'name',
@@ -89,13 +83,16 @@ const PatientOnboardingList = () => {
       title: 'Case No.',
       key: 'caseNumber',
       dataIndex: 'caseNumber',
-      width: 90,
-      render: (v) => v,
+      width: 100,
+      render: (v) => (
+        <Space className="action" style={{ fontWeight: 600 }}>
+          {v || '—'}
+        </Space>
+      ),
     },
     {
       title: 'Full Name',
       key: 'name',
-      width: 140,
       render: (r) => (
         <Tooltip title={`${r.firstName} ${r.lastName}`}>
           <span>
@@ -107,13 +104,14 @@ const PatientOnboardingList = () => {
     {
       title: 'Phone',
       key: 'phone',
+      width: 160,
       dataIndex: 'phone',
     },
     {
       title: 'Gender',
       key: 'gender',
       dataIndex: 'gender',
-      width: 100,
+      width: 120,
       render: (v) => v?.toUpperCase(),
     },
 
@@ -121,30 +119,42 @@ const PatientOnboardingList = () => {
       title: 'Case',
       key: 'caseType',
       dataIndex: 'caseType',
-      render: (v) => <Tag color="blue">{v?.toUpperCase()}</Tag>,
+      width: 120,
+      render: (v) => (
+        <Tag color="blue" className="w-100">
+          {v?.toUpperCase()}
+        </Tag>
+      ),
     },
     {
       title: 'Address',
       key: 'address',
+      width: 240,
       render: (r) => `${r.address?.line1 || ''} ${r.address?.city || ''}`,
     },
     {
       title: 'Blood Group',
       key: 'bloodGroup',
-      render: (r) => r.bloodGroup || '—',
+      width: 100,
+      render: (r) => <Space className="action">{r?.bloodGroup || '-'}</Space>,
     },
     {
       title: 'Status',
       key: 'isActive',
       dataIndex: 'isActive',
+      width: 140,
       render: (v) =>
         v ? (
           <strong>
-            <Tag color="green">ACTIVE</Tag>
+            <Tag color="green" className="w-100">
+              ACTIVE
+            </Tag>
           </strong>
         ) : (
           <strong>
-            <Tag color="red">INACTIVE</Tag>
+            <Tag color="red" className="w-100">
+              INACTIVE
+            </Tag>
           </strong>
         ),
     },
@@ -152,14 +162,15 @@ const PatientOnboardingList = () => {
       title: 'Created On',
       key: 'createdAt',
       dataIndex: 'createdAt',
-      render: (v) => dayjs(v).format('DD MMM YYYY'),
+      width: 140,
+      render: (v) => <Space className="action">{dayjs(v).format('DD-MM-YYYY')}</Space>,
     },
     {
       title: 'Actions',
       key: 'actions',
       width: 240,
       render: (_, r) => (
-        <Space>
+        <Space className="action">
           <Tooltip title="Receive Payment">
             <Button
               type="link"
@@ -263,7 +274,6 @@ const PatientOnboardingList = () => {
         <Breadcrumbs
           title="Patient List"
           showBack={true}
-          backTo="/dashboard"
           items={[
             { label: 'Patient List', href: '/patitent-onboarding' },
             { label: 'View Patient' },

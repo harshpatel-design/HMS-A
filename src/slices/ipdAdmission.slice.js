@@ -88,6 +88,17 @@ export const fetchActiveIpdByPatient = createAsyncThunk(
   }
 );
 
+export const fetchIpdAdmissionById = createAsyncThunk(
+  "ipd/fetchIpdAdmissionById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await ipdAdmissionService.getIpdAdmissionById(id);
+      return res;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data || { message: "IPD not found" });
+    }
+  }
+);
 
 
 const initialState = {
@@ -146,8 +157,6 @@ const ipdAdmissionSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ===== ADD CHARGE ===== */
       .addCase(addIpdCharge.fulfilled, (state, action) => {
         state.success = true;
         state.ipdAdmission = action.payload.data || action.payload;
@@ -155,8 +164,6 @@ const ipdAdmissionSlice = createSlice({
       .addCase(addIpdCharge.rejected, (state, action) => {
         state.error = action.payload;
       })
-
-      /* ===== DISCHARGE ===== */
       .addCase(dischargeIpdPatient.fulfilled, (state, action) => {
         state.success = true;
         state.ipdAdmission = action.payload.data || action.payload;
@@ -176,6 +183,17 @@ const ipdAdmissionSlice = createSlice({
       .addCase(fetchActiveIpdByPatient.rejected, (state, action) => {
         state.loading = false;
         state.activeIpd = null;
+        state.error = action.payload;
+      })
+      .addCase(fetchIpdAdmissionById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchIpdAdmissionById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ipdAdmission = action.payload.data || action.payload;
+      })
+      .addCase(fetchIpdAdmissionById.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   },

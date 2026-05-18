@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Drawer, Input, Select, Space, Table, Form, DatePicker, message } from 'antd';
+import { Button, Drawer, Input, Select, Space, Table, Form, DatePicker, message, Tag } from 'antd';
 import { PlusOutlined, HomeOutlined, EditOutlined } from '@ant-design/icons';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
@@ -11,7 +11,7 @@ import { fetchPatientName } from '../../slices/patientSlice';
 import {
   createIpdAdmission,
   fetchAllIpdAdmissions,
-  fetchActiveIpdByPatient,
+  fetchIpdAdmissionById,
 } from '../../slices/ipdAdmission.slice';
 import { fetchFloors } from '../../slices/floorSlice';
 import { fetchWards } from '../../slices/wardSlice';
@@ -38,17 +38,15 @@ function IpdAddmissionList() {
   const [doctorNameSerach, setDoctorNameSerach] = useState(null);
 
   useEffect(() => {
-    if (selectedFloor && selectedWard && selectedRoom) {
-      dispatch(
-        fetchBeds({
-          page: 1,
-          limit: 1000,
-          floorId: selectedFloor,
-          wardId: selectedWard,
-          roomId: selectedRoom,
-        })
-      );
-    }
+    dispatch(
+      fetchBeds({
+        page: 1,
+        limit: 1000,
+        floorId: selectedFloor,
+        wardId: selectedWard,
+        roomId: selectedRoom,
+      })
+    );
   }, [selectedFloor, selectedWard, selectedRoom, dispatch]);
 
   const { ipdAdmissions, loading, total, page, limit } = useSelector((state) => state.ipd);
@@ -88,17 +86,22 @@ function IpdAddmissionList() {
   }, [dispatch, selectedFloor, selectedWard, selectedRoom]);
 
   useEffect(() => {
+    dispatch(fetchAllIpdAdmissions({ page: 1, limit: 10 }));
+  }, [dispatch]);
+
+  useEffect(() => {
     if (drawerOpen) {
       dispatch(fetchPatientName({ page: 1, limit: 1000 }));
       dispatch(fetchChargeMasters({ page: 1, limit: 1000 }));
       dispatch(fetchFloors({ page: 1, limit: 1000 }));
+    }
+  }, [dispatch, drawerOpen]);
+
+  useEffect(() => {
+    if (drawerOpen) {
       dispatch(fetchDoctorsName({ search: doctorNameSerach }));
     }
   }, [dispatch, drawerOpen, doctorNameSerach]);
-
-  useEffect(() => {
-    dispatch(fetchAllIpdAdmissions({ page: 1, limit: 10 }));
-  }, [dispatch]);
 
   const handlePageChange = (pageNumber, pageSize) => {
     dispatch(
@@ -120,7 +123,7 @@ function IpdAddmissionList() {
   );
   const doctorOptions = useMemo(
     () =>
-      (doctorNames || []).map((d) => ({
+      (doctorNames || []).map((d, index) => ({
         label: d.name,
         value: d._id,
       })),
@@ -151,26 +154,54 @@ function IpdAddmissionList() {
     () => (chargeMasters || []).map((c) => ({ label: c.name, value: c._id })),
     [chargeMasters]
   );
+
   const columns = [
+    {
+      title: 'Case No.',
+      key: 'caseNumber',
+      dataIndex: ['patient', 'caseNumber'],
+      width: 100,
+      render: (v) => (
+        <Space className="action" style={{ fontWeight: 600 }}>
+          {v || '—'}
+        </Space>
+      ),
+    },
     {
       title: 'Patient Name',
       key: 'name',
       dataIndex: 'patient',
-      width: 180,
       render: (patient) =>
         `${patient?.firstName?.toUpperCase() || ''} ${patient?.lastName?.toUpperCase() || ''}`,
+    },
+    {
+      title: 'Age',
+      key: 'age',
+      dataIndex: ['patient', 'age'],
+      width: 80,
+      render: (v) => v || '—',
     },
     {
       title: 'gender',
       key: 'gender',
       dataIndex: ['patient', 'gender'],
-      width: 80,
+      width: 100,
+      render: (v) => (v ? v.toUpperCase() : '—'),
+    },
+    {
+      title: 'Bed Name',
+      key: 'bedName',
+      dataIndex: ['patient', 'ipdDetails'],
+      width: 210,
+      render: (v) => {
+        return bedOptions.find((b) => b.value === v?.bed)?.label || '—';
+      },
     },
     {
       title: 'City',
       key: 'city',
       dataIndex: ['patient', 'address'],
-      render: (v) => v.city,
+      render: (v) => v?.city.toUpperCase() || '—',
       width: 100,
     },
     {
@@ -184,30 +215,56 @@ function IpdAddmissionList() {
       title: 'Phone',
       dataIndex: ['patient', 'phone'],
       key: 'mobile',
-      width: 140,
+      width: 130,
     },
     {
       title: 'IsActive',
-      dataIndex: ['patient', 'isActive'],
+      dataIndex: ['isActive'],
       key: 'isActive',
-      width: 100,
+      width: 130,
       render: (v) => {
-        return v ? 'Active' : 'Inactive';
+        return v ? (
+          <Tag color="blue" className="w-100">
+            Active
+          </Tag>
+        ) : (
+          <Tag color="blue" className="w-100">
+            Inactive
+          </Tag>
+        );
       },
+    },
+    {
+      title: 'Admission Date',
+      dataIndex: ['patient', 'ipdDetails', 'admissionDate'],
+      key: 'createdAt',
+      width: 130,
+      render: (value) => (
+        <Space className="action">{value ? dayjs(value).format('DD-MM-YYYY') : '-'}</Space>
+      ),
     },
     {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 160,
-      render: (value) => (value ? dayjs(value).format('DD-MM-YYYY') : '-'),
+      width: 130,
+      render: (value) => (
+        <Space className="action">{value ? dayjs(value).format('DD-MM-YYYY') : '-'}</Space>
+      ),
     },
     {
       title: 'Action',
       key: 'action',
-      width: 160,
+      width: 50,
       render: (_, record) => (
-        <Button type="link" icon={<EditOutlined />} onClick={() => handleEdit(record)}></Button>
+        <Space className="action">
+          <Button
+            type="button"
+            icon={<EditOutlined />}
+            style={{ color: '#1677ff' }}
+            onClick={() => handleEdit(record)}
+          ></Button>
+        </Space>
       ),
     },
   ];
@@ -235,26 +292,34 @@ function IpdAddmissionList() {
     setDrawerMode('edit');
     setDrawerOpen(true);
 
+    setSelectedFloor(record?.floor);
+    setSelectedRoom(record?.room);
+    setSelectedWard(record?.ward);
+
     const patientId = record.patient?._id;
     const doctorId = record.doctor?._id;
+    const ipdId = record._id;
 
     if (!patientId) return;
     if (!doctorId) return;
 
-    dispatch(fetchActiveIpdByPatient(patientId))
+    dispatch(fetchIpdAdmissionById(ipdId))
       .unwrap()
       .then((res) => {
         form.setFieldsValue({
           admissionDate: res.admissionDate ? dayjs(res.admissionDate) : null,
           dischargeDate: res.dischargeDate ? dayjs(res.dischargeDate) : null,
 
-          // patient: res.patient?._id,
-          // doctor: res.doctor?._id,
-          // ward: res.ward || null,
-          // room: res.room || null,
-          // bed: res.bed || null,
-          // charges: res.charges?.map((c) => c.chargeMaster),
-          // isActive: res.isActive,
+          patient: res?.patient,
+          doctor: res?.doctor,
+          ward: res.ward || null,
+          room: res.room || null,
+          bed: res.bed || null,
+          floor: res.floor || null,
+          caseType: res.caseType,
+          caseStatus: res.caseStatus,
+          charges: [...new Set(res.charges?.map((c) => c.chargeMaster))],
+          isActive: res.isActive,
         });
       })
       .catch((err) => {
@@ -309,9 +374,8 @@ function IpdAddmissionList() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="IPD List"
-        showBack
-        backTo="/dashboard"
-        items={[{ label: 'IPD Admissions' }]}
+        showBack={true}
+        items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'IPD List' }]}
       />
 
       <div className="serachbar-bread">
@@ -400,13 +464,15 @@ function IpdAddmissionList() {
           <Form.Item name="patient" label="Patient" rules={[{ required: true }]}>
             <Select loading={patientLoading} options={patientOptions} />
           </Form.Item>
-          <Form.Item
-            name="doctor"
-            label="Doctor"
-            onSearch={(value) => setDoctorNameSerach(value)}
-            rules={[{ required: true }]}
-          >
-            <Select loading={doctorLoading} placeholder="Select Doctor" options={doctorOptions} />
+          <Form.Item name="doctor" label="Doctor" rules={[{ required: true }]}>
+            <Select
+              loading={doctorLoading}
+              showSearch
+              placeholder="Select Doctor"
+              options={doctorOptions}
+              onSearch={(value) => setDoctorNameSerach(value)}
+              filterOption={false}
+            />
           </Form.Item>
           <Form.Item
             name="caseType"

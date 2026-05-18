@@ -108,8 +108,7 @@ export default function AddEditDiagnosis() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Diagnosis"
-        showBack
-        backTo="/dashboard"
+        showBack={true}
         items={[
           { label: 'Diagnosis List', href: '/diagnosis' },
           { label: isEdit ? 'Edit Diagnosis' : 'Add Diagnosis' },

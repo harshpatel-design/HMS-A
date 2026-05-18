@@ -81,8 +81,7 @@ export default function AddDiagnosis() {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Add Diagnosis"
-        showBack
-        backTo="/diagnosis"
+        showBack={true}
         items={[{ label: 'Diagnosis List', href: '/diagnosis' }, { label: 'Add Diagnosis' }]}
       />
 

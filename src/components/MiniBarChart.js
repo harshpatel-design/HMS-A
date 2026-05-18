@@ -76,7 +76,7 @@ function MiniBarChart({ data = [], color = '#4338CA' }) {
     },
   };
 
-  return <ReactApexChart options={options} series={series} type="area" width={120} height={70} />;
+  return <ReactApexChart options={options} series={series} type="area" maxWidth={120} height={70} />;
 }
 
 export default MiniBarChart;

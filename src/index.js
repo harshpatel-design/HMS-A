@@ -11,7 +11,7 @@ import { BrowserRouter } from 'react-router-dom';
 import GlobalMessageProvider from '../src/feature/comman/GlobalMessage';
 message.config({
   top: 27,
-  duration: 5,
+  duration: 3,
   maxCount: 10,
 });
 

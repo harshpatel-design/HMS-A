@@ -137,10 +137,10 @@ function DashboardCountNumber() {
 
   return (
     <div className="dash-count">
-      <Row gutter={[16, 16]}>
-        <Col xs={12} sm={12} xl={6}>
+      <Row gutter={[16,16]}>
+        <Col xs={12} sm={12} xl={6} style={{borderRadius:"16px", overflow:"hidden"}}>
           <div className="count-card">
-            <div className="counter-effect">
+            <div className="counter-effect" style={{borderRadius:"16px"}}>
               <img src={doctorpolygon} alt="polygone" />
             </div>
             <div className="count-header">

@@ -6,8 +6,8 @@ import { Button, Card, Col, Row, Spin, Tag } from 'antd';
 import Breadcrumbs from '../comman/Breadcrumbs';
 import '../../hcss.css';
 import { PhoneOutlined } from '@ant-design/icons';
-import e1 from "../../images/Vector 7.png"
-import e2 from "../../images/Vector 8.png"
+import e1 from '../../images/Vector 7.png';
+import e2 from '../../images/Vector 8.png';
 
 function ViewDoctor() {
   const { id } = useParams();
@@ -16,7 +16,6 @@ function ViewDoctor() {
   const { selectedDoctor, loading } = useSelector((state) => state.doctor);
 
   useEffect(() => {
-
     if (id) dispatch(fetchDoctorById(id));
   }, [id, dispatch]);
 
@@ -33,8 +32,7 @@ function ViewDoctor() {
     <>
       <Breadcrumbs
         title="View Doctor"
-        showBack
-        backTo="/doctor-onbording"
+        showBack={true}
         items={[{ label: 'Doctors', href: '/doctor-onbording' }, { label: 'View Doctor' }]}
       />
 
@@ -97,7 +95,7 @@ function ViewDoctor() {
               </div>
             </div>
           </Col>
-          <Col md={6} xs={0}  className="profile-action ">
+          <Col md={6} xs={0} className="profile-action ">
             <div className="flex-column-between">
               <p className="education-degree"> {selectedDoctor.doctor.user.email}</p>
               <div className="flex-end">
@@ -109,7 +107,6 @@ function ViewDoctor() {
           </Col>
         </Row>
       </div>
-
 
       <div style={{ marginTop: 12 }}>
         <Row gutter={[16, 16]}>

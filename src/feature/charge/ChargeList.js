@@ -28,11 +28,10 @@ import {
   createCharge,
   updateCharge,
   fetchChargeById,
-  resetChargeState,
 } from '../../slices/chargeSlice';
 import { fetchPatientName } from '../../slices/patientSlice';
 import { fetchChargeMasters } from '../../slices/chargeMasterSlice';
-import { sortBy } from 'lodash';
+import { data } from 'react-router-dom';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -124,7 +123,15 @@ const ChargeList = () => {
     }
   };
 
-  const defaultChecked = ['name', 'amount', 'famount', 'damount', 'patient', 'createdAt'];
+  const defaultChecked = [
+    'name',
+    'amount',
+    'cashNumber',
+    'famount',
+    'damount',
+    'patient',
+    'createdAt',
+  ];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
 
@@ -137,6 +144,13 @@ const ChargeList = () => {
       render: (_, record) => {
         return record.patient ? `${record.patient.firstName} ${record.patient.lastName}` : '—';
       },
+    },
+    {
+      title: 'Case No',
+      key: 'caseNumber',
+      dataIndex: ['patient', 'caseNumber'],
+      render: (v) => v || '—',
+      width: 100,
     },
 
     {
@@ -182,14 +196,14 @@ const ChargeList = () => {
       title: 'Discount Amount',
       dataIndex: 'discountAmount',
       key: 'damount',
-      width: 170,
+      width: 100,
       render: (v) => v,
     },
     {
       title: 'final Amount',
       dataIndex: 'finalAmount',
       key: 'famount',
-      width: 130,
+      width: 100,
       render: (v) => v,
     },
 
@@ -197,7 +211,7 @@ const ChargeList = () => {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 150,
+      width: 130,
       sorter: true,
       render: (v) => {
         return v ? new Date(v).toLocaleDateString() : '—';
@@ -209,7 +223,7 @@ const ChargeList = () => {
       key: 'actions',
       width: 50,
       render: (record) => (
-        <Space>
+        <Space  className='action'>
           <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
         </Space>
       ),
@@ -237,7 +251,7 @@ const ChargeList = () => {
           caseStatus: values.caseContext?.caseStatus,
         },
       };
-      
+
       if (drawerMode === 'add') {
         res = await dispatch(createCharge(payload)).unwrap();
         message.success(res?.message || 'Charge added successfully');
@@ -421,8 +435,7 @@ const ChargeList = () => {
       <div className="page-wrapper">
         <Breadcrumbs
           title="Charge List"
-          showBack
-          backTo="/dashboard"
+         showBack={true}
           items={[{ label: 'Charges', href: '/charges' }, { label: 'Charge List' }]}
         />
 

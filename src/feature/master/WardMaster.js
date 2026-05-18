@@ -235,7 +235,7 @@ const WardMaster = () => {
       key: 'actions',
       width: 100,
       render: (record) => (
-        <Space>
+        <Space className="action">
           <Button
             type="text"
             icon={<EditOutlined />}
@@ -297,8 +297,7 @@ const WardMaster = () => {
       <div className="page-wrapper">
         <Breadcrumbs
           title="Ward List"
-          showBack
-          backTo="/dashboard"
+          showBack={true}
           items={[{ label: 'Ward List', href: '/ward-master' }, { label: 'Ward List' }]}
         />
 
@@ -407,12 +406,16 @@ const WardMaster = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="name" label="Ward Name" rules={[{ required: true , message: 'Please enter ward name'}]}>
-                <Input placeholder='Ward Name (e.g. General Ward A)' />
+              <Form.Item
+                name="name"
+                label="Ward Name"
+                rules={[{ required: true, message: 'Please enter ward name' }]}
+              >
+                <Input placeholder="Ward Name (e.g. General Ward A)" />
               </Form.Item>
 
               <Form.Item name="code" label="Ward Code" rules={[{ required: true }]}>
-                <Input placeholder='Ward Code (e.g. GW-A)' />
+                <Input placeholder="Ward Code (e.g. GW-A)" />
               </Form.Item>
 
               <Form.Item
@@ -441,7 +444,7 @@ const WardMaster = () => {
                 </Form.Item>
               )}
               <Form.Item name="notes" label="Notes">
-                <Input.TextArea rows={3} placeholder="Enter notes (optional)"/>
+                <Input.TextArea rows={3} placeholder="Enter notes (optional)" />
               </Form.Item>
 
               <Space className="width-space">

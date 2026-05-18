@@ -122,8 +122,7 @@ function ReceiveCharge({ setDrawerOpen }) {
     <div className="page-wrapper">
       <Breadcrumbs
         title="Receive Charge"
-        showBack
-        backTo="/dashboard"
+        showBack={true}
         items={[
           { label: 'Patient List', href: '/patitent-onboarding' },
           { label: 'Receive Charge' },
