@@ -56,6 +56,7 @@ function PatientChargesLedger() {
 
   const p = `${ledgerRows[0]?.patient.firstName} ${ledgerRows[0]?.patient.lastName}`;
   const m = `${ledgerRows[0]?.patient.phone}`;
+  const c = `${ledgerRows?.[0]?.patient?.caseNumber || 'N/A'}`;
 
   return (
     <div className="page-wrapper">
@@ -67,7 +68,7 @@ function PatientChargesLedger() {
           { label: 'Patient Charges Ledger' },
         ]}
       />
-      <Card title={`View Patient Charges :  ${p} (${m})`}>
+      <Card title={`View Patient Charges :  ${p} (${m}) - Case: ${c}`}>
         <Spin spinning={loading}>
           {ledgerRows.length ? (
             <div className="table-scroll-container">

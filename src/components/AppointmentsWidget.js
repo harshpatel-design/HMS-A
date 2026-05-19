@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Calendar, Select, List, Typography, Spin } from 'antd';
+import { Card, Calendar, Select, List, Spin } from 'antd';
 import { LeftOutlined, RightOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import '../hcss.css';
@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchPatientVisits } from '../slices/patientVisitSlice';
 import { Link } from 'react-router-dom';
 
-const { Link: TextLink } = Typography;
 
 const AppointmentsWidget = () => {
   const dispatch = useDispatch();
@@ -44,12 +43,16 @@ const AppointmentsWidget = () => {
             <Select.Option value="ipd">IPD</Select.Option>
           </Select>
         }
-        bodyStyle={{ padding: 16 }}
+        styles={{
+          body: {
+            padding: '10px',
+          },
+        }}
       >
         <Calendar
           fullscreen={false}
           value={value}
-          className='dashCal'
+          className="dashCal"
           onSelect={(val) => setValue(val)}
           headerRender={({ value, onChange }) => (
             <div
@@ -88,7 +91,7 @@ const AppointmentsWidget = () => {
             className="dashBordWCon"
             renderItem={(item) => (
               <List.Item
-              classNames="abcd2"
+                classNames="abcd2"
                 style={{
                   borderRadius: '10px',
                   marginBottom: 8,
@@ -119,7 +122,7 @@ const AppointmentsWidget = () => {
             )}
           />
         )}
-        <TextLink
+        <div
           style={{
             display: 'block',
             textAlign: 'center',
@@ -127,7 +130,7 @@ const AppointmentsWidget = () => {
           }}
         >
           <Link to="/patient-visit">View All Visits</Link>
-        </TextLink>
+        </div>
       </Card>
     </div>
   );

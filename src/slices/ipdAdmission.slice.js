@@ -62,9 +62,9 @@ export const addIpdCharge = createAsyncThunk(
 
 export const dischargeIpdPatient = createAsyncThunk(
   "ipd/dischargeIpdPatient",
-  async ({ id, dischargeDate, bed, patient }, { rejectWithValue }) => {
+  async ({ id, dischargeDate, bedId, patientId }, { rejectWithValue }) => {
     try {
-      const res = await ipdAdmissionService.dischargeIpdPatient(id, { dischargeDate, bedId: bed._id, patientId: patient._id });
+      const res = await ipdAdmissionService.dischargeIpdPatient(id, { dischargeDate, bedId, patientId });
       return res;
     } catch (err) {
       return rejectWithValue(

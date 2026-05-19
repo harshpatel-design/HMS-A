@@ -65,7 +65,7 @@ const updateIpdAdmission = (payload) => {
 
 const addIpdCharge = (ipdAdmissionId, payload) => {
   if (!isAdmin()) {
-    throw new Error('Admin Only Access ❌');
+    throw new Error('Admin Only Access');
   }
 
   return axiosClient
@@ -73,13 +73,13 @@ const addIpdCharge = (ipdAdmissionId, payload) => {
     .then((res) => res.data);
 };
 
-const dischargeIpdPatient = (ipdAdmissionId, { dischargeDate, bed, patient }) => {
+const dischargeIpdPatient = (ipdAdmissionId, { dischargeDate, bedId, patientId }) => {
   if (!isAdmin()) {
-    throw new Error('Admin Only Access ❌');
+    throw new Error('Admin Only Access ');
   }
 
   return axiosClient
-    .patch(`/api/ipd-admissions/${ipdAdmissionId}/discharge`, { dischargeDate, bedId: bed._id, patientId: patient._id })
+    .patch(`/api/ipd-admissions/${ipdAdmissionId}/discharge`, { dischargeDate, bedId, patientId })
     .then((res) => res.data);
 };
 

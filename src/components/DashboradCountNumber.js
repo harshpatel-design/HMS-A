@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Row, Col, Spin } from 'antd';
+import { Row, Col, Spin, Space, DatePicker } from 'antd';
 import doctoricon from '../images/Icon Container.png';
 import doctorpolygon from '../images/doctor polygon.png';
 import patienticon from '../images/patient icon.png';
@@ -14,7 +14,9 @@ import { getDashBoardCount } from '../slices/countSlice';
 
 function DashboardCountNumber() {
   const dispatch = useDispatch();
-
+  const { RangePicker } = DatePicker;
+  
+  
   const { counts, loading } = useSelector((state) => state.count);
 
   const patientCount = counts?.counts?.patientCount || 0;
@@ -25,7 +27,6 @@ function DashboardCountNumber() {
   const doctorChartData = counts?.counts?.charts?.doctors || [];
   const patientChartData = counts?.counts?.charts?.patients || [];
   const appointmentChartData = counts?.counts?.charts?.appointments || [];
-
 
   const revenueChartData = counts?.counts?.charts?.revenue || [];
 
@@ -46,7 +47,6 @@ function DashboardCountNumber() {
   const appointmentPercentage = getLast7DaysPercentage(appointmentChartData);
   const revenuePercentage = getLast7DaysPercentage(revenueChartData);
 
-
   useEffect(() => {
     dispatch(getDashBoardCount());
   }, [dispatch]);
@@ -54,6 +54,18 @@ function DashboardCountNumber() {
   return (
     <div className="dash-count">
       <Row gutter={[16, 16]}>
+        <Col span={24} className='dashboard-ant-picker'>
+          <div className="serachbar-bread">
+            <Space style={{ flexWrap: 'wrap' ,width: '100%'}}>
+              <RangePicker
+                format="DD/MM/YYYY"
+                onChange={(dates) => {
+                  dispatch(getDashBoardCount({ startDate: dates?.[0], endDate: dates?.[1] }));
+                }}
+              />
+            </Space>
+          </div>
+        </Col>
         <Col xs={12} sm={12} xl={6} style={{ borderRadius: '16px', overflow: 'hidden' }}>
           <div className="count-card">
             <div className="counter-effect" style={{ borderRadius: '16px' }}>

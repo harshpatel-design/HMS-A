@@ -99,6 +99,12 @@ h6 {
 
 }
 
+.table-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
 .table-scroll-container .ant-table-wrapper {
     min-width: 1500px;
@@ -2028,15 +2034,22 @@ section {
     font-weight: 600;
 }
 
+
+.doctor-card-header-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .doctor-specialization {
-    margin: 4px 0 0;
+    margin: 0 0;
     color: #8c8c8c;
 }
 
 .doctor-schedule-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+}
+.session-time {
+    font-size: 12px;
 }
 
 .schedule-card {
@@ -2173,6 +2186,35 @@ section {
   background: #ff7875 !important;
   border-color: #ff7875 !important;
 }
+
+.dashboard-ant-picker .ant-space-item {
+    width: 100%;
+    justify-content: end;
+}
+.dashboard-ant-picker .ant-picker {
+    min-width: 300px !important;
+    max-width: 400px !important;
+}
+
+.apexcharts-legend {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.apexcharts-legend-series {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    gap: 2px;
+    padding: 5px;
+}
+
+.apexcharts-legend-text {
+    font-weight: 500 !important;
+    font-size: 14px !important;
+}
 @media (max-width: 768px) {
 
     .view-diagnosis-page .panel-header {
@@ -2192,6 +2234,10 @@ section {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+.dashboard-ant-picker .ant-space-item {
+    justify-content: center !important;
 }
 
 }

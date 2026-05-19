@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DashboardCountNumber from '../../components/DashboradCountNumber';
 import AppointsmentDashbordList from '../../components/AppointsmentDashbordList';
 import { useNavigate } from 'react-router-dom';
-import { Card, Modal, Spin, Tag } from 'antd';
+import { Card, Col, Modal, Row, Spin, Tag } from 'antd';
 import { fetchDoctors } from '../../slices/doctorSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -65,47 +65,48 @@ function Dashboard() {
             {doctors ? (
               <>
                 <Card title="Doctors List" className="doctor-list-card">
-                  <div className="doctor-list-wrapper">
+                  <Row className="doctor-list-wrapper">
                     {doctors.map((doctor) => (
-                      <Card key={doctor.id} size="small" className="doctor-card-2">
-                        <div className="doctor-card-header">
-                          <div>
-                            <h3 className="doctor-name">{doctor.name}</h3>
+                      <Col key={doctor.id} span={24}>
+                        <Card size="small" className="doctor-card-2">
+                          <div className="doctor-card-header">
+                            <div className='doctor-card-header-details'>
+                              <h3 className="doctor-name">{doctor.name}</h3>
+                              <p className="doctor-specialization">{doctor.specialization}</p>
+                            </div>
 
-                            <p className="doctor-specialization">{doctor.specialization}</p>
+                            <Tag color="green">{doctor.status?.toUpperCase()}</Tag>
                           </div>
 
-                          <Tag color="green">{doctor.status?.toUpperCase()}</Tag>
-                        </div>
-
-                        <div className="doctor-schedule-wrapper">
-                          {doctor.schedule.map((schedule) => (
-                            <Card key={schedule._id} size="small" className="schedule-card">
-                              <div className="schedule-header">
-                                <h3>{schedule.day}</h3>
-                              </div>
-
-                              <div className="session-wrapper">
-                                {schedule.sessions.map((session) => (
-                                  <div key={session._id} className="session-card">
-                                    <p className="session-name">{session.sessionName}</p>
-
-                                    <div className="session-time">
-                                      <Tag color="purple">{session.from}</Tag>
-
-                                      <span>to</span>
-
-                                      <Tag color="cyan">{session.to}</Tag>
-                                    </div>
+                          <Row gutter={[16, 16]} className="doctor-schedule-wrapper">
+                            {doctor.schedule.map((schedule) => (
+                              <Col key={schedule._id} md={12} xs={24}>
+                                <Card size="small" className="schedule-card">
+                                  <div className="schedule-header">
+                                    <h3>{schedule.day}</h3>
                                   </div>
-                                ))}
-                              </div>
-                            </Card>
-                          ))}
-                        </div>
-                      </Card>
+
+                                  <div className="session-wrapper">
+                                    {schedule.sessions.map((session) => (
+                                      <div key={session._id} className="session-card">
+                                        <p className="session-name">{session.sessionName}</p>
+
+                                        <div className="session-time">
+                                          {session.from}
+                                          <span>to</span>
+                                          {session.to}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </Card>
+                              </Col>
+                            ))}
+                          </Row>
+                        </Card>
+                      </Col>
                     ))}
-                  </div>
+                  </Row>
                 </Card>
               </>
             ) : (
