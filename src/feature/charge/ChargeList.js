@@ -424,7 +424,7 @@ const ChargeList = () => {
 
       if (changed.finalAmount !== undefined || changed.paidAmount !== undefined) {
         handlePaymentStatus(values);
-        calculateBalanceAmount(values); // ← BALANCE ALSO UPDATED HERE
+        calculateBalanceAmount(values);
       }
     },
     [calculateFinalAmount, handlePaymentStatus, calculateBalanceAmount]
@@ -639,7 +639,7 @@ const ChargeList = () => {
                     <InputNumber
                       min={0}
                       style={{ width: '100%' }}
-                      disabled={getFieldValue('discountType') === 'none'} // ← ADD THIS
+                      disabled={getFieldValue('discountType') === 'none'}
                     />
                   </Form.Item>
                 )}

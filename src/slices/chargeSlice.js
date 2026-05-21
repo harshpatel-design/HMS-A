@@ -12,7 +12,6 @@ export const fetchCharges = createAsyncThunk(
       search,
       startDate,
       endDate,
-      
     } = {},
     { rejectWithValue }
   ) => {
@@ -139,18 +138,13 @@ const chargeSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔹 Create Charge
       .addCase(createCharge.fulfilled, (state, action) => {
         state.success = true;
         state.charges.unshift(action.payload.data || action.payload);
       })
-
       .addCase(createCharge.rejected, (state, action) => {
         state.error = action.payload;
       })
-
-      // 🔹 Update Charge
       .addCase(updateCharge.fulfilled, (state, action) => {
         state.success = true;
 

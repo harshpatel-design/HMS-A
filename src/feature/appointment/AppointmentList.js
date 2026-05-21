@@ -51,7 +51,6 @@ const AppointmentList = () => {
 
   useEffect(() => {
     loadData(1, ordering);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadData = (pageNum, orderingValue = ordering) => {

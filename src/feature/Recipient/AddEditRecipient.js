@@ -36,14 +36,11 @@ export default function AddEditRecipient() {
   const [oldImage, setOldImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  /* ================= IMAGE URL ================= */
   const buildImageUrl = (img) => {
     if (!img) return null;
     if (img.startsWith('http')) return img;
     return `${process.env.REACT_APP_API_URL}/uploads/users/${img}`;
   };
-
-  /* ================= LOAD DATA (EDIT) ================= */
   useEffect(() => {
     if (!isEdit) return;
 
@@ -81,7 +78,6 @@ export default function AddEditRecipient() {
       .finally(() => setLoading(false));
   }, [id, isEdit, dispatch, form]);
 
-  /* ================= IMAGE ================= */
   const handleImageChange = (info) => {
     const file = info.file;
     if (!file || !file.type.startsWith('image/')) {
@@ -92,8 +88,6 @@ export default function AddEditRecipient() {
     reader.onload = (e) => setPreview(e.target.result);
     reader.readAsDataURL(file);
   };
-
-  /* ================= SUBMIT ================= */
   const onFinish = async (values) => {
     try {
       setLoading(true);
@@ -133,8 +127,7 @@ export default function AddEditRecipient() {
 
       <Breadcrumbs
         title={isEdit ? 'Edit Recipient' : 'Add New Recipient'}
-        showBack = {true}
-      
+        showBack={true}
         items={[
           { label: 'Recipients', href: '/recipient-onboarding' },
           { label: isEdit ? 'Edit Recipient' : 'Add New Recipient' },
@@ -206,7 +199,6 @@ export default function AddEditRecipient() {
               </Row>
             </Panel>
 
-            {/* ================= JOB INFO ================= */}
             <Panel header="Job Information" key="job">
               <Row gutter={[16, 10]}>
                 <Col xs={24} sm={12} md={8}>
@@ -282,16 +274,17 @@ export default function AddEditRecipient() {
             </Panel>
           </Collapse>
 
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 , marginBottom:10}}>
+          <div
+            style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20, marginBottom: 10 }}
+          >
             <Button
-                htmlType="button"
-                disabled={loading}
-                 style={{marginRight:10 }}
-                onClick={() => navigate('/recipient-onboarding')}
-              >
-                Cancel
-              </Button>
+              htmlType="button"
+              disabled={loading}
+              style={{ marginRight: 10 }}
+              onClick={() => navigate('/recipient-onboarding')}
+            >
+              Cancel
+            </Button>
             <Button type="primary" htmlType="submit" className="btn">
               {isEdit ? 'Update Recipient' : 'Create Recipient'}
             </Button>

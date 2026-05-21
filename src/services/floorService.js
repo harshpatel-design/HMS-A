@@ -10,7 +10,6 @@ const axiosClient = axios.create({
   },
 });
 
-// 🔥 Attach token automatically
 axiosClient.interceptors.request.use((req) => {
   const token = localStorage.getItem("auth_token");
   if (token) {
@@ -22,11 +21,6 @@ axiosClient.interceptors.request.use((req) => {
 const getRole = () => JSON.parse(localStorage.getItem("user"))?.role;
 const isAdmin = () => getRole() === "admin";
 
-/* =========================
-   FLOORS API
-========================= */
-
-// 🔹 Get all floors
 const getFloors = ({
   page = 1,
   limit = 10,
@@ -46,14 +40,11 @@ const getFloors = ({
     });
 };
 
-// 🔹 Get floor by id
 const getFloorById = (id) => {
   return axiosClient
     .get(`api/floors/${id}`)
     .then((res) => res.data);
 };
-
-// 🔹 Create floor
 const createFloor = (payload) => {
   if (!isAdmin()) {
     throw new Error("Admin Only Access ❌");
@@ -68,7 +59,6 @@ const createFloor = (payload) => {
     .then((res) => res.data);
 };
 
-// 🔹 Update floor
 const updateFloor = (id, payload) => {
   if (!isAdmin()) {
     return Promise.reject({ message: "Admin Only Access ❌" });
@@ -83,7 +73,6 @@ const updateFloor = (id, payload) => {
     .then((res) => res.data);
 };
 
-// 🔹 Delete floor
 const deleteFloor = (id) => {
   if (!isAdmin()) {
     throw new Error("Admin Only Access ❌");

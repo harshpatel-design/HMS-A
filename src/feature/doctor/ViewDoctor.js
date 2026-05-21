@@ -157,13 +157,7 @@ function ViewDoctor() {
           </Col>
 
           <Col xs={24} xm={8}>
-            {/* <Row gutter={[10, 10]}>
-             {selectedDoctor.doctor.user.map((data) => {
-                 <Col span={24}>
-                  {data.name}
-                 </Col>
-             })}
-            </Row> */}
+            
           </Col>
         </Row>
       </div>

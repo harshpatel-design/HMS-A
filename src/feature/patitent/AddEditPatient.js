@@ -32,7 +32,7 @@ const { Option } = Select;
 
 export default function AddEditPatient() {
   const dispatch = useDispatch();
-  const { id } = useParams(); // 👈 URL se id
+  const { id } = useParams();
   const isEdit = Boolean(id);
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -622,7 +622,7 @@ export default function AddEditPatient() {
                         return Upload.LIST_IGNORE;
                       }
 
-                      return false; // stop auto upload
+                      return false; 
                     }}
                   >
                     <Button type="dashed" block>

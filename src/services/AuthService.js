@@ -18,7 +18,6 @@ axiosClient.interceptors.request.use(
 
     const token = localStorage.getItem('auth_token');
 
-    // No token
     if (!token) {
       localStorage.removeItem('user');
 

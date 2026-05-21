@@ -121,8 +121,6 @@ const paymentSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔹 GET PAYMENT HISTORY
       .addCase(getPatientPaymentHistory.pending, (state) => {
         state.loading = true;
         state.error = null;

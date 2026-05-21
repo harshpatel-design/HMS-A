@@ -348,7 +348,6 @@ const LabTest = () => {
           <Table
             rowKey="_id"
             columns={filteredColumns}
-            // className="my-custom-table"
             dataSource={labTests}
             scroll={{ x: 1000 }}
             loading={loading}

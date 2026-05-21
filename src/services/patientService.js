@@ -117,7 +117,6 @@ const updatePatient = async (id, payload) => {
   Object.entries(payload).forEach(([key, value]) => {
     if (key === 'documents') return;
 
-    // 🟢 IMPORTANT FIX (your logic preserved)
     if (key === 'opd' && value && !value.doctor) delete value.doctor;
     if (key === 'ipd' && value && !value.doctor) delete value.doctor;
 

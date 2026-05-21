@@ -4,15 +4,7 @@ import bedService from '../services/bad.service';
 export const fetchBeds = createAsyncThunk(
   'bed/fetchBeds',
   async (
-    {
-      page = 1,
-      limit = 10,
-      orderBy = 'createdAt',
-      order = 'DESC',
-      search,
-      wardId,
-      roomId,
-    },
+    { page = 1, limit = 10, orderBy = 'createdAt', order = 'DESC', search, wardId, roomId },
     { rejectWithValue }
   ) => {
     try {
@@ -131,7 +123,6 @@ const bedSlice = createSlice({
         state.error = action.payload;
       })
 
-      /* ===== FETCH BED BY ID ===== */
       .addCase(fetchBedById.pending, (state) => {
         state.loading = true;
       })
@@ -145,7 +136,6 @@ const bedSlice = createSlice({
         state.error = action.payload;
       })
 
-      /* ===== CREATE BED ===== */
       .addCase(createBed.fulfilled, (state, action) => {
         state.success = true;
         state.beds.unshift(action.payload.data || action.payload);
@@ -154,7 +144,6 @@ const bedSlice = createSlice({
         state.error = action.payload;
       })
 
-      /* ===== UPDATE BED ===== */
       .addCase(updateBed.fulfilled, (state, action) => {
         state.success = true;
         const updatedBed = action.payload.data || action.payload;

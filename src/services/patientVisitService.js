@@ -37,7 +37,6 @@ const getCurrentUser = () => {
 };
 
 const getRole = () => getCurrentUser()?.role;
-// const isAdmin = () => getRole()?.toLowerCase() === 'admin';
 const isDoctorOrAdmin = () => ['admin', 'doctor'].includes(getRole()?.toLowerCase());
 
 const getAllPatientVisitService = async ({
@@ -63,7 +62,6 @@ const getAllPatientVisitService = async ({
       caseType,
       caseStatus,
 
-      // ✅ date range
       ...(startDate && { startDate }),
       ...(endDate && { endDate }),
     },

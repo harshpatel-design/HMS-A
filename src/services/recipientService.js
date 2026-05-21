@@ -7,20 +7,15 @@ const axiosClient = axios.create({
     baseURL: API_URL,
 });
 
-// 🔥 Attach token for all requests
 axiosClient.interceptors.request.use((req) => {
     const token = localStorage.getItem("auth_token");
     if (token) req.headers.Authorization = `Bearer ${token}`;
     return req;
 });
 
-// USER ROLE CHECK
 const getRole = () => JSON.parse(localStorage.getItem("user"))?.role;
 const isAdmin = () => getRole() === "admin";
 
-/* =======================================================
-📌 1. GET RECIPIENTS LIST (Pagination, Search)
-======================================================= */
 const getRecipients = ({ page = 1, limit = 10, orderBy = "createdAt", order = "DESC", search = "" }) => {
     return axiosClient
         .get("api/recipients/recipients", {
@@ -30,9 +25,6 @@ const getRecipients = ({ page = 1, limit = 10, orderBy = "createdAt", order = "D
         .catch(err => err.response?.data || { message: "Failed to fetch recipients" });
 };
 
-/* =======================================================
-📌 2. GET RECIPIENT BY ID
-======================================================= */
 const getRecipientById = (id) => {
     return axiosClient
         .get(`api/recipients/recipients/${id}`)
@@ -40,9 +32,6 @@ const getRecipientById = (id) => {
         .catch(err => err.response?.data || { message: "Recipient not found" });
 };
 
-/* =======================================================
-📌 3. CREATE RECIPIENT (ADMIN ONLY)
-======================================================= */
 const createRecipient = (payload) => {
     if (!isAdmin()) return Promise.reject({ message: "Admin Only Access ❌" });
 
@@ -52,9 +41,6 @@ const createRecipient = (payload) => {
         .catch(err => err.response?.data || { message: "Create Failed" });
 };
 
-/* =======================================================
-📌 4. UPDATE RECIPIENT (ADMIN ONLY)
-======================================================= */
 const updateRecipient = (id, payload) => {
     if (!isAdmin()) return Promise.reject({ message: "Admin Only Access ❌" });
 
@@ -64,9 +50,6 @@ const updateRecipient = (id, payload) => {
         .catch(err => err.response?.data || { message: "Update Failed" });
 };
 
-/* =======================================================
-📌 5. DELETE RECIPIENT (ADMIN ONLY)
-======================================================= */
 const deleteRecipient = (id) => {
     if (!isAdmin()) return Promise.reject({ message: "Admin Only Access ❌" });
 
@@ -76,7 +59,6 @@ const deleteRecipient = (id) => {
         .catch(err => err.response?.data || { message: "Delete Failed" });
 };
 
-/* EXPORT LIKE doctorService */
 const recipientService = {
     getRecipients,
     getRecipientById,

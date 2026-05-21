@@ -1,6 +1,5 @@
 import { message as antdMessage, notification as antdNotification } from "antd";
 
-// Enable messages by default. Set REACT_APP_ENABLE_MESSAGES=false to disable.
 const ENABLE_MESSAGES = process.env.REACT_APP_ENABLE_MESSAGES !== "false";
 
 const notify = {
@@ -27,7 +26,6 @@ const notify = {
     destroy: () => antdMessage.destroy(),
 };
 
-// Notification wrapper
 notify.notification = {
     success: (options) => {
         if (!ENABLE_MESSAGES) return null;

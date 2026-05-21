@@ -29,9 +29,6 @@ const ServiceList = () => {
 
   const { services, total, page, limit, loading } = useSelector((state) => state.service);
 
-  /* ==========================================
-            Column Show / Hide States FIXED
-    ========================================== */
   const defaultChecked = ['serviceName', 'department', 'price', 'description', 'createdAt'];
 
   const [selectedColumns, setSelectedColumns] = useState(defaultChecked);
@@ -95,9 +92,6 @@ const ServiceList = () => {
     loadData(1, ordering);
   };
 
-  /* ============================
-        ALL TABLE COLUMNS
-    ============================ */
   const allColumns = [
     {
       key: 'serviceName',
@@ -150,15 +144,10 @@ const ServiceList = () => {
       ),
     },
   ];
-
-  /* SHOW ONLY SELECTED COLUMNS */
   const filteredColumns = allColumns.filter(
     (col) => selectedColumns.includes(col.key) || col.key === 'actions'
   );
 
-  /* ============================
-        COLUMN FILTER MENU
-    ============================ */
   const columnMenu = (
     <div className="column-filter-menu">
       <div className="column-filter-grid">

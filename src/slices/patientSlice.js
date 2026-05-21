@@ -180,8 +180,6 @@ const patientSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      /* ================= UPDATE ================= */
       .addCase(updatePatient.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -204,7 +202,6 @@ const patientSlice = createSlice({
         state.error = action.payload;
       })
 
-      /* ================= DELETE ================= */
       .addCase(deletePatient.pending, (state) => {
         state.loading = true;
         state.error = null;
