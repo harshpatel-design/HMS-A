@@ -59,7 +59,17 @@ const ViewDiagnosis = lazy(() => import('./feature/daignosis/ViewDiagnosis'));
 
 const Loader = () => {
   return (
-    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', zIndex: 9999 }}>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        zIndex: 9999,
+      }}
+    >
       <Spin size="large" />
     </div>
   );
@@ -154,7 +164,7 @@ export function AppRoutes() {
 
             <Route path="/add-edit-diagnosis" element={<AddEditDiagnosis />} />
 
-            <Route path="/add-edit-diagnosis/:id" element={<AddEditDiagnosis />} />
+            <Route path="/add-edit-diagnosis/:diagnosisId/:patientId/:doctorId" element={<AddDiagnosis />} />
           </Route>
         </Route>
 
@@ -167,7 +177,6 @@ export function AppRoutes() {
 
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Route>
-
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Suspense>

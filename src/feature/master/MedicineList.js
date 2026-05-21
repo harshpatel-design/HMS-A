@@ -156,7 +156,7 @@ const MedicineList = () => {
       dataIndex: 'isActive',
       key: 'isActive',
       width: 120,
-      render: (v) => (v ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>),
+      render: (v) => (v ? <Tag color="green" className="w-100">Active</Tag> : <Tag color="red">Inactive</Tag>),
     },
     {
       title: 'Notes',
@@ -179,7 +179,7 @@ const MedicineList = () => {
       key: 'actions',
       width: 100,
       render: (record) => (
-        <Space>
+        <Space className='action'>
           <Button
             type="text"
             icon={<EditOutlined />}

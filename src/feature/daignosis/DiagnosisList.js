@@ -65,6 +65,7 @@ const DiagnosisList = () => {
     {
       title: 'Patient',
       key: 'patient',
+      width: 140,
       render: (_, r) => (
         <Tooltip title={`${r.patient?.firstName} ${r.patient?.lastName}`}>
           <span>
@@ -76,6 +77,7 @@ const DiagnosisList = () => {
     {
       title: 'Doctor',
       key: 'doctor',
+      width: 140,
       render: (_, r) => (
         <Tooltip title={`${r.doctor?.user?.name}`}>
           <span>{r.doctor?.user?.name} </span>
@@ -85,57 +87,107 @@ const DiagnosisList = () => {
     {
       title: 'Diagnosis',
       key: 'diagnosis',
+      ellipsis: true,
+      width: 140,
       dataIndex: 'diagnosis',
-      render: (v) => v || '-',
+      render: (v) => {
+        return (
+          <Tooltip title={v}>
+            <div className="text-truncate">{v}</div>
+          </Tooltip>
+        );
+      },
     },
     {
       title: 'Clinical Notes',
       key: 'clinicalNotes',
+      ellipsis: true,
+      width: 140,
       dataIndex: 'clinicalNotes',
-      render: (v) => v || '-',
+      render: (v) => {
+        return (
+          <Tooltip title={v}>
+            <div>
+              <p>{v ? v : '-'}</p>
+            </div>
+          </Tooltip>
+        );
+      },
     },
     {
       title: 'Advice',
       key: 'advice',
       dataIndex: 'advice',
-      render: (v) => v || '-',
+      width: 140,
+      render: (v) => {
+        return (
+          <Tooltip title={v}>
+            <div>
+              <p>{v ? v : '-'}</p>
+            </div>
+          </Tooltip>
+        );
+      },
     },
     {
       title: 'Case Type',
       key: 'caseType',
       dataIndex: 'caseType',
-      render: (v) => <Tag color="blue">{v?.toUpperCase()}</Tag>,
+      width: 120,
+      align: 'center',
+      render: (v) => (
+        <Tag color="blue" className="w-100">
+          {v?.toUpperCase()}
+        </Tag>
+      ),
     },
     {
       title: 'Status',
       key: 'status',
       dataIndex: 'status',
+      width: 120,
+      align: 'center',
       render: (v) =>
-        v === 'completed' ? <Tag color="green">COMPLETED</Tag> : <Tag color="orange">DRAFT</Tag>,
+        v === 'completed' ? (
+          <Tag color="green" className="w-100">
+            COMPLETED
+          </Tag>
+        ) : (
+          <Tag color="orange" className="w-100">
+            DRAFT
+          </Tag>
+        ),
     },
     {
       title: 'Visit Date',
       key: 'visitDate',
       dataIndex: 'visitDate',
+      width: 120,
+      align: 'center',
       render: (v) => (v ? dayjs(v).format('DD MMM YYYY') : '-'),
     },
     {
       title: 'Created On',
       key: 'createdAt',
       dataIndex: 'createdAt',
+      width: 120,
+      align: 'center',
       render: (v) => dayjs(v).format('DD MMM YYYY'),
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 100,
+      align: 'center',
+      width: 70,
       render: (_, r) => (
         <Space>
-          <Button type="link" icon={<EyeOutlined />} onClick={() => handleAll(r)} />
+          {console.log('r', r)}
+          <Button type="link" style={{ color: '#000' }} icon={<EyeOutlined />} onClick={() => handleAll(r)} />
           <Button
             type="link"
+            style={{ color: '#1890ff' }}
             icon={<EditOutlined />}
-            onClick={() => navigate(`/add-edit-diagnosis/${r._id}`)}
+            onClick={() => navigate(`/add-edit-diagnosis/${r._id}/${r.patient._id}/${r.doctor._id}`)}
           />
         </Space>
       ),

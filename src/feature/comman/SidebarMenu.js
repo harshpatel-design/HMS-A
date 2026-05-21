@@ -60,6 +60,7 @@ export default function SidebarMenu({ collapsed, onMenuClick }) {
             { key: '/lab-test', label: 'Lab Test' },
             { key: '/department-master', label: 'Department' },
             { key: '/charge-master', label: 'Charge Master' },
+            { key: '/medicine', label: 'Medicine Master' },
           ],
         },
         {

@@ -93,6 +93,7 @@ const PatientOnboardingList = () => {
     {
       title: 'Full Name',
       key: 'name',
+      maxWidth: 200,
       render: (r) => (
         <Tooltip title={`${r.firstName} ${r.lastName}`}>
           <span>
@@ -104,7 +105,7 @@ const PatientOnboardingList = () => {
     {
       title: 'Phone',
       key: 'phone',
-      width: 160,
+      width: 120,
       dataIndex: 'phone',
     },
     {
@@ -129,7 +130,7 @@ const PatientOnboardingList = () => {
     {
       title: 'Address',
       key: 'address',
-      width: 240,
+      width: 140,
       render: (r) => `${r.address?.line1 || ''} ${r.address?.city || ''}`,
     },
     {

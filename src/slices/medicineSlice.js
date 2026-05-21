@@ -4,11 +4,11 @@ import medicineService from '../services/medicineService';
 export const fetchMedicines = createAsyncThunk(
   'medicine/fetchMedicines',
   async (
-    { page = 1, limit = 10, search = '', sortBy = 'createdAt', order = 'DESC' , form = '' },
+    { page = 1, limit = 10, search = '', sortBy = 'createdAt', order = 'DESC', form = '' },
     { rejectWithValue }
   ) => {
     try {
-      const res = await medicineService.getMedicines({ page, limit, search, sortBy, order , form });
+      const res = await medicineService.getMedicines({ page, limit, search, sortBy, order, form });
       return res;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -110,7 +110,16 @@ const medicineSlice = createSlice({
       })
       .addCase(fetchMedicines.fulfilled, (state, action) => {
         state.loading = false;
-        state.medicines = action.payload.data;
+        const currentPage = action.meta.arg.page;
+        if (currentPage === 1) {
+          state.medicines = action.payload.data;
+        } else {
+          const newMedicines = action.payload.data.filter(
+            (newItem) => !state.medicines.some((existing) => existing._id === newItem._id)
+          );
+          state.medicines = [...state.medicines, ...newMedicines];
+        }
+
         state.total = action.payload.total;
         state.totalPages = action.payload.totalPages;
         state.page = action.payload.page;

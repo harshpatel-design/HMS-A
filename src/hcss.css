@@ -52,6 +52,13 @@ h6 {
     min-height: 40px !important;
 }
 
+.ant-radio-wrapper .ant-radio-inner {
+    background: var(--bg-light);
+}
+.ant-radio-wrapper .ant-radio-checked .ant-radio-inner  {
+    background: var(--primary-dark);
+    border: none;
+}
 .ant-card {
     margin-bottom: 10px !important;
 }
@@ -68,8 +75,6 @@ h6 {
 .ant-table-wrapper .ant-table {
     border-radius: 8px;
 }
-
-
 
 .table-pagination {
     margin-top: 12px;
@@ -96,6 +101,7 @@ h6 {
     width: 100%;
     -webkit-overflow-scrolling: touch;
     box-sizing: border-box;
+    padding: 0px 0px 10px;
 
 }
 
@@ -111,7 +117,7 @@ h6 {
 }
 
 .table-scroll-container::-webkit-scrollbar {
-    height: 8px !important;
+    height: 6px !important;
 }
 
 .table-scroll-container::-webkit-scrollbar-track {
@@ -1740,6 +1746,25 @@ section {
     top: -13px;
     left: 49%;
 }
+
+.medication-table-container {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.medication-table {
+    flex: 1;
+}
+
+.addTabletBtn {
+    border-radius: 50%;
+    height: 35px !important;
+    width: 35px !important;
+    padding: 10px !important;
+    margin-top: 10px;
+}
+
 
 @keyframes floatRotate {
     0% {
